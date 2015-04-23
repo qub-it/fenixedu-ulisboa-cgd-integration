@@ -32,8 +32,6 @@ class configuration.CgdIntegrationConfiguration {
 }
 
 relation CgdIntegrationConfigurationRootDomainObject {
-	configuration.CgdIntegrationConfiguration playsRole cgdIntegrationConfigurations {
-		multiplicity *;
-	}
+	configuration.CgdIntegrationConfiguration playsRole cgdIntegrationConfiguration;
 	.org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
 }

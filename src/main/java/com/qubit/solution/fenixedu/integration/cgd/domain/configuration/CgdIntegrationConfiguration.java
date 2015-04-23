@@ -26,8 +26,7 @@
  */
 package com.qubit.solution.fenixedu.integration.cgd.domain.configuration;
 
-import java.util.Set;
-
+import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 
 import pt.ist.fenixframework.Atomic;
@@ -38,27 +37,27 @@ public class CgdIntegrationConfiguration extends CgdIntegrationConfiguration_Bas
 
     protected CgdIntegrationConfiguration() {
         super();
-        if (!Bennu.getInstance().getCgdIntegrationConfigurationsSet().isEmpty()) {
+        if (Bennu.getInstance().getCgdIntegrationConfiguration() != null) {
             throw new IllegalStateException("can only exist one cgdIntegrationConfiguration");
         }
         setRootDomainObject(Bennu.getInstance());
     }
 
     public static CgdIntegrationConfiguration getInstance() {
-        Set<CgdIntegrationConfiguration> cgdIntegrationConfigurationsSet =
-                Bennu.getInstance().getCgdIntegrationConfigurationsSet();
-        CgdIntegrationConfiguration configuration = null;
-        if (cgdIntegrationConfigurationsSet.isEmpty()) {
+        CgdIntegrationConfiguration configuration = Bennu.getInstance().getCgdIntegrationConfiguration();
+        if (configuration == null) {
             configuration = createConfiguration();
-        } else {
-            configuration = cgdIntegrationConfigurationsSet.iterator().next();
         }
         return configuration;
     }
 
     public <T extends IMemberIDAdapter> T getMemberIDStrategy() {
+        String memberIDResolverClass = getMemberIDResolverClass();
+        if (StringUtils.isEmpty(memberIDResolverClass)) {
+            throw new IllegalStateException("No memberIDResolverClass defined. Please define it in the application");
+        }
         try {
-            Class<?> forName = Class.forName(getMemberIDResolverClass());
+            Class<?> forName = Class.forName(memberIDResolverClass);
             return (T) forName.newInstance();
         } catch (Throwable t) {
             t.printStackTrace();

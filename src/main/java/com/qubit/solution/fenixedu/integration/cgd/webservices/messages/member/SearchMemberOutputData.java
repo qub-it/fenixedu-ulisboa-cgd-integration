@@ -203,7 +203,7 @@ public class SearchMemberOutputData implements Serializable {
 
         searchMemberOutputData.setStudentNumber(String.valueOf(student.getNumber()));
         searchMemberOutputData.setDegreeCode(registration.getDegree().getMinistryCode());
-        searchMemberOutputData.setDegreeCode(registration.getDegreeName());
+        searchMemberOutputData.setDegreeName(registration.getDegreeName());
         searchMemberOutputData.setCurricularYear(registration.getCurricularYear());
 
         return searchMemberOutputData;

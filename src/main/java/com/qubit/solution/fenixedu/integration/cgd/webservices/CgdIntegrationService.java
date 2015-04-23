@@ -47,7 +47,7 @@ public class CgdIntegrationService extends BennuWebService {
         SearchMemberOutput outputMessage = new SearchMemberOutput();
         Person identifiedPerson = message.getIdentifiedPerson();
         if (identifiedPerson != null) {
-            outputMessage.populate(identifiedPerson);
+            outputMessage.populate(identifiedPerson, message.getPopulationCode(), message.getMemberCode());
         }
         return outputMessage;
     }
@@ -67,6 +67,7 @@ public class CgdIntegrationService extends BennuWebService {
         UpdateMifareOutputMessage outputMessage = new UpdateMifareOutputMessage();
         Person person = message.getIdentifiedPerson();
         if (person != null) {
+            // TODO Implement how to change the mifare code
         }
         return outputMessage;
     }

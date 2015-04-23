@@ -28,12 +28,29 @@ package com.qubit.solution.fenixedu.integration.cgd.webservices.messages.member;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.academic.domain.student.Student;
 
+import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
+import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
+
 public class SearchMemberInput implements Serializable {
+
+    private static int IDCARD_TYPE = 101;
+    private static int TAXNUMBER_TYPE = 501;
+
+    // Single character to identify type of member
+    // A - student
+    // F - employee
+    // D - teacher
+    private String populationCode;
+
+    // Member identitification will be sent if the
+    // user is already known
+    private String memberID;
 
     // Identifies which kind of document will be sent
     // in documentID
@@ -45,9 +62,11 @@ public class SearchMemberInput implements Serializable {
     // DocumentID 
     private String documentID;
 
-    // Employee code/Student code when there is no
-    // identification provided 
-    private int code;
+    // The institution code for the member 
+    // student code if populationCode = A
+    // employee code if populationCode = F
+    // teacher code if populationCode = D
+    private String memberCode;
 
     public int getDocumentType() {
         return documentType;
@@ -65,34 +84,53 @@ public class SearchMemberInput implements Serializable {
         this.documentID = documentID;
     }
 
-    public int getCode() {
-        return code;
+    public String getPopulationCode() {
+        return populationCode;
     }
 
-    public void setCode(int code) {
-        this.code = code;
+    public void setPopulationCode(String populationCode) {
+        this.populationCode = populationCode;
+    }
+
+    public String getMemberID() {
+        return memberID;
+    }
+
+    public void setMemberID(String memberID) {
+        this.memberID = memberID;
+    }
+
+    public String getMemberCode() {
+        return memberCode;
+    }
+
+    public void setMemberCode(String memberCode) {
+        this.memberCode = memberCode;
     }
 
     public Person getIdentifiedPerson() {
         Person requestedPerson = null;
-        if (documentType == 101) {
-            requestedPerson = Person.readByDocumentIdNumberAndIdDocumentType(documentID, IDDocumentType.CITIZEN_CARD);
-            if (requestedPerson == null) {
-                requestedPerson = Person.readByDocumentIdNumberAndIdDocumentType(documentID, IDDocumentType.IDENTITY_CARD);
-            }
-        } else if (documentType == 501) {
-            Party party = requestedPerson.readByContributorNumber(documentID);
-            requestedPerson = (party instanceof Person) ? (Person) party : null;
-        }
 
-        if (requestedPerson == null) {
-            // We'll fall back to the student code search.
-            // ONLY SUPPORTING student code for now
-            Student student = Student.readStudentByNumber(code);
-            requestedPerson = student != null ? student.getPerson() : null;
+        // If CGD already knows the member will send the memberID. This is the unique
+        // identification of the member inside the institution so we'll short-circuit 
+        // the lookup using the memberID
+        // 23 April 2015 - Paulo Abrantes
+        if (!StringUtils.isEmpty(this.memberID)) {
+            requestedPerson = CgdIntegrationConfiguration.getInstance().getMemberIDStrategy().readPerson(this.memberID);
+        } else {
+            // No memberID was sent, this means the member is not known yet. Let's look using the documentID, which can
+            // either be the identification card or the tax number.
+            if (documentType == IDCARD_TYPE) {
+                requestedPerson = Person.readByDocumentIdNumberAndIdDocumentType(documentID, IDDocumentType.CITIZEN_CARD);
+                if (requestedPerson == null) {
+                    requestedPerson = Person.readByDocumentIdNumberAndIdDocumentType(documentID, IDDocumentType.IDENTITY_CARD);
+                }
+            } else if (documentType == TAXNUMBER_TYPE) {
+                Party party = requestedPerson.readByContributorNumber(documentID);
+                requestedPerson = (party instanceof Person) ? (Person) party : null;
+            }
         }
 
         return requestedPerson;
     }
-
 }
