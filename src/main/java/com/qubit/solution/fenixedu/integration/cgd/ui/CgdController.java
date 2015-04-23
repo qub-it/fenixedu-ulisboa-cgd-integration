@@ -24,45 +24,24 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu fenixedu-ulisboa-cgdIntegration.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.qubit.solution.fenixedu.integration.cgd.webservices.messages.mifare;
+package com.qubit.solution.fenixedu.integration.cgd.ui;
 
-import java.io.Serializable;
+import org.fenixedu.bennu.spring.portal.SpringApplication;
+import org.fenixedu.bennu.spring.portal.SpringFunctionality;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-import org.fenixedu.academic.domain.Person;
+import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
 
-import pt.ist.fenixframework.Atomic;
+@RequestMapping("/cgd")
+@SpringApplication(group = "logged", path = "cgd", title = "title.cgd")
+@SpringFunctionality(app = CgdController.class, title = "title.cgd")
+public class CgdController {
 
-import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
-
-public class UpdateMifareOutputMessage implements Serializable {
-
-    private int replyCode;
-
-    public UpdateMifareOutputMessage() {
-        super();
-        setReplyCode(CgdMessageUtils.REPLY_CODE_UNEXISTING_MEMBER);
-    }
-
-    public int getReplyCode() {
-        return replyCode;
-    }
-
-    public void setReplyCode(int replyCode) {
-        this.replyCode = replyCode;
-    }
-
-    public void populate(Person person, String populationCode, String memberCode, String mifareCode) {
-        if (CgdMessageUtils.verifyMatch(person, populationCode, memberCode)) {
-            modifyMifare(person, mifareCode);
-        } else {
-            setReplyCode(CgdMessageUtils.REPLY_CODE_INFORMATION_NOT_OK);
-        }
-    }
-
-    @Atomic
-    private void modifyMifare(Person person, String mifareCode) {
-        // TODO change mifare for person
-        throw new UnsupportedOperationException("Not yet implemented");
+    @RequestMapping
+    public String home(Model model) {
+        CgdIntegrationConfiguration instance = CgdIntegrationConfiguration.getInstance();
+        return "forward:/cgd/cgdconfiguration/cgdintegrationconfiguration/read/" + instance.getExternalId();
     }
 
 }
