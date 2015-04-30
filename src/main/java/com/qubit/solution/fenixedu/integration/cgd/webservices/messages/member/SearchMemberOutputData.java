@@ -179,7 +179,10 @@ public class SearchMemberOutputData implements Serializable {
         SearchMemberOutputData searchMemberOutputData = new SearchMemberOutputData();
         searchMemberOutputData.setMemberID(strategy.retrieveMemberID(person));
         searchMemberOutputData.setName(person.getName());
-        searchMemberOutputData.setFiscalCode(Long.valueOf(person.getSocialSecurityNumber()));
+        String socialSecurityNumber = person.getSocialSecurityNumber();
+        if (socialSecurityNumber != null) {
+            searchMemberOutputData.setFiscalCode(Long.valueOf(socialSecurityNumber));
+        }
 
         Unit institutionUnit = Bennu.getInstance().getInstitutionUnit();
 
