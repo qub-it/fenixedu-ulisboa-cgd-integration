@@ -64,24 +64,26 @@ public class SearchMemberOutput implements Serializable {
                 //
                 // 23 April 2015 - Paulo Abrantes
                 SearchMemberOutputData createDefault = SearchMemberOutputData.createDefault(memberIDStrategy, person);
-                switch (populationCode.charAt(0)) {
-                case 'A':
-                    Student student = person.getStudent();
-                    if (student != null) {
-                        createDefault.setPopulationCode("A");
-                        createDefault.setStudentNumber(String.valueOf(student.getNumber()));
+                if (populationCode != null) {
+                    switch (populationCode.charAt(0)) {
+                    case 'A':
+                        Student student = person.getStudent();
+                        if (student != null) {
+                            createDefault.setPopulationCode("A");
+                            createDefault.setStudentNumber(String.valueOf(student.getNumber()));
+                        }
+                        break;
+                    case 'D':
+                        Teacher teacher = person.getTeacher();
+                        if (teacher != null) {
+                            createDefault.setPopulationCode("T");
+                            createDefault.setStudentNumber(teacher.getTeacherId());
+                        }
+                        break;
+                    case 'F':
+                        // Not yet implemented
+                        break;
                     }
-                    break;
-                case 'D':
-                    Teacher teacher = person.getTeacher();
-                    if (teacher != null) {
-                        createDefault.setPopulationCode("T");
-                        createDefault.setStudentNumber(teacher.getTeacherId());
-                    }
-                    break;
-                case 'F':
-                    // Not yet implemented
-                    break;
                 }
                 list.add(createDefault);
             }
