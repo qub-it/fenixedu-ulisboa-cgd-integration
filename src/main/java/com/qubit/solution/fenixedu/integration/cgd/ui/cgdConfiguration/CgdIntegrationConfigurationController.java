@@ -1,4 +1,3 @@
-
 /**
  * This file was created by Quorum Born IT <http://www.qub-it.com/> and its 
  * copyright terms are bind to the legal agreement regulating the FenixEdu@ULisboa 
@@ -24,9 +23,16 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu fenixedu-ulisboa-cgdIntegration.  If not, see <http://www.gnu.org/licenses/>.
- */package com.qubit.solution.fenixedu.integration.cgd.ui.cgdConfiguration;
+ */
+package com.qubit.solution.fenixedu.integration.cgd.ui.cgdConfiguration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -99,4 +105,18 @@ public class CgdIntegrationConfigurationController extends CgdBaseController {
         getCgdIntegrationConfiguration(m).setMemberIDResolverClass(memberIDResolverClass);
     }
 
+    @RequestMapping(value = "/update/{oid}/strategies", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
+    public @org.springframework.web.bind.annotation.ResponseBody List<String> requestAvailableStrategies(
+            @PathVariable("oid") CgdIntegrationConfiguration cgdIntegrationConfiguration, Model model) {
+
+        List<String> results = new ArrayList<String>();
+        ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
+        provider.addIncludeFilter(new AssignableTypeFilter(IMemberIDAdapter.class));
+        for (BeanDefinition definition : provider
+                .findCandidateComponents("/com/qubit/solution/fenixedu/integration/cgd/services/memberid")) {
+            results.add(definition.getBeanClassName());
+        }
+
+        return results;
+    }
 }

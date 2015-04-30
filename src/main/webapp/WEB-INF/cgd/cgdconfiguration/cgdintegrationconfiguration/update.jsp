@@ -95,7 +95,9 @@ ${portal.toolkit()}
 <div class="col-sm-2 control-label"><spring:message code="label.CgdIntegrationConfiguration.memberIDResolverClass"/></div> 
 
 <div class="col-sm-10">
-	<input id="cgdIntegrationConfiguration_memberIDResolverClass" class="form-control" type="text" name="memberidresolverclass"  value='<c:out value='${not empty param.memberidresolverclass ? param.memberidresolverclass : cgdIntegrationConfiguration.memberIDResolverClass }'/>' />
+	<select id="cgdIntegrationConfiguration_memberIDResolverClass" class="form-control" name="memberidresolverclass" >
+		<option></option>
+	</select>
 </div>	
 </div>		
   </div>
@@ -104,3 +106,26 @@ ${portal.toolkit()}
 	</div>
 </div>
 </form>
+
+<script>
+function requestImplementations() {
+		var selectedStrategy = "${not empty param.memberidresolverclass ? param.memberidresolverclass : cgdIntegrationConfiguration.memberIDResolverClass }";
+		$.getJSON("${pageContext.request.contextPath}/cgd/cgdconfiguration/cgdintegrationconfiguration/update/${cgdIntegrationConfiguration.externalId}/strategies" ,
+			function (data) {
+				 $("#cgdIntegrationConfiguration_memberIDResolverClass").empty();
+				 $.each(data, function( key, val ) {
+					 if (val == selectedStrategy) {
+					 	$("#cgdIntegrationConfiguration_memberIDResolverClass").append("<option value='" + val + "' selected>" + val + "</option>")
+					 }else {
+						 $("#cgdIntegrationConfiguration_memberIDResolverClass").append("<option value='" + val + "'>" + val + "</option>")
+					 }
+					 
+				});
+			}
+		);
+	}
+	
+$(document).ready(function() {
+	requestImplementations();
+});
+	</script>
