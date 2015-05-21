@@ -29,6 +29,8 @@ package com.qubit.solution.fenixedu.integration.cgd.webservices.messages.mifare;
 import java.io.Serializable;
 
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.ulisboa.specifications.domain.idcards.CgdCard;
+import org.joda.time.LocalDate;
 
 import pt.ist.fenixframework.Atomic;
 
@@ -51,18 +53,23 @@ public class UpdateMifareOutputMessage implements Serializable {
         this.replyCode = replyCode;
     }
 
-    public void populate(Person person, String populationCode, String memberCode, String mifareCode) {
+    public void populate(Person person, String populationCode, String memberCode, String mifareCode, LocalDate issueDate) {
         if (CgdMessageUtils.verifyMatch(person, populationCode, memberCode)) {
-            modifyMifare(person, mifareCode);
+            modifyMifare(person, mifareCode, issueDate);
+            setReplyCode(CgdMessageUtils.REPLY_CODE_OPERATION_OK);
         } else {
             setReplyCode(CgdMessageUtils.REPLY_CODE_INFORMATION_NOT_OK);
         }
     }
 
     @Atomic
-    private void modifyMifare(Person person, String mifareCode) {
-        // TODO change mifare for person
-        throw new UnsupportedOperationException("Not yet implemented");
+    private void modifyMifare(Person person, String mifareCode, LocalDate issueDate) {
+        CgdCard card = CgdCard.findByPerson(person);
+        if (card == null) {
+            card = new CgdCard(person, mifareCode);
+        }
+        card.setMifareCode(mifareCode);
+        card.setIssueDate(issueDate);
     }
 
 }

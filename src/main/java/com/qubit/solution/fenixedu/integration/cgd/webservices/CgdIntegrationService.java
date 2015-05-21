@@ -30,6 +30,8 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 import org.fenixedu.academic.domain.Person;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
 
 import com.qubit.solution.fenixedu.bennu.webservices.services.server.BennuWebService;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.member.SearchMemberInput;
@@ -67,7 +69,8 @@ public class CgdIntegrationService extends BennuWebService {
         UpdateMifareOutputMessage outputMessage = new UpdateMifareOutputMessage();
         Person person = message.getIdentifiedPerson();
         if (person != null) {
-            // TODO Implement how to change the mifare code
+            outputMessage.populate(person, message.getPopulationCode(), message.getMemberCode(), message.getChipData(),
+                    LocalDate.parse(message.getPersonalizationDate(), DateTimeFormat.forPattern("YYYY-mm-dd")));
         }
         return outputMessage;
     }
