@@ -56,6 +56,8 @@ public class SearchMemberOutputData implements Serializable {
     private String studentNumber;
     private String degreeCode;
     private String degreeName;
+    private String degreeType;
+    private int degreeDuration;
     private int curricularYear;
     // END: FOR STUDENTS ONLY
 
@@ -116,6 +118,22 @@ public class SearchMemberOutputData implements Serializable {
 
     public void setDegreeName(String degreeName) {
         this.degreeName = degreeName;
+    }
+
+    public String getDegreeType() {
+        return degreeType;
+    }
+
+    public void setDegreeType(String degreeType) {
+        this.degreeType = degreeType;
+    }
+
+    public int getDegreeDuration() {
+        return degreeDuration;
+    }
+
+    public void setDegreeDuration(int degreeDuration) {
+        this.degreeDuration = degreeDuration;
     }
 
     public int getCurricularYear() {
