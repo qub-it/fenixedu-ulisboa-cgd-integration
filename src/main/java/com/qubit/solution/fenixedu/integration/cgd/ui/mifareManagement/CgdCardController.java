@@ -1,5 +1,6 @@
 package com.qubit.solution.fenixedu.integration.cgd.ui.mifareManagement;
 
+import org.fenixedu.academic.domain.Person;
 import org.fenixedu.bennu.spring.portal.BennuSpringController;
 import org.fenixedu.ulisboa.specifications.domain.idcards.CgdCard;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -30,14 +31,14 @@ public class CgdCardController extends CgdBaseController {
         m.addAttribute("cgdCard", cgdCard);
     }
 
-    @RequestMapping(value = "/updatemifare/{oid}", method = RequestMethod.GET)
-    public String updatemifare(@PathVariable("oid") CgdCard cgdCard, Model model) {
+    @RequestMapping(value = "/update/{oid}", method = RequestMethod.GET)
+    public String update(@PathVariable("oid") CgdCard cgdCard, Model model) {
         setCgdCard(cgdCard, model);
-        return "cgd/mifaremanagement/cgdcard/updatemifare";
+        return "cgd/mifaremanagement/cgdcard/update";
     }
 
-    @RequestMapping(value = "/updatemifare/{oid}", method = RequestMethod.POST)
-    public String updatemifare(
+    @RequestMapping(value = "/update/{oid}", method = RequestMethod.POST)
+    public String update(
             @PathVariable("oid") CgdCard cgdCard,
             @RequestParam(value = "mifarecode", required = false) java.lang.String mifareCode,
             @RequestParam(value = "validuntil", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ") org.joda.time.LocalDate validUntil,
@@ -60,4 +61,35 @@ public class CgdCardController extends CgdBaseController {
         getCgdCard(m).setEmployeeCard(employeeCard);
     }
 
+    @RequestMapping(value = "/create/{oid}", method = RequestMethod.GET)
+    public String create(@PathVariable("oid") Person person, Model model) {
+        model.addAttribute("person", person);
+        return "cgd/mifaremanagement/cgdcard/create";
+    }
+
+    @RequestMapping(value = "/create/{oid}", method = RequestMethod.POST)
+    public String create(
+            @PathVariable("oid") Person person,
+            @RequestParam(value = "mifarecode", required = false) java.lang.String mifareCode,
+            @RequestParam(value = "validuntil", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ") org.joda.time.LocalDate validUntil,
+            @RequestParam(value = "studentcard", required = false) java.lang.Boolean studentCard, @RequestParam(
+                    value = "teachercard", required = false) java.lang.Boolean teacherCard, @RequestParam(value = "employeecard",
+                    required = false) java.lang.Boolean employeeCard, Model model) {
+
+        CgdCard cgdCard = createCgdCard(person, mifareCode, validUntil, studentCard, teacherCard, employeeCard);
+        model.addAttribute("cgdCard", cgdCard);
+
+        return "redirect:/cgd/mifaremanagement/person/readpersonmifare/" + person.getExternalId();
+    }
+
+    @Atomic
+    public CgdCard createCgdCard(Person person, java.lang.String mifareCode, org.joda.time.LocalDate validUntil,
+            java.lang.Boolean studentCard, java.lang.Boolean teacherCard, java.lang.Boolean employeeCard) {
+        CgdCard cgdCard = new CgdCard(person, mifareCode);
+        cgdCard.setValidUntil(validUntil);
+        cgdCard.setStudentCard(studentCard);
+        cgdCard.setTeacherCard(teacherCard);
+        cgdCard.setEmployeeCard(employeeCard);
+        return cgdCard;
+    }
 }

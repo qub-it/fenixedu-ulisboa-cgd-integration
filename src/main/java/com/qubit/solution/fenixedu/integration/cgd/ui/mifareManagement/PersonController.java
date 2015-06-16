@@ -8,13 +8,10 @@ import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
-import org.fenixedu.ulisboa.specifications.domain.idcards.CgdCard;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import pt.ist.fenixframework.Atomic;
 
 import com.qubit.solution.fenixedu.integration.cgd.ui.CgdBaseController;
 import com.qubit.solution.fenixedu.integration.cgd.ui.CgdController;
@@ -69,13 +66,6 @@ public class PersonController extends CgdBaseController {
     @RequestMapping(value = "/readpersonmifare/{oid}/createmifarecard")
     public String processReadpersonmifareToCreateMifareCard(@PathVariable("oid") Person person, Model model) {
         setPerson(person, model);
-        createCgdCard(person);
-        return "redirect:/cgd/mifaremanagement/person/readpersonmifare/" + getPerson(model).getExternalId();
+        return "redirect:/cgd/mifaremanagement/cgdcard/create/" + getPerson(model).getExternalId();
     }
-
-    @Atomic
-    private void createCgdCard(Person person) {
-        new CgdCard(person, "");
-    }
-
 }

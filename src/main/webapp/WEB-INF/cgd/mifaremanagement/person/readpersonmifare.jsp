@@ -141,7 +141,7 @@ ${portal.toolkit()}
 				"employeeCard" : "<c:out value='${card.employeeCard}'/>",
 				
 				"actions" :
-				" <a  class=\"btn btn-default btn-xs\" href=\"${pageContext.request.contextPath}/cgd/mifaremanagement/cgdcard/updatemifare/${card.externalId}\"><spring:message code='label.edit'/></a>" +
+				" <a  class=\"btn btn-default btn-xs\" href=\"${pageContext.request.contextPath}/cgd/mifaremanagement/cgdcard/update/${card.externalId}\"><spring:message code='label.edit'/></a>" +
                 "" },
             </c:forEach>
     ];
