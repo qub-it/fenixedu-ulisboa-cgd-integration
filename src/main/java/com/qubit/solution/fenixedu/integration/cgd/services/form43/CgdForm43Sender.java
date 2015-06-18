@@ -40,7 +40,7 @@ import org.fenixedu.academic.domain.person.Gender;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.academic.domain.student.PersonalIngressionData;
 import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.bennu.core.domain.Bennu;-
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.YearMonthDay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
