@@ -4,12 +4,18 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>org.fenixedu</groupId>
-		<artifactId>fenix-framework-project</artifactId>
-		<version>2.2.0</version>
-		<relativePath />
+		<groupId>com.qubit.solution.fenixedu</groupId>
+		<artifactId>bennu-webservices-project</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 
+	<!-- <parent> <groupId>com.qubit.solution.fenixedu</groupId> <artifactId>versioned-fenix-framework-project</artifactId> 
+		<version>1.0.0-SNAPSHOT</version> </parent> -->
+	<!-- <parent> -->
+	<!-- <groupId>org.fenixedu</groupId> -->
+	<!-- <artifactId>fenix-framework-project</artifactId> -->
+	<!-- <version>2.2.0</version> -->
+	<!-- </parent> -->
 	<groupId>com.qubit.solution.fenixedu</groupId>
 	<artifactId>fenixedu-ulisboa-cgdIntegration</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
@@ -22,7 +28,6 @@
 		<version.org.fenixedu.academic>5.0.0-SNAPSHOT</version.org.fenixedu.academic>
 		<version.org.fenixedu.bennu.spring>1.2.0</version.org.fenixedu.bennu.spring>
 	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.fenixedu</groupId>
@@ -32,6 +37,11 @@
 		<dependency>
 			<groupId>com.qubit.solution.fenixedu</groupId>
 			<artifactId>bennu-webservices-core</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.qubit.solution.fenixedu</groupId>
+			<artifactId>bennu-versioning-core</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
@@ -51,20 +61,26 @@
 		</dependency>
 	</dependencies>
 
+
 	<repositories>
+		<repository>
+			<id>ulisboa-repo</id>
+			<url>http://nexjen.ulisboa.pt/nexus/content/groups/public/</url>
+		</repository>
 		<repository>
 			<id>fenixedu-maven-repository</id>
 			<url>https://repo.fenixedu.org/fenixedu-maven-repository</url>
 		</repository>
 	</repositories>
+
 	<distributionManagement>
 		<repository>
 			<id>ulisboa-repo</id>
-			<url>http://ul-nexjen.ulisboa.pt:8081/nexus/content/repositories/releases/</url>
+			<url>http://nexjen.ulisboa.pt/nexus/content/repositories/releases/</url>
 		</repository>
 		<snapshotRepository>
 			<id>ulisboa-repo</id>
-			<url>http://ul-nexjen.ulisboa.pt:8081/nexus/content/repositories/snapshots/</url>
+			<url>http://nexjen.ulisboa.pt/nexus/content/repositories/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 
