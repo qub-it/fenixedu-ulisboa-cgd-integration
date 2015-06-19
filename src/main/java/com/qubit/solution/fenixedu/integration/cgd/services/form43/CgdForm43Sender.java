@@ -30,6 +30,7 @@ import java.util.List;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.ws.BindingProvider;
 
 import org.datacontract.schemas._2004._07.wingman_cgd_caixaiu_datacontract.School;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -58,15 +59,20 @@ import services.caixaiu.cgd.wingman.iesservice.ValidationResult;
 import services.caixaiu.cgd.wingman.iesservice.Worker;
 
 import com.microsoft.schemas._2003._10.serialization.arrays.ArrayOfstring;
+import com.qubit.solution.fenixedu.bennu.webservices.services.client.BennuWebServiceClient;
 import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
 
-public class CgdForm43Sender {
+public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
+
+    protected BindingProvider getService() {
+        return (BindingProvider) new IESService().getBasicHttpBindingIIESService();
+    }
 
     private static services.caixaiu.cgd.wingman.iesservice.ObjectFactory objectFactory = new ObjectFactory();
     private static Logger logger = LoggerFactory.getLogger(CgdForm43Sender.class);
 
-    public static boolean sendForm43For(Registration registration, boolean requestCard) {
-        IIESService service = new IESService().getBasicHttpBindingIIESService();
+    public boolean sendForm43For(Registration registration, boolean requestCard) {
+        IIESService service = (IIESService) getService();
         boolean success = false;
         try {
             org.fenixedu.academic.domain.Person person = registration.getStudent().getPerson();
