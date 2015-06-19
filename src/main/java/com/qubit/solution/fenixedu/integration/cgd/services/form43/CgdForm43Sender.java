@@ -64,6 +64,7 @@ import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdInteg
 
 public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
 
+    @Override
     protected BindingProvider getService() {
         return (BindingProvider) new IESService().getBasicHttpBindingIIESService();
     }
