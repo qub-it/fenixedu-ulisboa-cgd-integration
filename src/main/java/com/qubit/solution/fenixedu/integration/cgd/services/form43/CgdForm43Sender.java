@@ -32,6 +32,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.ws.BindingProvider;
 
+import org.apache.commons.lang.StringUtils;
 import org.datacontract.schemas._2004._07.wingman_cgd_caixaiu_datacontract.School;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.ProfessionalSituationConditionType;
@@ -110,18 +111,23 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         return success;
     }
 
-    private static Client createClient(org.fenixedu.academic.domain.Person person, IIESService service) {
-        Client client = new Client();
+    private static String getInstitutionCode() {
         String code = Bennu.getInstance().getInstitutionUnit().getCode();
 
         // TEST since code is still null
         if (code == null) {
             code = "801";
         }
-        String findIES = findIES(code, service);
+
+        return code;
+    }
+
+    private static Client createClient(org.fenixedu.academic.domain.Person person, IIESService service) {
+        Client client = new Client();
+        String findIES = findIES(getInstitutionCode(), service);
         client.setIES(findIES);
         client.setGroup(objectFactory.createClientGroup("1")); // Fernando Nunes indicou que é o protocolo e neste caso será sempre 1
-        client.setMemberCategoryCode("91"); // ALUNOS
+        client.setMemberCategoryCode("91"); // Resposta da Carla Récio a 19 do 6 indica que grande parte das escolas usam ALUNOS 
         String retrieveMemberID = CgdIntegrationConfiguration.getInstance().getMemberIDStrategy().retrieveMemberID(person);
         client.setMemberNumber(retrieveMemberID);
 
@@ -187,8 +193,8 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
                     personalIngressionDataByExecutionYear.getMaritalStatus();
             personData.setMaritalStatusCode(objectFactory.createPersonMaritalStatusCode(getCodeForMaritalStatus(maritalStatus)));
         }
-        personData.setFather(objectFactory.createPersonFather(person.getNameOfFather()));
-        personData.setMother(objectFactory.createPersonMother(person.getNameOfMother()));
+        personData.setFather(objectFactory.createPersonFather(getShortNameFor(person.getNameOfFather())));
+        personData.setMother(objectFactory.createPersonMother(getShortNameFor(person.getNameOfMother())));
 
         personData.setPlaceOfBirthCountryCode(objectFactory.createPersonPlaceOfBirthCountryCode(person.getCountryOfBirth()
                 .getCode()));
@@ -204,7 +210,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         PhysicalAddress defaultPhysicalAddress = person.getDefaultPhysicalAddress();
         personData.setAddress(objectFactory.createPersonAddress(defaultPhysicalAddress.getAddress()));
         personData.setPlace(objectFactory.createPersonPlace(defaultPhysicalAddress.getArea()));
-        personData.setPostalCode(objectFactory.createPersonPostalCode(defaultPhysicalAddress.getPostalCode()));
+        personData.setPostalCode(objectFactory.createPersonPostalCode(defaultPhysicalAddress.getAreaCode()));
         personData.setDistrict(objectFactory.createPersonDistrict(defaultPhysicalAddress.getDistrictOfResidence()));
         personData.setCounty(objectFactory.createPersonCounty(defaultPhysicalAddress.getDistrictSubdivisionOfResidence()));
         personData.setParish(objectFactory.createPersonParish(defaultPhysicalAddress.getParishOfResidence()));
@@ -238,6 +244,15 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         personData.setIdentificationCard(objectFactory.createIdentificationCard(card));
 
         return personData;
+    }
+
+    private static String getShortNameFor(String name) {
+        String result = name;
+        if (!StringUtils.isEmpty(name)) {
+            String[] split = name.split(" ");
+            result = split[0] + " " + split[split.length - 1];
+        }
+        return result;
     }
 
     private static String getCodeForDocumentType(IDDocumentType idDocumentType) {
@@ -302,7 +317,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
 
     private static Student createStudent(Registration registration) {
         Student student = new Student();
-        student.setSchoolCode(Bennu.getInstance().getInstitutionUnit().getCode());
+        student.setSchoolCode(getInstitutionCode());
         student.setCourse(registration.getDegreeName());
         student.setStudentNumber(registration.getStudent().getNumber());
         student.setAcademicYear(registration.getCurricularYear());
