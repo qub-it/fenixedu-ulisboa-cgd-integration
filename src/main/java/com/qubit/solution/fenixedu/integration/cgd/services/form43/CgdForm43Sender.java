@@ -74,7 +74,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
     private static Logger logger = LoggerFactory.getLogger(CgdForm43Sender.class);
 
     public boolean sendForm43For(Registration registration, boolean requestCard) {
-        IIESService service = (IIESService) getService();
+        IIESService service = (IIESService) getClient();
         boolean success = false;
         try {
             org.fenixedu.academic.domain.Person person = registration.getStudent().getPerson();
