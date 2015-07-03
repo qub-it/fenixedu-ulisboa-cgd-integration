@@ -81,58 +81,22 @@ ${portal.toolkit()}
 </div>
 </div>		
 <div class="form-group row">
-<div class="col-sm-2 control-label"><spring:message code="label.CgdCard.studentCard"/></div> 
+<div class="col-sm-2 control-label"><spring:message code="label.CgdCard.temporary"/></div> 
 
 <div class="col-sm-2">
-<select id="cgdCard_studentCard" name="studentcard" class="form-control">
-<option value=""></option> <%-- empty option remove it if you don't want to have it or give it a label CHANGE_ME --%>
+<select id="cgdCard_temporary" name="temporary" class="form-control">
 <option value="false"><spring:message code="label.no"/></option>
-<option value="true"><spring:message code="label.yes"/></option>				
+<option value="true" selected><spring:message code="label.yes"/></option>				
 </select>
 	<script>
-		$("#cgdCard_studentCard").val('<c:out value='${not empty param.studentcard ? param.studentcard : cgdCard.studentCard }'/>');
+		$("#cgdCard_temporary").val('<c:out value='${not empty param.temporary ? param.temporary : cgdCard.temporary }'/>');
 	</script>	
 </div>
 </div>		
-<div class="form-group row">
-<div class="col-sm-2 control-label"><spring:message code="label.CgdCard.teacherCard"/></div> 
 
-<div class="col-sm-2">
-<select id="cgdCard_teacherCard" name="teachercard" class="form-control">
-<option value=""></option> <%-- empty option remove it if you don't want to have it or give it a label CHANGE_ME --%>
-<option value="false"><spring:message code="label.no"/></option>
-<option value="true"><spring:message code="label.yes"/></option>				
-</select>
-	<script>
-		$("#cgdCard_teacherCard").val('<c:out value='${not empty param.teachercard ? param.teachercard : cgdCard.teacherCard }'/>');
-	</script>	
-</div>
-</div>		
-<div class="form-group row">
-<div class="col-sm-2 control-label"><spring:message code="label.CgdCard.employeeCard"/></div> 
-
-<div class="col-sm-2">
-<select id="cgdCard_employeeCard" name="employeecard" class="form-control">
-<option value=""></option> <%-- empty option remove it if you don't want to have it or give it a label CHANGE_ME --%>
-<option value="false"><spring:message code="label.no"/></option>
-<option value="true"><spring:message code="label.yes"/></option>				
-</select>
-	<script>
-		$("#cgdCard_employeeCard").val('<c:out value='${not empty param.employeecard ? param.employeecard : cgdCard.employeeCard }'/>');
-	</script>	
-</div>
-</div>		
   </div>
   <div class="panel-footer">
 		<input type="submit" class="btn btn-default" role="button" value="<spring:message code="label.submit" />"/>
 	</div>
 </div>
 </form>
-
-<script>
-$(document).ready(function() {
-
-	
-	
-	});
-</script>

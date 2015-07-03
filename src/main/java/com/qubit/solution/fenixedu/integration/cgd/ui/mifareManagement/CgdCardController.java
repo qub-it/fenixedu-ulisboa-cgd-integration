@@ -42,23 +42,18 @@ public class CgdCardController extends CgdBaseController {
             @PathVariable("oid") CgdCard cgdCard,
             @RequestParam(value = "mifarecode", required = false) java.lang.String mifareCode,
             @RequestParam(value = "validuntil", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ") org.joda.time.LocalDate validUntil,
-            @RequestParam(value = "studentcard", required = false) java.lang.Boolean studentCard, @RequestParam(
-                    value = "teachercard", required = false) java.lang.Boolean teacherCard, @RequestParam(value = "employeecard",
-                    required = false) java.lang.Boolean employeeCard, Model model) {
+            @RequestParam(value = "temporary", required = true) boolean temporary, Model model) {
 
         setCgdCard(cgdCard, model);
-        updateCgdCard(mifareCode, validUntil, studentCard, teacherCard, employeeCard, model);
+        updateCgdCard(mifareCode, validUntil, temporary, model);
         return "redirect:/cgd/mifaremanagement/person/readpersonmifare/" + getCgdCard(model).getPerson().getExternalId();
     }
 
     @Atomic
-    public void updateCgdCard(java.lang.String mifareCode, org.joda.time.LocalDate validUntil, java.lang.Boolean studentCard,
-            java.lang.Boolean teacherCard, java.lang.Boolean employeeCard, Model m) {
+    public void updateCgdCard(java.lang.String mifareCode, org.joda.time.LocalDate validUntil, boolean temporary, Model m) {
         getCgdCard(m).setMifareCode(mifareCode);
         getCgdCard(m).setValidUntil(validUntil);
-        getCgdCard(m).setStudentCard(studentCard);
-        getCgdCard(m).setTeacherCard(teacherCard);
-        getCgdCard(m).setEmployeeCard(employeeCard);
+        getCgdCard(m).setTemporary(temporary);
     }
 
     @RequestMapping(value = "/create/{oid}", method = RequestMethod.GET)
@@ -72,24 +67,18 @@ public class CgdCardController extends CgdBaseController {
             @PathVariable("oid") Person person,
             @RequestParam(value = "mifarecode", required = false) java.lang.String mifareCode,
             @RequestParam(value = "validuntil", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ") org.joda.time.LocalDate validUntil,
-            @RequestParam(value = "studentcard", required = false) java.lang.Boolean studentCard, @RequestParam(
-                    value = "teachercard", required = false) java.lang.Boolean teacherCard, @RequestParam(value = "employeecard",
-                    required = false) java.lang.Boolean employeeCard, Model model) {
+            @RequestParam(value = "temporary", required = true) boolean temporary, Model model) {
 
-        CgdCard cgdCard = createCgdCard(person, mifareCode, validUntil, studentCard, teacherCard, employeeCard);
+        CgdCard cgdCard = createCgdCard(person, mifareCode, validUntil, temporary);
         model.addAttribute("cgdCard", cgdCard);
 
         return "redirect:/cgd/mifaremanagement/person/readpersonmifare/" + person.getExternalId();
     }
 
     @Atomic
-    public CgdCard createCgdCard(Person person, java.lang.String mifareCode, org.joda.time.LocalDate validUntil,
-            java.lang.Boolean studentCard, java.lang.Boolean teacherCard, java.lang.Boolean employeeCard) {
-        CgdCard cgdCard = new CgdCard(person, mifareCode);
+    public CgdCard createCgdCard(Person person, java.lang.String mifareCode, org.joda.time.LocalDate validUntil, boolean temporary) {
+        CgdCard cgdCard = new CgdCard(person, mifareCode, temporary);
         cgdCard.setValidUntil(validUntil);
-        cgdCard.setStudentCard(studentCard);
-        cgdCard.setTeacherCard(teacherCard);
-        cgdCard.setEmployeeCard(employeeCard);
         return cgdCard;
     }
 }

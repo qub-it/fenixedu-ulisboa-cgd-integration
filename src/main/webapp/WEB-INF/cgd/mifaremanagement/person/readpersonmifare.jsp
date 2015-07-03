@@ -109,9 +109,7 @@ ${portal.toolkit()}
 					<th><spring:message code="label.CgdCard.mifareCode"/></th>
 					<th><spring:message code="label.CgdCard.issueDate"/></th>
 					<th><spring:message code="label.CgdCard.validUntil"/></th>
-					<th><spring:message code="label.CgdCard.studentCard"/></th>
-					<th><spring:message code="label.CgdCard.teacherCard"/></th>
-					<th><spring:message code="label.CgdCard.employeeCard"/></th>
+					<th><spring:message code="label.CgdCard.temporary"/></th>
 					<%-- Operations Column --%>
 					<th></th>
 				</tr>
@@ -136,9 +134,7 @@ ${portal.toolkit()}
 				"mifareCode" : "<c:out value='${card.mifareCode}'/>",
 				"issueDate" : "<c:out value='${card.issueDate}'/>",
 				"validUntil" : "<c:out value='${card.validUntil}'/>",
-				"studentCard" : "<c:out value='${card.studentCard}'/>",
-				"teacherCard" : "<c:out value='${card.teacherCard}'/>",
-				"employeeCard" : "<c:out value='${card.employeeCard}'/>",
+				"temporary" : "<spring:message code='label.${card.temporary}'/>",
 				
 				"actions" :
 				" <a  class=\"btn btn-default btn-xs\" href=\"${pageContext.request.contextPath}/cgd/mifaremanagement/cgdcard/update/${card.externalId}\"><spring:message code='label.edit'/></a>" +
@@ -156,9 +152,7 @@ ${portal.toolkit()}
 			{ data: 'mifareCode' },
 			{ data: 'issueDate' },
 			{ data: 'validUntil' },
-			{ data: 'studentCard' },
-			{ data: 'teacherCard' },
-			{ data: 'employeeCard' },
+			{ data: 'temporary' },
 			{ data: 'actions' }
 			
 		],

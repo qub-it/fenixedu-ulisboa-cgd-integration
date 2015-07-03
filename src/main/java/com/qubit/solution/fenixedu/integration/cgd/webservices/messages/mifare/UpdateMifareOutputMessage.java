@@ -66,10 +66,11 @@ public class UpdateMifareOutputMessage implements Serializable {
     private void modifyMifare(Person person, String mifareCode, LocalDate issueDate) {
         CgdCard card = CgdCard.findByPerson(person);
         if (card == null) {
-            card = new CgdCard(person, mifareCode);
+            card = new CgdCard(person, mifareCode, false);
         }
         card.setMifareCode(mifareCode);
         card.setIssueDate(issueDate);
+        card.setTemporary(false);
     }
 
 }
