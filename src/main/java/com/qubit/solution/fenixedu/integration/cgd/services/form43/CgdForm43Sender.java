@@ -73,6 +73,14 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
     private static services.caixaiu.cgd.wingman.iesservice.ObjectFactory objectFactory = new ObjectFactory();
     private static Logger logger = LoggerFactory.getLogger(CgdForm43Sender.class);
 
+    public boolean sendForm43For(Registration registration) {
+        // From the email sent by Tiago Martins on the 2nd July 2015 it's expected that 
+        // in ULisboa project the webservice will always be invoked with requestCard = true
+        //
+        // 3 July 2015 - Paulo Abrantes
+        return sendForm43For(registration, true);
+    }
+
     public boolean sendForm43For(Registration registration, boolean requestCard) {
         IIESService service = (IIESService) getClient();
         boolean success = false;
@@ -336,6 +344,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         Integer MASTERS = 5;
         Integer PHD = 6;
         Integer NO_STUDIES = 7;
+        Integer OTHER = 99;
 
         String code = degreeType.getCode();
 
@@ -349,7 +358,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         } else if ("PHD".equals(code)) {
             return PHD;
         } else if ("SPECIALIZATION_DEGREE".equals(code)) {
-            return MASTERS;
+            return OTHER;
         } else if ("BOLONHA_DEGREE".equals(code)) {
             return DEGREE;
         } else if ("BOLONHA_MASTER_DEGREE".equals(code)) {
@@ -359,15 +368,15 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         } else if ("BOLONHA_PHD".equals(code)) {
             return PHD;
         } else if ("BOLONHA_ADVANCED_FORMATION_DIPLOMA".equals(code)) {
-            return MASTERS;
+            return OTHER;
         } else if ("BOLONHA_ADVANCED_SPECIALIZATION_DIPLOMA".equals(code)) {
-            return MASTERS;
+            return OTHER;
         } else if ("BOLONHA_SPECIALIZATION_DEGREE".equals(code)) {
-            return MASTERS;
+            return OTHER;
         } else if ("FREE_DEGREE".equals(code)) {
-            return DEGREE;
+            return OTHER;
         } else if ("BOLONHA_POST_DOCTORAL_DEGREE".equals(code)) {
-            return PHD;
+            return OTHER;
         } else if ("EMPTY".equals(code)) {
             return NO_STUDIES;
         }
