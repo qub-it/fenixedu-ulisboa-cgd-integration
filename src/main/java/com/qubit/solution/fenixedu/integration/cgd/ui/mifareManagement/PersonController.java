@@ -1,22 +1,27 @@
 package com.qubit.solution.fenixedu.integration.cgd.ui.mifareManagement;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
+import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Sender;
 import com.qubit.solution.fenixedu.integration.cgd.ui.CgdBaseController;
 import com.qubit.solution.fenixedu.integration.cgd.ui.CgdController;
 
-@SpringFunctionality(app = CgdController.class, title = "label.title.mifareManagement", accessGroup = "anyone")
+@SpringFunctionality(app = CgdController.class, title = "label.title.mifareManagement", accessGroup = "#managers")
 // CHANGE_ME accessGroup = "group1 | group2 | groupXPTO"
 @RequestMapping("/cgd/mifaremanagement/person")
 public class PersonController extends CgdBaseController {
@@ -38,6 +43,7 @@ public class PersonController extends CgdBaseController {
     public String search(@RequestParam(value = "name", required = false, defaultValue = "") String name, @RequestParam(
             value = "username", required = false) String username,
             @RequestParam(value = "documentidnumber", required = false) String documentIdNumber, Model model) {
+
         List<Person> searchpersonResultsDataSet = filterSearchPerson(name, username, documentIdNumber);
         model.addAttribute("searchpersonResultsDataSet", searchpersonResultsDataSet);
         return "cgd/mifaremanagement/person/search";
