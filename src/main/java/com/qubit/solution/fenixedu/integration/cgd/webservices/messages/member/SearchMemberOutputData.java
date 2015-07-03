@@ -27,7 +27,10 @@
 package com.qubit.solution.fenixedu.integration.cgd.webservices.messages.member;
 
 import java.io.Serializable;
+import java.util.List;
 
+import org.fenixedu.academic.domain.DegreeCurricularPlan;
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
@@ -226,6 +229,12 @@ public class SearchMemberOutputData implements Serializable {
         searchMemberOutputData.setDegreeCode(registration.getDegree().getMinistryCode());
         searchMemberOutputData.setDegreeName(registration.getDegreeName());
         searchMemberOutputData.setCurricularYear(registration.getCurricularYear());
+        List<DegreeCurricularPlan> degreeCurricularPlansForYear =
+                registration.getDegree().getDegreeCurricularPlansForYear(ExecutionYear.readCurrentExecutionYear());
+        if (!degreeCurricularPlansForYear.isEmpty()) {
+            searchMemberOutputData.setDegreeDuration(degreeCurricularPlansForYear.iterator().next().getDurationInYears());
+        }
+        searchMemberOutputData.setDegreeType(registration.getDegree().getDegreeType().getName().getContent());
 
         return searchMemberOutputData;
     }
