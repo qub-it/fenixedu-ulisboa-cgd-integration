@@ -35,7 +35,6 @@ import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdInteg
 
 @RequestMapping("/cgd")
 @SpringApplication(group = "logged", path = "cgd", title = "title.cgd")
-@SpringFunctionality(app = CgdController.class, title = "title.cgd")
 public class CgdController {
 
     @RequestMapping
