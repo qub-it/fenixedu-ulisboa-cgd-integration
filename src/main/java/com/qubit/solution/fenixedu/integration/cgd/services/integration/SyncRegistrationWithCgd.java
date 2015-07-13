@@ -33,11 +33,18 @@ import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Send
 
 public class SyncRegistrationWithCgd implements SyncRegistrationWithExternalServices {
 
-    private CgdForm43Sender sender = new CgdForm43Sender();
+    private CgdForm43Sender sender = null;
+
+    private CgdForm43Sender getSender() {
+        if (sender == null) {
+            sender = new CgdForm43Sender();
+        }
+        return sender;
+    }
 
     @Override
     public boolean syncRegistrationToExternal(Registration registration) {
-        return sender.sendForm43For(registration);
+        return getSender().sendForm43For(registration);
     }
 
 }
