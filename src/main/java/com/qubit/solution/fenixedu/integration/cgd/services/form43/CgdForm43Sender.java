@@ -34,6 +34,7 @@ import javax.xml.ws.BindingProvider;
 
 import org.apache.commons.lang.StringUtils;
 import org.datacontract.schemas._2004._07.wingman_cgd_caixaiu_datacontract.School;
+import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.ProfessionalSituationConditionType;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
@@ -187,8 +188,11 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         personData.setEmail(objectFactory.createPersonEmail(person.getInstitutionalEmailAddressValue()));
         personData.setGenderCode(objectFactory.createPersonGenderCode(getCodeForGender(person.getGender())));
         try {
-            personData.setBirthDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(
-                    person.getDateOfBirthYearMonthDay().toDateTimeAtMidnight().toGregorianCalendar()));
+            YearMonthDay dateOfBirthYearMonthDay = person.getDateOfBirthYearMonthDay();
+            if (dateOfBirthYearMonthDay != null) {
+                personData.setBirthDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(
+                        dateOfBirthYearMonthDay.toDateTimeAtMidnight().toGregorianCalendar()));
+            }
         } catch (DatatypeConfigurationException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -216,15 +220,21 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         personData.setNationalities(nationality);
 
         PhysicalAddress defaultPhysicalAddress = person.getDefaultPhysicalAddress();
-        personData.setAddress(objectFactory.createPersonAddress(defaultPhysicalAddress.getAddress()));
-        personData.setPlace(objectFactory.createPersonPlace(defaultPhysicalAddress.getArea()));
-        personData.setPostalCode(objectFactory.createPersonPostalCode(defaultPhysicalAddress.getAreaCode()));
-        personData.setDistrict(objectFactory.createPersonDistrict(defaultPhysicalAddress.getDistrictOfResidence()));
-        personData.setCounty(objectFactory.createPersonCounty(defaultPhysicalAddress.getDistrictSubdivisionOfResidence()));
-        personData.setParish(objectFactory.createPersonParish(defaultPhysicalAddress.getParishOfResidence()));
+        if (defaultPhysicalAddress != null) {
+            personData.setAddress(objectFactory.createPersonAddress(defaultPhysicalAddress.getAddress()));
+            personData.setPlace(objectFactory.createPersonPlace(defaultPhysicalAddress.getArea()));
+            personData.setPostalCode(objectFactory.createPersonPostalCode(defaultPhysicalAddress.getAreaCode()));
+            personData.setDistrict(objectFactory.createPersonDistrict(defaultPhysicalAddress.getDistrictOfResidence()));
+            personData.setCounty(objectFactory.createPersonCounty(defaultPhysicalAddress.getDistrictSubdivisionOfResidence()));
+            personData.setParish(objectFactory.createPersonParish(defaultPhysicalAddress.getParishOfResidence()));
+        }
 
-        personData.setCountryOfResidenceCode(objectFactory.createPersonCountryOfResidenceCode(person.getCountryOfResidence()
-                .getCode()));
+        Country countryOfResidence = person.getCountryOfResidence();
+        if (countryOfResidence != null) {
+            personData.setCountryOfResidenceCode(objectFactory.createPersonCountryOfResidenceCode(countryOfResidence.getCode()));
+        } else {
+            personData.setCountryOfResidenceCode(objectFactory.createPersonCountryOfResidenceCode("PT"));
+        }
 
         personData.setPhone(objectFactory.createPersonPhone(person.getDefaultPhoneNumber()));
         personData.setMobilePhone(objectFactory.createPersonMobilePhone(person.getDefaultMobilePhoneNumber()));
