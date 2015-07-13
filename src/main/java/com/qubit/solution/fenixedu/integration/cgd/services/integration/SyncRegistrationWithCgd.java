@@ -24,42 +24,33 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FenixEdu fenixedu-ulisboa-cgdIntegration.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.qubit.solution.fenixedu.integration.cgd.servlet;
+package com.qubit.solution.fenixedu.integration.cgd.services.integration;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
+import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.ulisboa.specifications.domain.student.access.importation.external.SyncRegistrationWithExternalServices;
 
-import org.fenixedu.bennu.core.groups.DynamicGroup;
-import org.fenixedu.ulisboa.specifications.domain.student.access.StudentAccessServices;
+import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Sender;
 
-import pt.ist.fenixframework.CallableWithoutException;
-import pt.ist.fenixframework.FenixFramework;
+public class SyncRegistrationWithCgd implements SyncRegistrationWithExternalServices {
 
-import com.qubit.solution.fenixedu.integration.cgd.services.integration.SyncRegistrationWithCgd;
+    private CgdForm43Sender cgdForm43Sender;
+    private Long timestamp;
 
-@WebListener
-public class CgdintegrationInitializer implements ServletContextListener {
-
-    @Override
-    public void contextInitialized(ServletContextEvent event) {
-        FenixFramework.getTransactionManager().withTransaction(new CallableWithoutException<Object>() {
-
-            @Override
-            public Object call() {
-                DynamicGroup dynamicGroup = org.fenixedu.bennu.core.groups.DynamicGroup.get("cgdCollaborators");
-                if (!dynamicGroup.isDefined()) {
-                    dynamicGroup.toPersistentGroup();
-                }
-                return null;
-            }
-        });
-
-        StudentAccessServices.subscribeSyncRegistration(new SyncRegistrationWithCgd());
-
+    private CgdForm43Sender getSender() {
+        // We cache a cgdForm43Sender for at least 60 seconds 
+        // so we're not creating a form43 for each call
+        //
+        // 13 July 2015 - Paulo Abrantes
+        if (cgdForm43Sender == null || (System.currentTimeMillis() - timestamp) > 1000 * 60) {
+            cgdForm43Sender = new CgdForm43Sender();
+            timestamp = System.currentTimeMillis();
+        }
+        return cgdForm43Sender;
     }
 
     @Override
-    public void contextDestroyed(ServletContextEvent event) {
+    public boolean syncRegistrationToExternal(Registration registration) {
+        return getSender().sendForm43For(registration);
     }
+
 }
