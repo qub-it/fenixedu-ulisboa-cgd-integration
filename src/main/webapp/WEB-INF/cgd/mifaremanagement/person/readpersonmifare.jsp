@@ -107,6 +107,7 @@ ${portal.toolkit()}
 				<tr>
 					<%--!!!  Field names here --%>
 					<th><spring:message code="label.CgdCard.mifareCode"/></th>
+					<th><spring:message code="label.CgdCard.cardNumber"/></th>
 					<th><spring:message code="label.CgdCard.issueDate"/></th>
 					<th><spring:message code="label.CgdCard.validUntil"/></th>
 					<th><spring:message code="label.CgdCard.temporary"/></th>
@@ -132,6 +133,7 @@ ${portal.toolkit()}
 				{
 				"DT_RowId" : '<c:out value='${card.externalId}'/>',
 				"mifareCode" : "<c:out value='${card.mifareCode}'/>",
+				"cardNumber" : "<c:out value='${card.cardNumber}'/>",
 				"issueDate" : "<c:out value='${card.issueDate}'/>",
 				"validUntil" : "<c:out value='${card.validUntil}'/>",
 				"temporary" : "<spring:message code='label.${card.temporary}'/>",
@@ -150,6 +152,7 @@ ${portal.toolkit()}
 		},
 		"columns": [
 			{ data: 'mifareCode' },
+			{ data: 'cardNumber' },
 			{ data: 'issueDate' },
 			{ data: 'validUntil' },
 			{ data: 'temporary' },

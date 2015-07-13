@@ -69,9 +69,17 @@ ${portal.toolkit()}
 <div class="col-sm-2 control-label"><spring:message code="label.CgdCard.mifareCode"/></div> 
 
 <div class="col-sm-10">
-	<input id="cgdCard_mifareCode" class="form-control" type="text" name="mifarecode"  value='<c:out value='${not empty param.mifarecode ? param.mifarecode : cgdCard.mifareCode }'/>' />
+	<input id="cgdCard_mifareCode" class="form-control" type="text" name="mifarecode"  value='<c:out value='${not empty param.mifarecode ? param.mifarecode : cgdCard.mifareCode }'/>' required/>
+</div>	
+</div>
+<div class="form-group row">
+<div class="col-sm-2 control-label"><spring:message code="label.CgdCard.cardNumber"/></div> 
+
+<div class="col-sm-10">
+	<input id="cgdCard_cardNumber" class="form-control" type="text" name="cardNumber"  value='<c:out value='${not empty param.cardNumber ? param.cardNumber : cgdCard.cardNumber }'/>' />
 </div>	
 </div>		
+		
 <div class="form-group row">
 <div class="col-sm-2 control-label"><spring:message code="label.CgdCard.validUntil"/></div> 
 
