@@ -21,8 +21,7 @@ import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Send
 import com.qubit.solution.fenixedu.integration.cgd.ui.CgdBaseController;
 import com.qubit.solution.fenixedu.integration.cgd.ui.CgdController;
 
-@SpringFunctionality(app = CgdController.class, title = "label.title.mifareManagement", accessGroup = "#managers")
-// CHANGE_ME accessGroup = "group1 | group2 | groupXPTO"
+@SpringFunctionality(app = CgdController.class, title = "label.title.mifareManagement", accessGroup = "#managers | #cgdCollaborators")
 @RequestMapping("/cgd/mifaremanagement/person")
 public class PersonController extends CgdBaseController {
 

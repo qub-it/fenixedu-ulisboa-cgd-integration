@@ -30,11 +30,30 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import org.fenixedu.bennu.core.groups.DynamicGroup;
+
+import com.google.common.hash.Hashing;
+
+import pt.ist.fenixframework.CallableWithoutException;
+import pt.ist.fenixframework.FenixFramework;
+
 @WebListener
 public class CgdintegrationInitializer implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent event) {
+        FenixFramework.getTransactionManager().withTransaction(new CallableWithoutException<Object>() {
+
+            @Override
+            public Object call() {
+                DynamicGroup dynamicGroup = org.fenixedu.bennu.core.groups.DynamicGroup.get("cgdCollaborators");
+                if (!dynamicGroup.isDefined()) {
+                    dynamicGroup.toPersistentGroup();
+                }
+                return null;
+            }
+        });
+
     }
 
     @Override

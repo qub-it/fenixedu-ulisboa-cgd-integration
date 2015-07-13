@@ -47,7 +47,6 @@ import com.qubit.solution.fenixedu.integration.cgd.ui.CgdController;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
 
 @SpringFunctionality(app = CgdController.class, title = "label.title.cgdConfiguration", accessGroup = "#managers")
-// CHANGE_ME 
 @RequestMapping("/cgd/cgdconfiguration/cgdintegrationconfiguration")
 public class CgdIntegrationConfigurationController extends CgdBaseController {
 
