@@ -33,24 +33,11 @@ import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Send
 
 public class SyncRegistrationWithCgd implements SyncRegistrationWithExternalServices {
 
-    private CgdForm43Sender cgdForm43Sender;
-    private Long timestamp;
-
-    private CgdForm43Sender getSender() {
-        // We cache a cgdForm43Sender for at least 60 seconds 
-        // so we're not creating a form43 for each call
-        //
-        // 13 July 2015 - Paulo Abrantes
-        if (cgdForm43Sender == null || (System.currentTimeMillis() - timestamp) > 1000 * 60) {
-            cgdForm43Sender = new CgdForm43Sender();
-            timestamp = System.currentTimeMillis();
-        }
-        return cgdForm43Sender;
-    }
+    private CgdForm43Sender sender = new CgdForm43Sender();
 
     @Override
     public boolean syncRegistrationToExternal(Registration registration) {
-        return getSender().sendForm43For(registration);
+        return sender.sendForm43For(registration);
     }
 
 }
