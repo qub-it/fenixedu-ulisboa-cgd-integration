@@ -4,9 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.qubit.solution.fenixedu</groupId>
-		<artifactId>bennu-webservices-project</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<groupId>org.fenixedu</groupId>
+		<artifactId>fenix-framework-project</artifactId>
+		<version>2.2.0</version>
 	</parent>
 
 	<!-- <parent> <groupId>com.qubit.solution.fenixedu</groupId> <artifactId>versioned-fenix-framework-project</artifactId> 
@@ -113,6 +113,67 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.jvnet.jax-ws-commons</groupId>
+				<artifactId>jaxws-maven-plugin</artifactId>
+				<version>2.3</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>wsimport</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<packageName>${generate.packageName}</packageName>
+					<wsdlDirectory>
+						src/main/resources/wsdl
+					</wsdlDirectory>
+					<wsdlFiles>
+						<wsdlFile>IESService.prod.wsdl</wsdlFile>
+					</wsdlFiles>
+					<wsdlLocation>
+						/wsdl/IESService.prod.wsdl
+					</wsdlLocation>
+					<vmArgs>
+						<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
+					</vmArgs>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.3</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/endorsed</outputDirectory>
+							<silent>true</silent>
+							<artifactItems>
+								<artifactItem>
+									<groupId>javax.xml.bind</groupId>
+									<artifactId>jaxb-api</artifactId>
+									<version>2.2.7</version>
+									<type>jar</type>
+								</artifactItem>
+								<artifactItem>
+									<groupId>javax.xml.ws</groupId>
+									<artifactId>jaxws-api</artifactId>
+									<version>2.2.9</version>
+									<type>jar</type>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
+
 	</build>
 </project>
