@@ -26,6 +26,8 @@
  */
 package com.qubit.solution.fenixedu.integration.cgd.services.memberid;
 
+import java.util.Collection;
+
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.academic.domain.person.IdDocument;
@@ -40,13 +42,18 @@ public class IDcardAdapter implements IMemberIDAdapter {
                 person.getIdDocumentsSet().stream()
                         .filter(document -> document.getIdDocumentType().getValue() == IDDocumentType.IDENTITY_CARD).findFirst()
                         .orElse(null);
-        return doc != null ? doc.getValue() : null;
+        return doc != null ? doc.getValue() : person.getDocumentIdNumber();
 
     }
 
     @Override
     public Person readPerson(String memberID) {
-        return Person.readByDocumentIdNumberAndIdDocumentType(memberID, IDDocumentType.IDENTITY_CARD);
+        Person person = Person.readByDocumentIdNumberAndIdDocumentType(memberID, IDDocumentType.IDENTITY_CARD);
+        if (person == null) {
+            Collection<Person> people = Person.readByDocumentIdNumber(memberID);
+            person = people.isEmpty() ? null : people.iterator().next();
+        }
+        return person;
     }
 
 }

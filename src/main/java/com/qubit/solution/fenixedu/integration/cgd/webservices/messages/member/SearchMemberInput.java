@@ -27,6 +27,7 @@
 package com.qubit.solution.fenixedu.integration.cgd.webservices.messages.member;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
@@ -35,7 +36,6 @@ import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.academic.domain.student.Student;
 
 import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
-import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
 
 public class SearchMemberInput implements Serializable {
 
@@ -57,7 +57,7 @@ public class SearchMemberInput implements Serializable {
     //
     // 101 - BI/CC
     // 501 - NIF
-    private int documentType;
+    private Integer documentType;
 
     // DocumentID 
     private String documentID;
@@ -68,7 +68,7 @@ public class SearchMemberInput implements Serializable {
     // teacher code if populationCode = D
     private String memberCode;
 
-    public int getDocumentType() {
+    public Integer getDocumentType() {
         return documentType;
     }
 
@@ -120,17 +120,34 @@ public class SearchMemberInput implements Serializable {
         } else {
             // No memberID was sent, this means the member is not known yet. Let's look using the documentID, which can
             // either be the identification card or the tax number.
-            if (documentType == IDCARD_TYPE) {
+            if (documentType != null && documentType == IDCARD_TYPE) {
                 requestedPerson = Person.readByDocumentIdNumberAndIdDocumentType(documentID, IDDocumentType.CITIZEN_CARD);
                 if (requestedPerson == null) {
                     requestedPerson = Person.readByDocumentIdNumberAndIdDocumentType(documentID, IDDocumentType.IDENTITY_CARD);
                 }
-            } else if (documentType == TAXNUMBER_TYPE) {
+                if (requestedPerson == null) {
+                    Collection<Person> people = Person.readByDocumentIdNumber(documentID);
+                    requestedPerson = people.isEmpty() ? null : people.iterator().next();
+
+                }
+            } else if (documentType != null && documentType == TAXNUMBER_TYPE) {
                 Party party = requestedPerson.readByContributorNumber(documentID);
                 requestedPerson = (party instanceof Person) ? (Person) party : null;
             }
         }
+        if (requestedPerson == null && !StringUtils.isEmpty(this.memberCode)) {
+            switch (populationCode.charAt(0)) {
+            case 'A':
+                Student student = Student.readStudentByNumber(Integer.valueOf(this.memberCode));
+                if (student != null) {
+                    requestedPerson = student.getPerson();
+                }
+            case 'E':
+                break;
+            case 'D':
 
+            }
+        }
         return requestedPerson;
     }
 }
