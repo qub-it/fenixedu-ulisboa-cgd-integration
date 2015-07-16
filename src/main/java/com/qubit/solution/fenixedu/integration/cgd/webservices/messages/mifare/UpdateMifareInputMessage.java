@@ -55,6 +55,15 @@ public class UpdateMifareInputMessage implements Serializable {
 
     private int chipDataSize;
     private String chipData;
+    private String cardIdentification;
+
+    public String getCardIdentification() {
+        return cardIdentification;
+    }
+
+    public void setCardIdentification(String cardIdentification) {
+        this.cardIdentification = cardIdentification;
+    }
 
     public String getPopulationCode() {
         return populationCode;
