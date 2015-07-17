@@ -70,6 +70,7 @@ public class CgdIntegrationService extends BennuWebService {
         Person person = message.getIdentifiedPerson();
         if (person != null) {
             outputMessage.populate(person, message.getPopulationCode(), message.getMemberCode(), message.getChipData(),
+                    message.getCardIdentification(),
                     LocalDate.parse(message.getPersonalizationDate(), DateTimeFormat.forPattern("YYYY-mm-dd")));
         }
         return outputMessage;

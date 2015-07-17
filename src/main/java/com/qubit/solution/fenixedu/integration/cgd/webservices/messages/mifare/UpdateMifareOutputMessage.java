@@ -53,9 +53,10 @@ public class UpdateMifareOutputMessage implements Serializable {
         this.replyCode = replyCode;
     }
 
-    public void populate(Person person, String populationCode, String memberCode, String mifareCode, LocalDate issueDate) {
+    public void populate(Person person, String populationCode, String memberCode, String mifareCode, String cardId,
+            LocalDate issueDate) {
         if (CgdMessageUtils.verifyMatch(person, populationCode, memberCode)) {
-            modifyMifare(person, mifareCode, issueDate);
+            modifyMifare(person, mifareCode, issueDate, cardId);
             setReplyCode(CgdMessageUtils.REPLY_CODE_OPERATION_OK);
         } else {
             setReplyCode(CgdMessageUtils.REPLY_CODE_INFORMATION_NOT_OK);
@@ -63,7 +64,7 @@ public class UpdateMifareOutputMessage implements Serializable {
     }
 
     @Atomic
-    private void modifyMifare(Person person, String mifareCode, LocalDate issueDate) {
+    private void modifyMifare(Person person, String mifareCode, LocalDate issueDate, String cardId) {
         CgdCard card = CgdCard.findByPerson(person);
         if (card == null) {
             card = new CgdCard(person, mifareCode, false);
@@ -71,6 +72,7 @@ public class UpdateMifareOutputMessage implements Serializable {
         card.setMifareCode(mifareCode);
         card.setIssueDate(issueDate);
         card.setTemporary(false);
+        card.setCardNumber(cardId);
     }
 
 }
