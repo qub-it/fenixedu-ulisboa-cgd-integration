@@ -94,10 +94,10 @@ ${portal.toolkit()}
 <div class="col-sm-2">
 <select id="cgdCard_temporary" name="temporary" class="form-control" required>
 <option value="false"><spring:message code="label.no"/></option>
-<option value="true" selected><spring:message code="label.yes"/></option>				
+<option value="true"><spring:message code="label.yes"/></option>				
 </select>
 	<script>
-		$("#cgdCard_temporary").val('<c:out value='${not empty param.temporary ? param.temporary : cgdCard.temporary }'/>');
+		$("#cgdCard_temporary").val('<c:out value='${not empty param.temporary ? param.temporary : "true" }'/>');
 	</script>	
 </div>
 </div>		
