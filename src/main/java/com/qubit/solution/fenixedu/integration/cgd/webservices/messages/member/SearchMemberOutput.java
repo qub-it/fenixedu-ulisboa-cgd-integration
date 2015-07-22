@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.student.Registration;
@@ -47,9 +48,12 @@ public class SearchMemberOutput implements Serializable {
             setReplyCode(CgdMessageUtils.REPLY_CODE_OPERATION_OK);
             IMemberIDAdapter memberIDStrategy = CgdMessageUtils.getMemberIDStrategy();
             List<SearchMemberOutputData> list = new ArrayList<SearchMemberOutputData>();
+            ExecutionYear readCurrentExecutionYear = ExecutionYear.readCurrentExecutionYear();
             if (person.getStudent() != null && !person.getStudent().getActiveRegistrations().isEmpty()) {
                 for (Registration registration : person.getStudent().getActiveRegistrations()) {
-                    list.add(SearchMemberOutputData.createStudentBased(memberIDStrategy, registration));
+                    if (!registration.getEnrolments(readCurrentExecutionYear).isEmpty()) {
+                        list.add(SearchMemberOutputData.createStudentBased(memberIDStrategy, registration));
+                    }
                 }
             }
             if (person.getTeacher() != null && person.getTeacher().isActiveContractedTeacher()) {
