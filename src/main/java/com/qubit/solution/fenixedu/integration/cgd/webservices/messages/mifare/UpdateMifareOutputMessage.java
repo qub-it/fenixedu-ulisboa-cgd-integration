@@ -53,9 +53,9 @@ public class UpdateMifareOutputMessage implements Serializable {
         this.replyCode = replyCode;
     }
 
-    public void populate(Person person, String populationCode, String memberCode, String mifareCode, String cardId,
-            LocalDate issueDate) {
-        if (CgdMessageUtils.verifyMatch(person, populationCode, memberCode)) {
+    public void populate(Person person, String populationCode, String memberCode, String memberID, String mifareCode,
+            String cardId, LocalDate issueDate) {
+        if (CgdMessageUtils.verifyMatch(person, populationCode, memberCode, memberID)) {
             modifyMifare(person, mifareCode, issueDate, cardId);
             setReplyCode(CgdMessageUtils.REPLY_CODE_OPERATION_OK);
         } else {

@@ -26,7 +26,13 @@
  */
 package com.qubit.solution.fenixedu.integration.cgd.webservices.messages;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.academic.domain.student.Student;
 
 import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
@@ -37,18 +43,48 @@ public class CgdMessageUtils {
     public static int REPLY_CODE_INFORMATION_NOT_OK = 1;
     public static int REPLY_CODE_UNEXISTING_MEMBER = 9;
 
-    public static boolean verifyMatch(Person person, String populationCode, String memberCode) {
-        boolean matchOk = false;
-        switch (populationCode.charAt(0)) {
-        case 'A':
-            matchOk = person.getStudent() != null && String.valueOf(person.getStudent().getNumber()).equals(memberCode);
-            break;
-        case 'F':
-            // YET TO BE IMPLEMENTED
-            break;
-        case 'D':
-            matchOk = person.getTeacher() != null && person.getTeacher().getTeacherId().equals(memberCode);
-            break;
+    public static Person readPersonByMemberCode(String populationCode, String memberCode) {
+        Person requestedPerson = null;
+        if (!StringUtils.isEmpty(memberCode) && !StringUtils.isEmpty(populationCode)) {
+            switch (populationCode.charAt(0)) {
+            case 'A':
+                Student student = Student.readStudentByNumber(Integer.valueOf(memberCode));
+                if (student != null) {
+                    requestedPerson = student.getPerson();
+                }
+            case 'E':
+                // NOT YET IMPLEMENTED
+                break;
+            case 'D':
+                List<Teacher> readByNumbers = Teacher.readByNumbers(Collections.singleton(memberCode));
+                Teacher teacher = readByNumbers.isEmpty() ? null : readByNumbers.iterator().next();
+                if (teacher != null) {
+                    requestedPerson = teacher.getPerson();
+                }
+            }
+        }
+        return requestedPerson;
+    }
+
+    public static boolean verifyMatch(Person person, String populationCode, String memberCode, String memberID) {
+        boolean matchOk = StringUtils.isEmpty(populationCode) || StringUtils.isEmpty(memberCode);
+
+        if (!matchOk) {
+            switch (populationCode.charAt(0)) {
+            case 'A':
+                matchOk = person.getStudent() != null && String.valueOf(person.getStudent().getNumber()).equals(memberCode);
+                break;
+            case 'F':
+                // YET TO BE IMPLEMENTED
+                break;
+            case 'D':
+                matchOk = person.getTeacher() != null && person.getTeacher().getTeacherId().equals(memberCode);
+                break;
+            }
+        }
+
+        if (matchOk && !StringUtils.isEmpty(memberID)) {
+            matchOk = memberID.equals(getMemberIDStrategy().retrieveMemberID(person));
         }
 
         return matchOk;

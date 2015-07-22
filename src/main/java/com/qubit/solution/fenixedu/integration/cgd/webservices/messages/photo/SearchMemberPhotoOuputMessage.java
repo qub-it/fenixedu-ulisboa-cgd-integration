@@ -36,7 +36,7 @@ import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessa
 
 public class SearchMemberPhotoOuputMessage implements Serializable {
 
-    public static int UNAVAILABLE_PHOTO = 1;
+    public static int UNAVAILABLE_PHOTO = 8;
 
     private int replyCode;
     private String name;
@@ -71,8 +71,8 @@ public class SearchMemberPhotoOuputMessage implements Serializable {
         this.photo = photo;
     }
 
-    public void populate(Person person, String populationCode, String memberCode) {
-        boolean verifyMatch = CgdMessageUtils.verifyMatch(person, populationCode, memberCode);
+    public void populate(Person person, String populationCode, String memberCode, String memberID) {
+        boolean verifyMatch = CgdMessageUtils.verifyMatch(person, populationCode, memberCode, memberID);
         if (verifyMatch) {
             Photograph personalPhoto = person.getPersonalPhoto();
             if (personalPhoto == null) {
@@ -88,5 +88,4 @@ public class SearchMemberPhotoOuputMessage implements Serializable {
             setReplyCode(CgdMessageUtils.REPLY_CODE_INFORMATION_NOT_OK);
         }
     }
-
 }

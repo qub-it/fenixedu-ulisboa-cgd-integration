@@ -49,7 +49,7 @@ public class CgdIntegrationService extends BennuWebService {
         SearchMemberOutput outputMessage = new SearchMemberOutput();
         Person identifiedPerson = message.getIdentifiedPerson();
         if (identifiedPerson != null) {
-            outputMessage.populate(identifiedPerson, message.getPopulationCode(), message.getMemberCode());
+            outputMessage.populate(identifiedPerson, message.getPopulationCode(), message.getMemberCode(), message.getMemberID());
         }
         return outputMessage;
     }
@@ -59,7 +59,7 @@ public class CgdIntegrationService extends BennuWebService {
         SearchMemberPhotoOuputMessage outputMessage = new SearchMemberPhotoOuputMessage();
         Person person = message.getIdentifiedPerson();
         if (person != null) {
-            outputMessage.populate(person, message.getPopulationCode(), message.getMemberCode());
+            outputMessage.populate(person, message.getPopulationCode(), message.getMemberCode(),message.getMemberID());
         }
         return outputMessage;
     }
@@ -69,9 +69,9 @@ public class CgdIntegrationService extends BennuWebService {
         UpdateMifareOutputMessage outputMessage = new UpdateMifareOutputMessage();
         Person person = message.getIdentifiedPerson();
         if (person != null) {
-            outputMessage.populate(person, message.getPopulationCode(), message.getMemberCode(), message.getChipData(),
-                    message.getCardIdentification(),
-                    LocalDate.parse(message.getPersonalizationDate(), DateTimeFormat.forPattern("YYYY-mm-dd")));
+            outputMessage.populate(person, message.getPopulationCode(), message.getMemberCode(), message.getMemberID(),
+                    message.getChipData(), message.getCardIdentification(),
+                    LocalDate.parse(message.getPersonalizationDate(), DateTimeFormat.forPattern("YYYY-MM-dd")));
         }
         return outputMessage;
     }

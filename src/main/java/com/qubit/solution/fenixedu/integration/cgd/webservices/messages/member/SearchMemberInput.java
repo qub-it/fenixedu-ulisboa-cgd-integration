@@ -33,9 +33,9 @@ import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.person.IDDocumentType;
-import org.fenixedu.academic.domain.student.Student;
 
 import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
+import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
 
 public class SearchMemberInput implements Serializable {
 
@@ -72,7 +72,7 @@ public class SearchMemberInput implements Serializable {
         return documentType;
     }
 
-    public void setDocumentType(int documentType) {
+    public void setDocumentType(Integer documentType) {
         this.documentType = documentType;
     }
 
@@ -136,17 +136,7 @@ public class SearchMemberInput implements Serializable {
             }
         }
         if (requestedPerson == null && !StringUtils.isEmpty(this.memberCode)) {
-            switch (populationCode.charAt(0)) {
-            case 'A':
-                Student student = Student.readStudentByNumber(Integer.valueOf(this.memberCode));
-                if (student != null) {
-                    requestedPerson = student.getPerson();
-                }
-            case 'E':
-                break;
-            case 'D':
-
-            }
+            requestedPerson = CgdMessageUtils.readPersonByMemberCode(this.populationCode, this.memberCode);
         }
         return requestedPerson;
     }

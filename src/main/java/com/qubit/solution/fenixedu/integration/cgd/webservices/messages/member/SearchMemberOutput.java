@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.student.Registration;
@@ -40,9 +41,8 @@ public class SearchMemberOutput implements Serializable {
         this.memberInfo = memberInfo;
     }
 
-    public void populate(Person person, String populationCode, String memberCode) {
-        boolean verifyMatch =
-                populationCode == null || memberCode == null || CgdMessageUtils.verifyMatch(person, populationCode, memberCode);
+    public void populate(Person person, String populationCode, String memberCode, String memberID) {
+        boolean verifyMatch = CgdMessageUtils.verifyMatch(person, populationCode, memberCode, memberID);
         if (verifyMatch) {
             setReplyCode(CgdMessageUtils.REPLY_CODE_OPERATION_OK);
             IMemberIDAdapter memberIDStrategy = CgdMessageUtils.getMemberIDStrategy();
@@ -64,7 +64,7 @@ public class SearchMemberOutput implements Serializable {
                 //
                 // 23 April 2015 - Paulo Abrantes
                 SearchMemberOutputData createDefault = SearchMemberOutputData.createDefault(memberIDStrategy, person);
-                if (populationCode != null) {
+                if (!StringUtils.isEmpty(populationCode)) {
                     switch (populationCode.charAt(0)) {
                     case 'A':
                         Student student = person.getStudent();
