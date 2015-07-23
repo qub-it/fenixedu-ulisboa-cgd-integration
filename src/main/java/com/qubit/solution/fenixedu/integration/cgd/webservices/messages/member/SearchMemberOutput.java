@@ -56,7 +56,7 @@ public class SearchMemberOutput implements Serializable {
                     }
                 }
             }
-            if (person.getTeacher() != null && person.getTeacher().isActiveContractedTeacher()) {
+            if (person.getTeacher() != null && person.getTeacher() != null) {
                 list.add(SearchMemberOutputData.createTeacherBased(memberIDStrategy, person.getTeacher()));
             }
 

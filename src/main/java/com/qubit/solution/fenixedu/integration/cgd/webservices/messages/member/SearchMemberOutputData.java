@@ -60,8 +60,8 @@ public class SearchMemberOutputData implements Serializable {
     private String degreeCode;
     private String degreeName;
     private String degreeType;
-    private int degreeDuration;
-    private int curricularYear;
+    private Integer degreeDuration;
+    private Integer curricularYear;
     // END: FOR STUDENTS ONLY
 
     // BEGIN: TEACHERS ONLY
@@ -131,19 +131,19 @@ public class SearchMemberOutputData implements Serializable {
         this.degreeType = degreeType;
     }
 
-    public int getDegreeDuration() {
+    public Integer getDegreeDuration() {
         return degreeDuration;
     }
 
-    public void setDegreeDuration(int degreeDuration) {
+    public void setDegreeDuration(Integer degreeDuration) {
         this.degreeDuration = degreeDuration;
     }
 
-    public int getCurricularYear() {
+    public Integer getCurricularYear() {
         return curricularYear;
     }
 
-    public void setCurricularYear(int curricularYear) {
+    public void setCurricularYear(Integer curricularYear) {
         this.curricularYear = curricularYear;
     }
 
@@ -244,7 +244,11 @@ public class SearchMemberOutputData implements Serializable {
         SearchMemberOutputData searchMemberOutputData = createDefault(strategy, person);
         searchMemberOutputData.setPopulationCode("D");
 
-        searchMemberOutputData.setTeacherCategory(teacher.getCategory().getCode());
+        String content = teacher.getCategory().getName().getContent();
+        if (content.length() > 23) {
+            content = content.substring(0, 23);
+        }
+        searchMemberOutputData.setTeacherCategory(content);
         searchMemberOutputData.setTeacherNumber(teacher.getTeacherId());
 
         return searchMemberOutputData;
