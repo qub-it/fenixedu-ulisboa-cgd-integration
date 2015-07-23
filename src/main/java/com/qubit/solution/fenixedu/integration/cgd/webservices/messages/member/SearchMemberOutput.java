@@ -43,8 +43,15 @@ public class SearchMemberOutput implements Serializable {
     }
 
     public void populate(Person person, String populationCode, String memberCode, String memberID) {
-        boolean verifyMatch = CgdMessageUtils.verifyMatch(person, populationCode, memberCode, memberID);
-        if (verifyMatch) {
+        // After phone talk with Marcelino Lopes and his email (sent at 1:48 PM of 23 July) it has been
+        // requested that in the SearchMember service no verification is made in the information aligned
+        // since this is data that has been inputed by the student and may not be corrected.
+        //
+        // 23 July 2015 - Paulo Abrantes
+
+        //        boolean verifyMatch = CgdMessageUtils.verifyMatch(person, populationCode, memberCode, memberID);
+        //         if (verifyMatch) {
+        if (person != null) {
             setReplyCode(CgdMessageUtils.REPLY_CODE_OPERATION_OK);
             IMemberIDAdapter memberIDStrategy = CgdMessageUtils.getMemberIDStrategy();
             List<SearchMemberOutputData> list = new ArrayList<SearchMemberOutputData>();
@@ -80,8 +87,8 @@ public class SearchMemberOutput implements Serializable {
                     case 'D':
                         Teacher teacher = person.getTeacher();
                         if (teacher != null) {
-                            createDefault.setPopulationCode("T");
-                            createDefault.setStudentNumber(teacher.getTeacherId());
+                            createDefault.setPopulationCode("D");
+                            createDefault.setTeacherNumber(teacher.getTeacherId());
                         }
                         break;
                     case 'F':
@@ -92,8 +99,9 @@ public class SearchMemberOutput implements Serializable {
                 list.add(createDefault);
             }
             setMemberInfo(list);
-        } else {
-            setReplyCode(CgdMessageUtils.REPLY_CODE_INFORMATION_NOT_OK);
         }
+//        } else {
+//            setReplyCode(CgdMessageUtils.REPLY_CODE_INFORMATION_NOT_OK);
+//        }
     }
 }

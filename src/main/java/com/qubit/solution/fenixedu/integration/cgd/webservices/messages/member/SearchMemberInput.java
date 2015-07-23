@@ -115,11 +115,19 @@ public class SearchMemberInput implements Serializable {
         // identification of the member inside the institution so we'll short-circuit 
         // the lookup using the memberID
         // 23 April 2015 - Paulo Abrantes
+        //
+        // Update after phone talk with Marcelino Lopes from CGD we've established that
+        // in the SearchMemberService the resolution must be:
+        // * Lookup by memberID
+        // * If not found lookup by documentID
+        // * If not found lookup by memberCode
+        //
+        // 23 July 2015 - Paulo Abrantes
         if (!StringUtils.isEmpty(this.memberID)) {
             requestedPerson = CgdIntegrationConfiguration.getInstance().getMemberIDStrategy().readPerson(this.memberID);
-        } else {
-            // No memberID was sent, this means the member is not known yet. Let's look using the documentID, which can
-            // either be the identification card or the tax number.
+        }
+
+        if (requestedPerson == null) {
             if (documentType != null && documentType == IDCARD_TYPE) {
                 requestedPerson = Person.readByDocumentIdNumberAndIdDocumentType(documentID, IDDocumentType.CITIZEN_CARD);
                 if (requestedPerson == null) {
@@ -135,6 +143,7 @@ public class SearchMemberInput implements Serializable {
                 requestedPerson = (party instanceof Person) ? (Person) party : null;
             }
         }
+
         if (requestedPerson == null && !StringUtils.isEmpty(this.memberCode)) {
             requestedPerson = CgdMessageUtils.readPersonByMemberCode(this.populationCode, this.memberCode);
         }
