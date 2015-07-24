@@ -253,4 +253,15 @@ public class SearchMemberOutputData implements Serializable {
 
         return searchMemberOutputData;
     }
+
+    public static SearchMemberOutputData createEmployeeBased(IMemberIDAdapter strategy, Person person) {
+        SearchMemberOutputData searchMemberOutputData = createDefault(strategy, person);
+        searchMemberOutputData.setPopulationCode("F");
+
+        searchMemberOutputData.setTeacherCategory("");
+        searchMemberOutputData.setTeacherNumber(person.getUsername());
+
+        return searchMemberOutputData;
+    }
+
 }

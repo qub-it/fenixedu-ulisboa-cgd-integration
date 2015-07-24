@@ -11,6 +11,7 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
+import org.fenixedu.bennu.core.groups.DynamicGroup;
 
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
@@ -88,12 +89,20 @@ public class SearchMemberOutput implements Serializable {
                         Teacher teacher = person.getTeacher();
                         if (teacher != null) {
                             createDefault.setPopulationCode("D");
+                            String content = teacher.getCategory().getName().getContent();
+                            if (content.length() > 23) {
+                                content = content.substring(0, 23);
+                            }
+                            createDefault.setTeacherCategory(content);
                             createDefault.setTeacherNumber(teacher.getTeacherId());
                         }
                         break;
                     case 'F':
-                        // Not yet implemented
-                        break;
+                        boolean member = DynamicGroup.get("employees").isMember(person.getUser());
+                        if (member) {
+                            createDefault.setPopulationCode("F");
+                            createDefault.setTeacherNumber(person.getUsername());
+                        }
                     }
                 }
                 list.add(createDefault);
