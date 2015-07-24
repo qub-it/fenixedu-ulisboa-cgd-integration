@@ -123,11 +123,6 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
     private static String getInstitutionCode() {
         String code = Bennu.getInstance().getInstitutionUnit().getCode();
 
-        // TEST since code is still null
-        if (code == null) {
-            code = "801";
-        }
-
         return code;
     }
 
