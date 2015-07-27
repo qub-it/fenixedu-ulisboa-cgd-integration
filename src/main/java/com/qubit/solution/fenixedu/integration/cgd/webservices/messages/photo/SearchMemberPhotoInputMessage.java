@@ -77,7 +77,7 @@ public class SearchMemberPhotoInputMessage implements Serializable {
     public Person getIdentifiedPerson() {
         Person person = CgdMessageUtils.getMemberIDStrategy().readPerson(getMemberID());
         if (person == null) {
-            person = CgdMessageUtils.readPersonByMemberCode(this.populationCode, this.memberCode);
+            person = CgdMessageUtils.readPersonByMemberCode(getPopulationCode(), getMemberCode());
         }
         return person;
     }

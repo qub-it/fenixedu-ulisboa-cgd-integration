@@ -123,18 +123,19 @@ public class SearchMemberInput implements Serializable {
         // * If not found lookup by memberCode
         //
         // 23 July 2015 - Paulo Abrantes
-        if (!StringUtils.isEmpty(this.memberID)) {
-            requestedPerson = CgdIntegrationConfiguration.getInstance().getMemberIDStrategy().readPerson(this.memberID);
+        if (!StringUtils.isEmpty(getMemberID())) {
+            requestedPerson = CgdIntegrationConfiguration.getInstance().getMemberIDStrategy().readPerson(getMemberID());
         }
 
         if (requestedPerson == null) {
             if (documentType != null && documentType == IDCARD_TYPE) {
-                requestedPerson = Person.readByDocumentIdNumberAndIdDocumentType(documentID, IDDocumentType.CITIZEN_CARD);
+                requestedPerson = Person.readByDocumentIdNumberAndIdDocumentType(getDocumentID(), IDDocumentType.CITIZEN_CARD);
                 if (requestedPerson == null) {
-                    requestedPerson = Person.readByDocumentIdNumberAndIdDocumentType(documentID, IDDocumentType.IDENTITY_CARD);
+                    requestedPerson =
+                            Person.readByDocumentIdNumberAndIdDocumentType(getDocumentID(), IDDocumentType.IDENTITY_CARD);
                 }
                 if (requestedPerson == null) {
-                    Collection<Person> people = Person.readByDocumentIdNumber(documentID);
+                    Collection<Person> people = Person.readByDocumentIdNumber(getDocumentID());
                     requestedPerson = people.isEmpty() ? null : people.iterator().next();
 
                 }
@@ -144,8 +145,8 @@ public class SearchMemberInput implements Serializable {
             }
         }
 
-        if (requestedPerson == null && !StringUtils.isEmpty(this.memberCode)) {
-            requestedPerson = CgdMessageUtils.readPersonByMemberCode(this.populationCode, this.memberCode);
+        if (requestedPerson == null && !StringUtils.isEmpty(getMemberCode())) {
+            requestedPerson = CgdMessageUtils.readPersonByMemberCode(getPopulationCode(), getMemberCode());
         }
         return requestedPerson;
     }
