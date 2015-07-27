@@ -51,7 +51,7 @@ public class SearchMemberPhotoInputMessage implements Serializable {
     private String memberCode;
 
     public String getPopulationCode() {
-        return populationCode;
+        return populationCode != null ? populationCode.trim() : populationCode;
     }
 
     public void setPopulationCode(String populationCode) {
@@ -59,7 +59,7 @@ public class SearchMemberPhotoInputMessage implements Serializable {
     }
 
     public String getMemberID() {
-        return memberID;
+        return memberID != null ? memberID.trim() : memberID;
     }
 
     public void setMemberID(String memberID) {
@@ -67,7 +67,7 @@ public class SearchMemberPhotoInputMessage implements Serializable {
     }
 
     public String getMemberCode() {
-        return memberCode;
+        return memberCode != null ? memberCode.trim() : memberCode;
     }
 
     public void setMemberCode(String memberCode) {
