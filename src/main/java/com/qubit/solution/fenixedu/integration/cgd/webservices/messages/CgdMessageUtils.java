@@ -48,7 +48,10 @@ public class CgdMessageUtils {
         if (!StringUtils.isEmpty(memberCode) && !StringUtils.isEmpty(populationCode)) {
             switch (populationCode.charAt(0)) {
             case 'A':
-                Student student = Student.readStudentByNumber(Integer.valueOf(memberCode));
+                Student student = null;
+                if (StringUtils.isNumeric(memberCode)) {
+                    student = Student.readStudentByNumber(Integer.valueOf(memberCode));
+                }
                 if (student != null) {
                     requestedPerson = student.getPerson();
                 }

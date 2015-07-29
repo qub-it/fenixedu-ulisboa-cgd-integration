@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
@@ -57,14 +58,21 @@ public class SearchMemberOutput implements Serializable {
             IMemberIDAdapter memberIDStrategy = CgdMessageUtils.getMemberIDStrategy();
             List<SearchMemberOutputData> list = new ArrayList<SearchMemberOutputData>();
             ExecutionYear readCurrentExecutionYear = ExecutionYear.readCurrentExecutionYear();
+            ExecutionYear previousYear = readCurrentExecutionYear.getPreviousExecutionYear();
             if (person.getStudent() != null && !person.getStudent().getActiveRegistrations().isEmpty()) {
                 for (Registration registration : person.getStudent().getActiveRegistrations()) {
-                    if (!registration.getEnrolments(readCurrentExecutionYear).isEmpty()) {
+                    if (!registration.getEnrolments(readCurrentExecutionYear).isEmpty()
+                            || !registration.getEnrolments(previousYear).isEmpty()) {
                         list.add(SearchMemberOutputData.createStudentBased(memberIDStrategy, registration));
                     }
                 }
             }
-            if (person.getTeacher() != null && person.getTeacher() != null) {
+            List<ExecutionSemester> semesters = new ArrayList<ExecutionSemester>();
+            semesters.addAll(readCurrentExecutionYear.getExecutionPeriodsSet());
+            semesters.addAll(previousYear.getExecutionPeriodsSet());
+            if (person.getTeacher() != null
+                    && person.getTeacher().getTeacherAuthorizationStream()
+                            .anyMatch(authorization -> semesters.contains(authorization.getExecutionSemester()))) {
                 list.add(SearchMemberOutputData.createTeacherBased(memberIDStrategy, person.getTeacher()));
             }
 

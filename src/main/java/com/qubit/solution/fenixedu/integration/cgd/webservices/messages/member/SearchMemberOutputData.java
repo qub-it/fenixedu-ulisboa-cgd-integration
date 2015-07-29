@@ -27,12 +27,15 @@
 package com.qubit.solution.fenixedu.integration.cgd.webservices.messages.member;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
+import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
+import org.fenixedu.academic.domain.TeacherCategory;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
@@ -210,9 +213,16 @@ public class SearchMemberOutputData implements Serializable {
         searchMemberOutputData.setEstablishmentName(institutionUnit.getName());
         searchMemberOutputData.setEstablishmentCode(institutionUnit.getCode());
 
+        ExecutionYear readCurrentExecutionYear = ExecutionYear.readCurrentExecutionYear();
+        ExecutionYear previousYear = readCurrentExecutionYear.getPreviousExecutionYear();
+        List<ExecutionSemester> semesters = new ArrayList<ExecutionSemester>();
+        semesters.addAll(readCurrentExecutionYear.getExecutionPeriodsSet());
+        semesters.addAll(previousYear.getExecutionPeriodsSet());
+
         String stayingIndicator =
                 (person.getStudent() != null && person.getStudent().hasActiveRegistrations())
-                        || (person.getTeacher() != null && person.getTeacher().isActiveContractedTeacher()) ? "S" : "N";
+                        || (person.getTeacher() != null && person.getTeacher().getTeacherAuthorizationStream()
+                                .anyMatch(authorization -> semesters.contains(authorization.getExecutionSemester()))) ? "S" : "N";
         searchMemberOutputData.setStayingIndicator(stayingIndicator);
         return searchMemberOutputData;
     }
@@ -244,11 +254,14 @@ public class SearchMemberOutputData implements Serializable {
         SearchMemberOutputData searchMemberOutputData = createDefault(strategy, person);
         searchMemberOutputData.setPopulationCode("D");
 
-        String content = teacher.getCategory().getName().getContent();
-        if (content.length() > 23) {
-            content = content.substring(0, 23);
+        TeacherCategory category = teacher.getCategory();
+        if (category != null) {
+            String content = category.getName().getContent();
+            if (content.length() > 23) {
+                content = content.substring(0, 23);
+            }
+            searchMemberOutputData.setTeacherCategory(content);
         }
-        searchMemberOutputData.setTeacherCategory(content);
         searchMemberOutputData.setTeacherNumber(teacher.getTeacherId());
 
         return searchMemberOutputData;
