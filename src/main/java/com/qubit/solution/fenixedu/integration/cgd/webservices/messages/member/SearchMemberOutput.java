@@ -76,6 +76,10 @@ public class SearchMemberOutput implements Serializable {
                 list.add(SearchMemberOutputData.createTeacherBased(memberIDStrategy, person.getTeacher()));
             }
 
+            if (DynamicGroup.get("employees").isMember(person.getUser())) {
+                list.add(SearchMemberOutputData.createEmployeeBased(memberIDStrategy, person));
+            }
+
             if (list.isEmpty()) {
                 // Even though the person was found no active students nor teachers were found. So send at least
                 // some information about the person we'll create a default package and then check which kind of
@@ -83,6 +87,7 @@ public class SearchMemberOutput implements Serializable {
                 // the id number which was already sent by the cgd)
                 //
                 // 23 April 2015 - Paulo Abrantes
+
                 SearchMemberOutputData createDefault = SearchMemberOutputData.createDefault(memberIDStrategy, person);
                 if (!StringUtils.isEmpty(populationCode)) {
                     switch (populationCode.charAt(0)) {
