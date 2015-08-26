@@ -33,6 +33,7 @@ import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.student.Student;
+import org.fenixedu.bennu.core.groups.DynamicGroup;
 
 import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
@@ -78,7 +79,7 @@ public class CgdMessageUtils {
                 matchOk = person.getStudent() != null && String.valueOf(person.getStudent().getNumber()).equals(memberCode);
                 break;
             case 'F':
-                // YET TO BE IMPLEMENTED
+                matchOk = DynamicGroup.get("employees").isMember(person.getUser());
                 break;
             case 'D':
                 matchOk = person.getTeacher() != null && person.getTeacher().getTeacherId().equals(memberCode);
