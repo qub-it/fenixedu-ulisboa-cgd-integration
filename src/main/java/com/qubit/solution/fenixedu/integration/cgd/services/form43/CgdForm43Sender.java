@@ -331,7 +331,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
     private static Student createStudent(Registration registration) {
         Student student = new Student();
         student.setSchoolCode(getInstitutionCode());
-        student.setCourse(registration.getDegreeName());
+        student.setCourse(registration.getDegree().getIdCardName());
         student.setStudentNumber(registration.getStudent().getNumber());
         student.setAcademicYear(registration.getCurricularYear());
         student.setAcademicDegreeCode(objectFactory.createStudentAcademicDegreeCode(getCodeForDegreeType(

@@ -237,7 +237,7 @@ public class SearchMemberOutputData implements Serializable {
 
         searchMemberOutputData.setStudentNumber(String.valueOf(student.getNumber()));
         searchMemberOutputData.setDegreeCode(registration.getDegree().getMinistryCode());
-        searchMemberOutputData.setDegreeName(registration.getDegreeName());
+        searchMemberOutputData.setDegreeName(registration.getDegree().getIdCardName());
         searchMemberOutputData.setCurricularYear(registration.getCurricularYear());
         List<DegreeCurricularPlan> degreeCurricularPlansForYear =
                 registration.getDegree().getDegreeCurricularPlansForYear(ExecutionYear.readCurrentExecutionYear());
