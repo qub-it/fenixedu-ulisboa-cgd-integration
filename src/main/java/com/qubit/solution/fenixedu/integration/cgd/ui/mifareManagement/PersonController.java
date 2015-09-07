@@ -1,27 +1,24 @@
 package com.qubit.solution.fenixedu.integration.cgd.ui.mifareManagement;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
-import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Sender;
 import com.qubit.solution.fenixedu.integration.cgd.ui.CgdBaseController;
 import com.qubit.solution.fenixedu.integration.cgd.ui.CgdController;
 
-@SpringFunctionality(app = CgdController.class, title = "label.title.mifareManagement", accessGroup = "#managers | #cgdCollaborators")
+@SpringFunctionality(app = CgdController.class, title = "label.title.mifareManagement",
+        accessGroup = "#managers | #cgdCollaborators")
 @RequestMapping("/cgd/mifaremanagement/person")
 public class PersonController extends CgdBaseController {
 
@@ -49,6 +46,10 @@ public class PersonController extends CgdBaseController {
     }
 
     private List<Person> filterSearchPerson(String name, String username, String documentIdNumber) {
+        if (StringUtils.isEmpty(name) && StringUtils.isEmpty(username) && StringUtils.isEmpty(documentIdNumber)) {
+            return Collections.emptyList();
+        }
+
         Stream<Person> stream =
                 StringUtils.isEmpty(name) ? Party.getPartysSet(Person.class).stream() : Person.findPersonStream(name,
                         Integer.MAX_VALUE);
