@@ -111,6 +111,8 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
                     logger.error("Validation error : " + validation.getErrorMessage().getValue() + " [member: "
                             + validation.getMemberNames().getValue().getString().toString() + "]");
                 }
+            } else {
+                logger.info("Sent successfuly form 43 for student with number:" + registration.getStudent().getNumber());
             }
         } catch (Throwable t) {
             logger.warn("Problems while trying to send form43 for student with number: " + registration.getStudent().getNumber(),
