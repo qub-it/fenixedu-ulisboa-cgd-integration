@@ -30,6 +30,44 @@ ${portal.toolkit()}
 	</h1>
 </div>
 
+<div class="modal fade" id="deleteModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><spring:message code="label.confirmation"/></h4>
+      </div>
+      <div class="modal-body">
+        <p><spring:message code = "label.mifareManagement.cgdCard.confirmDelete"/></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><spring:message code = "label.close"/></button>
+        <a id="deleteLink" class="btn btn-danger" href="javascript:deleteCard();"> <spring:message code = "label.delete"/></a>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script>
+	function requestCardDelete(externalId) {
+		$('#deleteModal').modal('toggle')
+		$("#val").attr('value', externalId);
+	}
+	
+	function deleteCard() {
+		var externalId = $("#val").attr('value');
+		var url = "${pageContext.request.contextPath}/cgd/mifaremanagement/cgdcard/delete/" + externalId;
+		$("#deleteCgdForm").attr('action',url);
+		$("#deleteCgdForm").submit();
+	}
+</script>
+
+<form id="deleteCgdForm"
+	method="POST">
+<input type="hidden" id="val"/>	
+</form>
+	
+	
 <%-- NAVIGATION --%>
 <div class="well well-sm" style="display:inline-block">
 	<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span>&nbsp;<a class="" href="${pageContext.request.contextPath}/cgd/mifaremanagement/person/"  ><spring:message code="label.event.back" /></a>
@@ -140,6 +178,7 @@ ${portal.toolkit()}
 				
 				"actions" :
 				" <a  class=\"btn btn-default btn-xs\" href=\"${pageContext.request.contextPath}/cgd/mifaremanagement/cgdcard/update/${card.externalId}\"><spring:message code='label.edit'/></a>" +
+				" <a  class=\"btn btn-default btn-xs\" href=\"javascript:requestCardDelete(${card.externalId})\"><spring:message code='label.delete'/></a>" + 
                 "" },
             </c:forEach>
     ];

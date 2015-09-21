@@ -110,6 +110,13 @@ ${portal.toolkit()}
 	<input id="person_idDocumentNumbber" class="form-control" type="text" name="documentidnumber"  value='<c:out value='${not empty param.documentidnumber ? param.documentidnumber : person.documentIdNumber }'/>' />
 </div>	
 </div>		
+<div class="form-group row">
+<div class="col-sm-2 control-label"><spring:message code="label.Person.mifareCode"/></div> 
+
+<div class="col-sm-10">
+	<input id="person_mifareCode" class="form-control" type="text" name="mifareCode"  value='<c:out value='${param.mifareCode}'/>' />
+</div>	
+</div>		
 </div>
 <div class="panel-footer">
 	<input type="submit" class="btn btn-default" role="button" value="<spring:message code="label.search" />"/>

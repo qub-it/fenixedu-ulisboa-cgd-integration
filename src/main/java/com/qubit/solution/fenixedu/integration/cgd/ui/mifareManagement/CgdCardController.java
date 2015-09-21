@@ -1,6 +1,9 @@
 package com.qubit.solution.fenixedu.integration.cgd.ui.mifareManagement;
 
+import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.spring.portal.BennuSpringController;
 import org.fenixedu.ulisboa.specifications.domain.idcards.CgdCard;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -35,6 +38,13 @@ public class CgdCardController extends CgdBaseController {
     public String update(@PathVariable("oid") CgdCard cgdCard, Model model) {
         setCgdCard(cgdCard, model);
         return "cgd/mifaremanagement/cgdcard/update";
+    }
+
+    @RequestMapping(value = "/delete/{oid}", method = RequestMethod.POST)
+    public String delete(@PathVariable("oid") CgdCard cgdCard, Model model) {
+        Person person = cgdCard.getPerson();
+        cgdCard.delete();
+        return "redirect:/cgd/mifaremanagement/person/readpersonmifare/" + person.getExternalId();
     }
 
     @RequestMapping(value = "/update/{oid}", method = RequestMethod.POST)
@@ -73,10 +83,32 @@ public class CgdCardController extends CgdBaseController {
             @RequestParam(value = "validuntil", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ") org.joda.time.LocalDate validUntil,
             @RequestParam(value = "temporary", required = true) boolean temporary, Model model) {
 
-        CgdCard cgdCard = createCgdCard(person, mifareCode, validUntil, temporary);
-        model.addAttribute("cgdCard", cgdCard);
+        String correctMifareCode = mifareCode;
+        if (!StringUtils.isEmpty(mifareCode) && mifareCode.length() > 4) {
+            String possibleLength = mifareCode.substring(0, 4);
+            Integer valueOf = Integer.valueOf(possibleLength);
+            String possibleCode = mifareCode.substring(4);
+            // Codes may be insered with the check digits if so we have 
+            // to add them.
+            //
+            // 7 September 2015 - Paulo Abrantes
+            if (possibleCode.length() != valueOf) {
+                correctMifareCode = StringUtils.leftPad(String.valueOf(mifareCode.length()), 4, "0") + mifareCode;
+            }
+        }
 
-        return "redirect:/cgd/mifaremanagement/person/readpersonmifare/" + person.getExternalId();
+        final String mifareCodeToCheck = correctMifareCode;
+        if (Bennu.getInstance().getCgdCardsSet().stream().anyMatch(card -> mifareCodeToCheck.equals(card.getMifareCode()))) {
+            addErrorMessage(BundleUtil.getString(BUNDLE, "label.mifareManagment.cgdCard.duplicate", mifareCodeToCheck), model);
+            model.addAttribute("person", person);
+            return "cgd/mifaremanagement/cgdcard/create";
+        } else {
+
+            CgdCard cgdCard = createCgdCard(person, mifareCode, validUntil, temporary);
+            model.addAttribute("cgdCard", cgdCard);
+
+            return "redirect:/cgd/mifaremanagement/person/readpersonmifare/" + person.getExternalId();
+        }
     }
 
     @Atomic

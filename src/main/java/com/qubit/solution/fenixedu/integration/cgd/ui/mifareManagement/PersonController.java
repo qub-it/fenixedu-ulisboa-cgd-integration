@@ -9,6 +9,7 @@ import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
+import org.fenixedu.ulisboa.specifications.domain.idcards.CgdCard;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,24 +39,29 @@ public class PersonController extends CgdBaseController {
     @RequestMapping(value = "/")
     public String search(@RequestParam(value = "name", required = false, defaultValue = "") String name, @RequestParam(
             value = "username", required = false) String username,
-            @RequestParam(value = "documentidnumber", required = false) String documentIdNumber, Model model) {
+            @RequestParam(value = "documentidnumber", required = false) String documentIdNumber, @RequestParam(
+                    value = "mifareCode", required = false) String mifareCode, Model model) {
 
-        List<Person> searchpersonResultsDataSet = filterSearchPerson(name, username, documentIdNumber);
+        List<Person> searchpersonResultsDataSet = filterSearchPerson(name, username, documentIdNumber, mifareCode);
         model.addAttribute("searchpersonResultsDataSet", searchpersonResultsDataSet);
         return "cgd/mifaremanagement/person/search";
     }
 
-    private List<Person> filterSearchPerson(String name, String username, String documentIdNumber) {
-        if (StringUtils.isEmpty(name) && StringUtils.isEmpty(username) && StringUtils.isEmpty(documentIdNumber)) {
+    private List<Person> filterSearchPerson(String name, String username, String documentIdNumber, String mifareCode) {
+        if (StringUtils.isEmpty(name) && StringUtils.isEmpty(username) && StringUtils.isEmpty(documentIdNumber)
+                && StringUtils.isEmpty(mifareCode)) {
             return Collections.emptyList();
         }
 
         Stream<Person> stream =
                 StringUtils.isEmpty(name) ? Party.getPartysSet(Person.class).stream() : Person.findPersonStream(name,
                         Integer.MAX_VALUE);
-        return stream.filter(person -> StringUtils.isEmpty(username) || username.equals(person.getUsername()))
+        return stream
+                .filter(person -> StringUtils.isEmpty(username) || username.equals(person.getUsername()))
                 .filter(person -> StringUtils.isEmpty(documentIdNumber) || documentIdNumber.equals(person.getDocumentIdNumber()))
-                .collect(Collectors.toList());
+                .filter(person -> StringUtils.isEmpty(mifareCode)
+                        || (CgdCard.findByPerson(person) != null && mifareCode.equals(CgdCard.findByPerson(person)
+                                .getMifareCode()))).collect(Collectors.toList());
     }
 
     @RequestMapping(value = "/search/view/{oid}")
