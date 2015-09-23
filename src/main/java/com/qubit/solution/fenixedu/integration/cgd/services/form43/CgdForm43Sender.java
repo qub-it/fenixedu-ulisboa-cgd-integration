@@ -205,8 +205,10 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         personData.setFather(objectFactory.createPersonFather(getShortNameFor(person.getNameOfFather())));
         personData.setMother(objectFactory.createPersonMother(getShortNameFor(person.getNameOfMother())));
 
-        personData.setPlaceOfBirthCountryCode(objectFactory.createPersonPlaceOfBirthCountryCode(person.getCountryOfBirth()
-                .getCode()));
+        if (person.getCountryOfBirth() != null) {
+            personData.setPlaceOfBirthCountryCode(objectFactory.createPersonPlaceOfBirthCountryCode(person.getCountryOfBirth()
+                    .getCode()));
+        }
 
         personData.setPlaceOfBirthDistrict(objectFactory.createPersonPlaceOfBirthDistrict(person.getDistrictOfBirth()));
         personData.setPlaceOfBirthCounty(objectFactory.createPersonPlaceOfBirthCounty(person.getDistrictSubdivisionOfBirth()));
