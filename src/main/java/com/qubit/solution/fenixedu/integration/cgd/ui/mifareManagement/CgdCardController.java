@@ -84,7 +84,7 @@ public class CgdCardController extends CgdBaseController {
             @RequestParam(value = "temporary", required = true) boolean temporary, Model model) {
 
         String correctMifareCode = mifareCode;
-        if (!StringUtils.isEmpty(mifareCode) && mifareCode.length() > 4) {
+        if (!StringUtils.isBlank(mifareCode) && mifareCode.length() > 4) {
             String possibleLength = mifareCode.substring(0, 4);
             Integer valueOf = Integer.valueOf(possibleLength);
             String possibleCode = mifareCode.substring(4);
@@ -97,6 +97,11 @@ public class CgdCardController extends CgdBaseController {
             }
         }
 
+        if (StringUtils.isBlank(mifareCode)) {
+            addErrorMessage(BundleUtil.getString(BUNDLE, "label.mifareManagment.cgdCard.cannotBeBlank"), model);
+            model.addAttribute("person", person);
+            return "cgd/mifaremanagement/cgdcard/create";
+        }
         final String mifareCodeToCheck = correctMifareCode;
         if (Bennu.getInstance().getCgdCardsSet().stream().anyMatch(card -> mifareCodeToCheck.equals(card.getMifareCode()))) {
             addErrorMessage(BundleUtil.getString(BUNDLE, "label.mifareManagment.cgdCard.duplicate", mifareCodeToCheck), model);
