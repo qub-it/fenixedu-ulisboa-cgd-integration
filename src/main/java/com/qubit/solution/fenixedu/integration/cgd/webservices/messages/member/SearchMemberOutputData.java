@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -40,6 +41,7 @@ import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.ulisboa.specifications.ui.firstTimeCandidacy.util.FiscalCodeValidation;
 
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
 
@@ -204,8 +206,10 @@ public class SearchMemberOutputData implements Serializable {
         searchMemberOutputData.setMemberID(strategy.retrieveMemberID(person));
         searchMemberOutputData.setName(person.getName());
         String socialSecurityNumber = person.getSocialSecurityNumber();
-        if (socialSecurityNumber != null) {
+        if (socialSecurityNumber != null && FiscalCodeValidation.isValidcontrib(socialSecurityNumber)) {
             searchMemberOutputData.setFiscalCode(Long.valueOf(socialSecurityNumber));
+        }else {
+            searchMemberOutputData.setFiscalCode(0L);
         }
 
         Unit institutionUnit = Bennu.getInstance().getInstitutionUnit();
