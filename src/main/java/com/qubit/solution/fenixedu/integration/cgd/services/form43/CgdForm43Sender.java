@@ -395,6 +395,12 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         return DEGREE;
     }
 
+    public String getSchooldIESCode() {
+        String institutionCode = getInstitutionCode();
+        IIESService client = getClient();
+        return findIES(institutionCode, client);
+    }
+
     private static String findIES(String ministryCode, IIESService service) {
         List<School> schools = service.getSchools().getSchool();
         for (School school : schools) {
