@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <endpoints xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime"
 	version="2.0">
-	<endpoint name="cgdIntegration" implementation="com.qubit.solution.fenixedu.integration.cgd.webservices.CgdIntegrationService"
+	<endpoint name="cgdIntegration"
+		implementation="com.qubit.solution.fenixedu.integration.cgd.webservices.CgdIntegrationService"
 		url-pattern="/web-services/cgdIntegration" />
+
+	<endpoint name="temporaryMifare"
+		implementation="com.qubit.solution.fenixedu.integration.cgd.webservices.TemporaryMifareReceiverService"
+		url-pattern="/web-services/temporaryMifare" />
 </endpoints>
