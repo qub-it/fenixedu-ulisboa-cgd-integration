@@ -159,6 +159,9 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
     }
 
     private static String getCodeForProfessionalCondition(ProfessionalSituationConditionType professionalCondition) {
+        if (professionalCondition == null) {
+            professionalCondition = ProfessionalSituationConditionType.UNKNOWN;
+        }
         switch (professionalCondition) {
         case WORKS_FOR_OTHERS:
             return "1";
@@ -273,45 +276,54 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
     }
 
     private static String getCodeForDocumentType(IDDocumentType idDocumentType) {
-        switch (idDocumentType) {
-        case IDENTITY_CARD:
-            return "101";
-        case PASSPORT:
-            return "302";
-        case FOREIGNER_IDENTITY_CARD:
-            return "301";
-        case NATIVE_COUNTRY_IDENTITY_CARD:
-            return "301";
-        case NAVY_IDENTITY_CARD:
-            return "203";
-        case AIR_FORCE_IDENTITY_CARD:
-            return "202";
-        case OTHER:
-            return null;
-        case MILITARY_IDENTITY_CARD:
-            return "201";
-        case EXTERNAL:
-            return null;
-        case CITIZEN_CARD:
-            return "801";
-        case RESIDENCE_AUTHORIZATION:
-            return "102";
+        if (idDocumentType != null) {
+            switch (idDocumentType) {
+            case IDENTITY_CARD:
+                return "101";
+            case PASSPORT:
+                return "302";
+            case FOREIGNER_IDENTITY_CARD:
+                return "301";
+            case NATIVE_COUNTRY_IDENTITY_CARD:
+                return "301";
+            case NAVY_IDENTITY_CARD:
+                return "203";
+            case AIR_FORCE_IDENTITY_CARD:
+                return "202";
+            case OTHER:
+                return null;
+            case MILITARY_IDENTITY_CARD:
+                return "201";
+            case EXTERNAL:
+                return null;
+            case CITIZEN_CARD:
+                return "801";
+            case RESIDENCE_AUTHORIZATION:
+                return "102";
+            }
         }
         return null;
     }
 
     private static String getCodeForGender(Gender gender) {
-        switch (gender) {
-        case MALE:
-            return "M";
-        case FEMALE:
-            return "F";
-        default:
+        if (gender != null) {
+            switch (gender) {
+            case MALE:
+                return "M";
+            case FEMALE:
+                return "F";
+            default:
+                return "X";
+            }
+        } else {
             return "X";
         }
     }
 
     private static String getCodeForMaritalStatus(org.fenixedu.academic.domain.person.MaritalStatus maritalStatus) {
+        if (maritalStatus == null) {
+            maritalStatus = org.fenixedu.academic.domain.person.MaritalStatus.UNKNOWN;
+        }
         switch (maritalStatus) {
         case SINGLE:
             return "001";
