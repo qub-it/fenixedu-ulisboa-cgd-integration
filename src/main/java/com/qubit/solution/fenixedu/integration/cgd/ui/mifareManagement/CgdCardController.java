@@ -52,7 +52,7 @@ public class CgdCardController extends CgdBaseController {
             @PathVariable("oid") CgdCard cgdCard,
             @RequestParam(value = "mifarecode", required = true) java.lang.String mifareCode,
             @RequestParam(value = "cardNumber", required = false) java.lang.String cardNumber,
-            @RequestParam(value = "validuntil", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ") org.joda.time.LocalDate validUntil,
+            @RequestParam(value = "validuntil", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") org.joda.time.LocalDate validUntil,
             @RequestParam(value = "temporary", required = true) boolean temporary, Model model) {
 
         setCgdCard(cgdCard, model);
@@ -80,7 +80,7 @@ public class CgdCardController extends CgdBaseController {
     public String create(
             @PathVariable("oid") Person person,
             @RequestParam(value = "mifarecode", required = false) java.lang.String mifareCode,
-            @RequestParam(value = "validuntil", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ") org.joda.time.LocalDate validUntil,
+            @RequestParam(value = "validuntil", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") org.joda.time.LocalDate validUntil,
             @RequestParam(value = "temporary", required = true) boolean temporary, Model model) {
 
         String correctMifareCode = mifareCode;
