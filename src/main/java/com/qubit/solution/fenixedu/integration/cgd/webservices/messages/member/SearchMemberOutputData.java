@@ -39,6 +39,7 @@ import org.fenixedu.academic.domain.TeacherCategory;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
+import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.treasury.util.FiscalCodeValidation;
 
@@ -204,8 +205,9 @@ public class SearchMemberOutputData implements Serializable {
         SearchMemberOutputData searchMemberOutputData = new SearchMemberOutputData();
         searchMemberOutputData.setMemberID(strategy.retrieveMemberID(person));
         searchMemberOutputData.setName(person.getName());
-        String socialSecurityNumber = person.getSocialSecurityNumber();
-        if (socialSecurityNumber != null && FiscalCodeValidation.isValidcontrib(socialSecurityNumber)) {
+        String socialSecurityNumber = PersonCustomer.fiscalNumber(person);
+        String fiscalCountry = PersonCustomer.countryCode(person);
+        if (socialSecurityNumber != null && FiscalCodeValidation.isValidcontrib(fiscalCountry, socialSecurityNumber)) {
             searchMemberOutputData.setFiscalCode(Long.valueOf(socialSecurityNumber));
         }else {
             searchMemberOutputData.setFiscalCode(0L);
