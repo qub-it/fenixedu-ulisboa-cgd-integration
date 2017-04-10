@@ -42,7 +42,7 @@ public class StudentNumberAdapter implements IMemberIDAdapter {
     @Override
     public Person readPerson(String memberID) {
         Student readStudentByNumber = Student.readStudentByNumber(Integer.valueOf(memberID));
-        return readStudentByNumber.getPerson();
+        return readStudentByNumber != null ? readStudentByNumber.getPerson() : null;
     }
 
 }
