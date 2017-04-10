@@ -34,11 +34,15 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.core.groups.DynamicGroup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
 
 public class CgdMessageUtils {
+
+    private static Logger logger = LoggerFactory.getLogger(CgdMessageUtils.class);
 
     public static int REPLY_CODE_OPERATION_OK = 0;
     public static int REPLY_CODE_INFORMATION_NOT_OK = 1;
@@ -50,9 +54,14 @@ public class CgdMessageUtils {
             switch (populationCode.charAt(0)) {
             case 'A':
                 Student student = null;
-                if (StringUtils.isNumeric(memberCode)) {
-                    student = Student.readStudentByNumber(Integer.valueOf(memberCode));
+
+                try {
+                    int number = Integer.parseInt(memberCode);
+                    student = Student.readStudentByNumber(number);
+                } catch (Exception e) {
+                    logger.warn(String.format("Invalid student number: [%s]", memberCode));
                 }
+
                 if (student != null) {
                     requestedPerson = student.getPerson();
                 }
