@@ -207,7 +207,7 @@ public class SearchMemberOutputData implements Serializable {
         searchMemberOutputData.setName(person.getName());
         String socialSecurityNumber = PersonCustomer.fiscalNumber(person);
         String fiscalCountry = PersonCustomer.countryCode(person);
-        if (socialSecurityNumber != null && FiscalCodeValidation.isValidcontrib(fiscalCountry, socialSecurityNumber)) {
+        if (socialSecurityNumber != null && FiscalCodeValidation.isValidFiscalNumber(fiscalCountry, socialSecurityNumber)) {
             searchMemberOutputData.setFiscalCode(Long.valueOf(socialSecurityNumber));
         }else {
             searchMemberOutputData.setFiscalCode(0L);
