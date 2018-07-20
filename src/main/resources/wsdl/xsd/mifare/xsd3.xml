@@ -1,0 +1,17 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://schemas.datacontract.org/2004/07/WcfService2" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/WcfService2">
+	<xs:simpleType name="ErrorCode">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="NONE"/>
+			<xs:enumeration value="INTERNAL_ERROR"/>
+			<xs:enumeration value="INVALID_DATA"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="ErrorCode" nillable="true" type="tns:ErrorCode"/>
+	<xs:simpleType name="Status">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="OK"/>
+			<xs:enumeration value="NOK"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="Status" nillable="true" type="tns:Status"/>
+</xs:schema>

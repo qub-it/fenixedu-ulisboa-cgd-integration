@@ -1,0 +1,12 @@
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="GenericWebService.Response" elementFormDefault="qualified" targetNamespace="GenericWebService.Response">
+	<xs:import schemaLocation="xsd3.xml" namespace="http://schemas.datacontract.org/2004/07/WcfService2"/>
+	<xs:complexType name="Response">
+		<xs:sequence>
+			<xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/WcfService2" minOccurs="0" name="ErrorCode" type="q1:ErrorCode"/>
+			<xs:element minOccurs="0" name="ErrorDescription" nillable="true" type="xs:string"/>
+			<xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/WcfService2" minOccurs="0" name="status" type="q2:Status"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Response" nillable="true" type="tns:Response"/>
+</xs:schema>

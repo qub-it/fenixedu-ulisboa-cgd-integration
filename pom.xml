@@ -145,6 +145,7 @@
 					</wsdlDirectory>
 					<wsdlFiles>
 						<wsdlFile>IESService.prod.wsdl</wsdlFile>
+						<wsdlFile>mifare.wsdl</wsdlFile>
 					</wsdlFiles>
 					<wsdlLocation>
 						/wsdl/IESService.prod.wsdl

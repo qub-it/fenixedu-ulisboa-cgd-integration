@@ -3,8 +3,8 @@
  * copyright terms are bind to the legal agreement regulating the FenixEdu@ULisboa 
  * software development project between Quorum Born IT and Serviços Partilhados da
  * Universidade de Lisboa:
- *  - Copyright © 2016 Quorum Born IT (until any Go-Live phase)
- *  - Copyright © 2016 Universidade de Lisboa (after any Go-Live phase)
+ *  - Copyright © 2015 Quorum Born IT (until any Go-Live phase)
+ *  - Copyright © 2015 Universidade de Lisboa (after any Go-Live phase)
  *
  * Contributors: paulo.abrantes@qub-it.com
  *
@@ -27,28 +27,35 @@
 package com.qubit.solution.fenixedu.integration.cgd.webservices;
 
 import javax.jws.WebMethod;
+import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.jws.WebService;
+import javax.xml.ws.RequestWrapper;
+import javax.xml.ws.ResponseWrapper;
 
+import org.datacontract.schemas._2004._07.wcfservice2.ErrorCode;
+import org.datacontract.schemas._2004._07.wcfservice2.Status;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.ulisboa.specifications.domain.idcards.CgdCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pt.ist.fenixframework.Atomic;
-
 import com.qubit.solution.fenixedu.bennu.webservices.services.server.BennuWebService;
 import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Sender;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
-import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.mifareReceiver.Response;
-import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.mifareReceiver.Response.ErrorCode;
-import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.mifareReceiver.Response.Status;
+
+import pt.ist.fenixframework.Atomic;
+import receveivemifareservice.IGenericService;
+import response.genericwebservice.Response;
 
 @WebService
-public class TemporaryMifareReceiverService extends BennuWebService {
+public class ReceiveMifareService extends BennuWebService implements IGenericService {
 
-    private static Logger logger = LoggerFactory.getLogger(TemporaryMifareReceiverService.class);
+    private static Logger logger = LoggerFactory.getLogger(ReceiveMifareService.class);
 
     private static String IES_CODE = null;
+
+    response.genericwebservice.ObjectFactory objectFactory = new response.genericwebservice.ObjectFactory();
 
     private String getIESCode() {
         if (IES_CODE == null) {
@@ -57,21 +64,31 @@ public class TemporaryMifareReceiverService extends BennuWebService {
         return IES_CODE;
     }
 
-    @WebMethod
-    public Response receiveMifare(String mifare, String memberNumber, String memberCategoryCode, String iesCode) {
-
+    @WebMethod(operationName = "ReceiveMifare", action = "http://ReceveiveMifareService/IGenericService/ReceiveMifare")
+    @WebResult(name = "ReceiveMifareResult", targetNamespace = "http://ReceveiveMifareService")
+    @RequestWrapper(localName = "ReceiveMifare", targetNamespace = "http://ReceveiveMifareService",
+            className = "receveivemifareservice.ReceiveMifare")
+    @ResponseWrapper(localName = "ReceiveMifareResponse", targetNamespace = "http://ReceveiveMifareService",
+            className = "receveivemifareservice.ReceiveMifareResponse")
+    @Override
+    public Response receiveMifare(@WebParam(name = "Mifare", targetNamespace = "http://ReceveiveMifareService") String mifare,
+            @WebParam(name = "MemberNumber", targetNamespace = "http://ReceveiveMifareService") String memberNumber,
+            @WebParam(name = "memberCategoryCode", targetNamespace = "http://ReceveiveMifareService") String memberCategoryCode,
+            @WebParam(name = "IES", targetNamespace = "http://ReceveiveMifareService") String iesCode) {
         Response response = new Response();
         if (getIESCode() != null && !getIESCode().equals(iesCode)) {
             response.setStatus(Status.NOK);
             response.setErrorCode(ErrorCode.INVALID_DATA);
-            response.setErrorDescription("Wrong iesCode, expected: " + getIESCode() + " received " + iesCode);
+            response.setErrorDescription(objectFactory
+                    .createResponseErrorDescription("Wrong iesCode, expected: " + getIESCode() + " received " + iesCode));
         } else {
             try {
                 Person readPerson = CgdMessageUtils.getMemberIDStrategy().readPerson(memberNumber);
                 if (readPerson == null) {
                     response.setStatus(Status.NOK);
                     response.setErrorCode(ErrorCode.INVALID_DATA);
-                    response.setErrorDescription("No member with identification: " + memberNumber);
+                    response.setErrorDescription(
+                            objectFactory.createResponseErrorDescription("No member with identification: " + memberNumber));
                 } else {
                     CgdCard card = CgdCard.findByPerson(readPerson);
                     if (card != null) {
@@ -79,13 +96,15 @@ public class TemporaryMifareReceiverService extends BennuWebService {
                     } else {
                         createCgdCard(readPerson, mifare);
                     }
+                    response.setStatus(Status.OK);
+                    response.setErrorCode(ErrorCode.NONE);
                 }
 
             } catch (Throwable t) {
                 logger.error("Problem while receiving temporary mifare", t);
                 response.setStatus(Status.NOK);
                 response.setErrorCode(ErrorCode.INTERNAL_ERROR);
-                response.setErrorDescription(t.getMessage());
+                response.setErrorDescription(objectFactory.createResponseErrorDescription(t.getMessage()));
             }
         }
         return response;

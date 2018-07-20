@@ -5,7 +5,8 @@
 		implementation="com.qubit.solution.fenixedu.integration.cgd.webservices.CgdIntegrationService"
 		url-pattern="/web-services/cgdIntegration" />
 
-	<endpoint name="temporaryMifare"
-		implementation="com.qubit.solution.fenixedu.integration.cgd.webservices.TemporaryMifareReceiverService"
-		url-pattern="/web-services/temporaryMifare" />
+	<endpoint name="receiveMifare"
+		implementation="com.qubit.solution.fenixedu.integration.cgd.webservices.ReceiveMifareService"
+		url-pattern="/web-services/receiveMifare" />
+		
 </endpoints>

@@ -1,0 +1,20 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://ReceveiveMifareService" elementFormDefault="qualified" targetNamespace="http://ReceveiveMifareService">
+	<xs:import schemaLocation="xsd2.xml" namespace="GenericWebService.Response"/>
+	<xs:element name="ReceiveMifare">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="0" name="Mifare" nillable="true" type="xs:string"/>
+				<xs:element minOccurs="0" name="MemberNumber" nillable="true" type="xs:string"/>
+				<xs:element minOccurs="0" name="memberCategoryCode" nillable="true" type="xs:string"/>
+				<xs:element minOccurs="0" name="IES" nillable="true" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ReceiveMifareResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element xmlns:q1="GenericWebService.Response" minOccurs="0" name="ReceiveMifareResult" nillable="true" type="q1:Response"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
