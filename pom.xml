@@ -21,37 +21,37 @@
 		<version.org.fenixedu.academic>8.4.0</version.org.fenixedu.academic>
 	</properties>
 	<dependencies>
-        <dependency>
-            <groupId>org.fenixedu</groupId>
-            <artifactId>bennu-core</artifactId>
-            <version>${version.org.fenixedu.bennu}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.fenixedu</groupId>
-            <artifactId>bennu-scheduler</artifactId>
-            <version>${version.org.fenixedu.bennu}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.fenixedu</groupId>
-            <artifactId>bennu-portal</artifactId>
-            <version>${version.org.fenixedu.bennu}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.fenixedu</groupId>
-            <artifactId>bennu-io</artifactId>
-            <version>${version.org.fenixedu.bennu}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.fenixedu</groupId>
-            <artifactId>bennu-spring</artifactId>
-            <version>${version.org.fenixedu.bennu}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.fenixedu</groupId>
-            <artifactId>bennu-cas-client</artifactId>
-            <version>${version.org.fenixedu.bennu}</version>
-        </dependency>
-   
+		<dependency>
+			<groupId>org.fenixedu</groupId>
+			<artifactId>bennu-core</artifactId>
+			<version>${version.org.fenixedu.bennu}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.fenixedu</groupId>
+			<artifactId>bennu-scheduler</artifactId>
+			<version>${version.org.fenixedu.bennu}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.fenixedu</groupId>
+			<artifactId>bennu-portal</artifactId>
+			<version>${version.org.fenixedu.bennu}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.fenixedu</groupId>
+			<artifactId>bennu-io</artifactId>
+			<version>${version.org.fenixedu.bennu}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.fenixedu</groupId>
+			<artifactId>bennu-spring</artifactId>
+			<version>${version.org.fenixedu.bennu}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.fenixedu</groupId>
+			<artifactId>bennu-cas-client</artifactId>
+			<version>${version.org.fenixedu.bennu}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.qubit.solution.fenixedu</groupId>
 			<artifactId>bennu-webservices-core</artifactId>
@@ -71,6 +71,16 @@
 			<groupId>org.fenixedu.ulisboa</groupId>
 			<artifactId>fenixedu-ulisboa-specifications</artifactId>
 			<version>2.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.fenixedu</groupId>
+			<artifactId>fenixedu-academic-extensions</artifactId>
+			<version>2.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.libphonenumber</groupId>
+			<artifactId>libphonenumber</artifactId>
+			<version>8.9.9</version>
 		</dependency>
 	</dependencies>
 

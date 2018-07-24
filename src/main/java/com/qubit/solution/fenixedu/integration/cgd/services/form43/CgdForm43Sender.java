@@ -43,10 +43,20 @@ import org.fenixedu.academic.domain.person.Gender;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.academic.domain.student.PersonalIngressionData;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academicextensions.domain.person.dataShare.DataShareAuthorization;
+import org.fenixedu.academicextensions.domain.person.dataShare.DataShareAuthorizationType;
+import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.YearMonthDay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
+import com.microsoft.schemas._2003._10.serialization.arrays.ArrayOfstring;
+import com.qubit.solution.fenixedu.bennu.webservices.services.client.BennuWebServiceClient;
+import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
+import com.qubit.solution.fenixedu.integration.cgd.services.CgdAuthorizationCodes;
 
 import services.caixaiu.cgd.wingman.iesservice.Client;
 import services.caixaiu.cgd.wingman.iesservice.Form43Digital;
@@ -59,10 +69,6 @@ import services.caixaiu.cgd.wingman.iesservice.Person;
 import services.caixaiu.cgd.wingman.iesservice.Student;
 import services.caixaiu.cgd.wingman.iesservice.ValidationResult;
 import services.caixaiu.cgd.wingman.iesservice.Worker;
-
-import com.microsoft.schemas._2003._10.serialization.arrays.ArrayOfstring;
-import com.qubit.solution.fenixedu.bennu.webservices.services.client.BennuWebServiceClient;
-import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
 
 public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
 
@@ -102,11 +108,11 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
             OperationResult setForm43DigitalData = service.setForm43DigitalData(form43Digital);
             success = !setForm43DigitalData.isError();
             if (!success) {
-                logger.info("Problems while trying to send form 43 to student with number: "
-                        + registration.getStudent().getNumber() + "with message: "
-                        + setForm43DigitalData.getFriendlyMessage().getValue() + "\nCode id: " + setForm43DigitalData.getCodeId()
-                        + "\n Unique Error ID: " + setForm43DigitalData.getUEC()
-                        + "\n In case there are violations they'll be present bellow ");
+                logger.info(
+                        "Problems while trying to send form 43 to student with number: " + registration.getStudent().getNumber()
+                                + "with message: " + setForm43DigitalData.getFriendlyMessage().getValue() + "\nCode id: "
+                                + setForm43DigitalData.getCodeId() + "\n Unique Error ID: " + setForm43DigitalData.getUEC()
+                                + "\n In case there are violations they'll be present bellow ");
                 for (ValidationResult validation : setForm43DigitalData.getViolations().getValue().getValidationResult()) {
                     logger.error("Validation error : " + validation.getErrorMessage().getValue() + " [member: "
                             + validation.getMemberNames().getValue().getString().toString() + "]");
@@ -131,30 +137,39 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
     private static Client createClient(org.fenixedu.academic.domain.Person person, IIESService service) {
         Client client = new Client();
         String findIES = findIES(getInstitutionCode(), service);
-        client.setIES(findIES);
-        client.setGroup(objectFactory.createClientGroup("1")); // Fernando Nunes indicou que é o protocolo e neste caso será sempre 1
-        client.setMemberCategoryCode("91"); // Resposta da Carla Récio a 19 do 6 indica que grande parte das escolas usam ALUNOS 
-        String retrieveMemberID = CgdIntegrationConfiguration.getInstance().getMemberIDStrategy().retrieveMemberID(person);
-        client.setMemberNumber(retrieveMemberID);
+
+        executeIfAllowed(person, CgdAuthorizationCodes.BASIC_INFO, () -> {
+            client.setIES(findIES);
+            client.setGroup(objectFactory.createClientGroup("1")); // Fernando Nunes indicou que é o protocolo e neste caso será sempre 1
+            client.setMemberCategoryCode("91"); // Resposta da Carla Récio a 19 do 6 indica que grande parte das escolas usam ALUNOS 
+            String retrieveMemberID = CgdIntegrationConfiguration.getInstance().getMemberIDStrategy().retrieveMemberID(person);
+            client.setMemberNumber(retrieveMemberID);
+        });
 
         return client;
+
     }
 
     private static Worker createWorker(org.fenixedu.academic.domain.Person person) {
         Worker worker = new Worker();
-        worker.setIsWorker(person.getStudent().isWorkingStudent());
-        PersonalIngressionData personalIngressionDataByExecutionYear =
-                person.getStudent().getPersonalIngressionDataByExecutionYear(ExecutionYear.readCurrentExecutionYear());
+        executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_WORKING_INFO, () -> {
+            worker.setIsWorker(person.getStudent().isWorkingStudent());
+            PersonalIngressionData personalIngressionDataByExecutionYear =
+                    person.getStudent().getPersonalIngressionDataByExecutionYear(ExecutionYear.readCurrentExecutionYear());
 
-        if (personalIngressionDataByExecutionYear != null) {
-            // should we also skip this?
-            worker.setSituationCode(objectFactory
-                    .createWorkerSituationCode(getCodeForProfessionalCondition(personalIngressionDataByExecutionYear
-                            .getProfessionalCondition())));
-            // Skipping employeer
-            // Skpping situationCode
-            // Skipping fiscal country code
-        }
+            if (personalIngressionDataByExecutionYear != null) {
+                // should we also skip this?
+                worker.setSituationCode(objectFactory.createWorkerSituationCode(
+                        getCodeForProfessionalCondition(personalIngressionDataByExecutionYear.getProfessionalCondition())));
+                // Skipping employeer
+                // Skpping situationCode
+                // Skipping fiscal country code
+            }
+        });
+
+        executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_FISCAL_COUNTRY, () -> worker
+                .setFiscalCountryCode(objectFactory.createWorkerFiscalCountryCode(PersonCustomer.countryCode(person))));
+
         return worker;
     }
 
@@ -182,64 +197,104 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
 
     }
 
+    private static void executeIfAllowed(org.fenixedu.academic.domain.Person person, String dataShareQuestionCode,
+            Runnable executeIfAuthorized) {
+        DataShareAuthorization authorization =
+                DataShareAuthorization.findLatest(person, DataShareAuthorizationType.findUnique(dataShareQuestionCode));
+        if (authorization != null && authorization.getAllow()) {
+            executeIfAuthorized.run();
+        }
+    }
+
     private static Person createPerson(org.fenixedu.academic.domain.Person person) {
         Person personData = new Person();
-        personData.setName(person.getName());
-        personData.setEmail(objectFactory.createPersonEmail(person.getInstitutionalEmailAddressValue()));
-        personData.setGenderCode(objectFactory.createPersonGenderCode(getCodeForGender(person.getGender())));
-        try {
-            YearMonthDay dateOfBirthYearMonthDay = person.getDateOfBirthYearMonthDay();
-            if (dateOfBirthYearMonthDay != null) {
-                personData.setBirthDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(
-                        dateOfBirthYearMonthDay.toDateTimeAtMidnight().toGregorianCalendar()));
-            }
-        } catch (DatatypeConfigurationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+
+        executeIfAllowed(person, CgdAuthorizationCodes.BASIC_INFO, () -> personData.setName(person.getName()));
+        executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_EMAIL,
+                () -> personData.setEmail(objectFactory.createPersonEmail(person.getInstitutionalEmailAddressValue())));
+        executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_GENDER,
+                () -> personData.setGenderCode(objectFactory.createPersonGenderCode(getCodeForGender(person.getGender()))));
+
+        YearMonthDay dateOfBirthYearMonthDay = person.getDateOfBirthYearMonthDay();
+        if (dateOfBirthYearMonthDay != null) {
+            executeIfAllowed(person, CgdAuthorizationCodes.BASIC_INFO, () -> {
+                try {
+                    personData.setBirthDate(DatatypeFactory.newInstance()
+                            .newXMLGregorianCalendar(dateOfBirthYearMonthDay.toDateTimeAtMidnight().toGregorianCalendar()));
+                } catch (DatatypeConfigurationException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            });
         }
-        personData.setFiscalNumber(objectFactory.createPersonFiscalNumber(person.getSocialSecurityNumber()));
+        executeIfAllowed(person, CgdAuthorizationCodes.BASIC_INFO,
+                () -> personData.setFiscalNumber(objectFactory.createPersonFiscalNumber(person.getSocialSecurityNumber())));
+
         PersonalIngressionData personalIngressionDataByExecutionYear =
                 person.getStudent().getPersonalIngressionDataByExecutionYear(ExecutionYear.readCurrentExecutionYear());
         if (personalIngressionDataByExecutionYear != null) {
             org.fenixedu.academic.domain.person.MaritalStatus maritalStatus =
                     personalIngressionDataByExecutionYear.getMaritalStatus();
-            personData.setMaritalStatusCode(objectFactory.createPersonMaritalStatusCode(getCodeForMaritalStatus(maritalStatus)));
+            executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_MARITAL_STATUS, () -> personData
+                    .setMaritalStatusCode(objectFactory.createPersonMaritalStatusCode(getCodeForMaritalStatus(maritalStatus))));
+
         }
-        personData.setFather(objectFactory.createPersonFather(getShortNameFor(person.getNameOfFather())));
-        personData.setMother(objectFactory.createPersonMother(getShortNameFor(person.getNameOfMother())));
+
+        executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_FATHER_NAME,
+                () -> personData.setFather(objectFactory.createPersonFather(getShortNameFor(person.getNameOfFather()))));
+
+        executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_MOTHER_NAME,
+                () -> personData.setMother(objectFactory.createPersonMother(getShortNameFor(person.getNameOfMother()))));
 
         if (person.getCountryOfBirth() != null) {
-            personData.setPlaceOfBirthCountryCode(objectFactory.createPersonPlaceOfBirthCountryCode(person.getCountryOfBirth()
-                    .getCode()));
+            executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_BIRTH_COUNTRY,
+                    () -> personData.setPlaceOfBirthCountryCode(
+                            objectFactory.createPersonPlaceOfBirthCountryCode(person.getCountryOfBirth().getCode())));
         }
 
-        personData.setPlaceOfBirthDistrict(objectFactory.createPersonPlaceOfBirthDistrict(person.getDistrictOfBirth()));
-        personData.setPlaceOfBirthCounty(objectFactory.createPersonPlaceOfBirthCounty(person.getDistrictSubdivisionOfBirth()));
-        personData.setPlaceOfBirthParish(objectFactory.createPersonPlaceOfBirthParish(person.getParishOfBirth()));
+        executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_BIRTH_DISTRICT, () -> personData
+                .setPlaceOfBirthDistrict(objectFactory.createPersonPlaceOfBirthDistrict(person.getDistrictOfBirth())));
+
+        executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_BIRTH_COUNTY, () -> personData
+                .setPlaceOfBirthCounty(objectFactory.createPersonPlaceOfBirthCounty(person.getDistrictSubdivisionOfBirth())));
+
+        executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_BIRTH_PARISH,
+                () -> personData.setPlaceOfBirthParish(objectFactory.createPersonPlaceOfBirthParish(person.getParishOfBirth())));
 
         ArrayOfstring nationality = new ArrayOfstring();
         nationality.getString().add(person.getCountry().getCode());
-        personData.setNationalities(nationality);
+        Country countryOfResidence = person.getCountryOfResidence();
+
+        executeIfAllowed(person, CgdAuthorizationCodes.BASIC_INFO, () -> {
+            personData.setNationalities(nationality);
+            if (countryOfResidence != null) {
+                personData.setCountryOfResidenceCode(
+                        objectFactory.createPersonCountryOfResidenceCode(countryOfResidence.getCode()));
+            } else {
+                personData.setCountryOfResidenceCode(objectFactory.createPersonCountryOfResidenceCode("PT"));
+            }
+        });
 
         PhysicalAddress defaultPhysicalAddress = person.getDefaultPhysicalAddress();
         if (defaultPhysicalAddress != null) {
-            personData.setAddress(objectFactory.createPersonAddress(defaultPhysicalAddress.getAddress()));
-            personData.setPlace(objectFactory.createPersonPlace(defaultPhysicalAddress.getArea()));
-            personData.setPostalCode(objectFactory.createPersonPostalCode(defaultPhysicalAddress.getAreaCode()));
-            personData.setDistrict(objectFactory.createPersonDistrict(defaultPhysicalAddress.getDistrictOfResidence()));
-            personData.setCounty(objectFactory.createPersonCounty(defaultPhysicalAddress.getDistrictSubdivisionOfResidence()));
-            personData.setParish(objectFactory.createPersonParish(defaultPhysicalAddress.getParishOfResidence()));
+            executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_PLACE, () -> {
+                personData.setAddress(objectFactory.createPersonAddress(defaultPhysicalAddress.getAddress()));
+                personData.setPlace(objectFactory.createPersonPlace(defaultPhysicalAddress.getArea()));
+            });
+            executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_POSTAL_CODE,
+                    () -> personData.setPostalCode(objectFactory.createPersonPostalCode(defaultPhysicalAddress.getAreaCode())));
+            executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_DISTRICT, () -> personData
+                    .setDistrict(objectFactory.createPersonDistrict(defaultPhysicalAddress.getDistrictOfResidence())));
+            executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_POSTAL_COUNTY, () -> personData
+                    .setCounty(objectFactory.createPersonCounty(defaultPhysicalAddress.getDistrictSubdivisionOfResidence())));
+            executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_POSTAL_PARISH,
+                    () -> personData.setParish(objectFactory.createPersonParish(defaultPhysicalAddress.getParishOfResidence())));
         }
 
-        Country countryOfResidence = person.getCountryOfResidence();
-        if (countryOfResidence != null) {
-            personData.setCountryOfResidenceCode(objectFactory.createPersonCountryOfResidenceCode(countryOfResidence.getCode()));
-        } else {
-            personData.setCountryOfResidenceCode(objectFactory.createPersonCountryOfResidenceCode("PT"));
-        }
-
-        personData.setPhone(objectFactory.createPersonPhone(person.getDefaultPhoneNumber()));
-        personData.setMobilePhone(objectFactory.createPersonMobilePhone(person.getDefaultMobilePhoneNumber()));
+        executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_PHONE, () -> personData
+                .setPhone(objectFactory.createPersonPhone(getPhoneNumberWithoutCountryCode(person.getDefaultPhoneNumber()))));
+        executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_MOBILE_PHONE, () -> personData.setMobilePhone(
+                objectFactory.createPersonMobilePhone(getPhoneNumberWithoutCountryCode(person.getDefaultMobilePhoneNumber()))));
 
         IdentificationCard card = new IdentificationCard();
 
@@ -250,20 +305,37 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         }
         card.setNumber(person.getDocumentIdNumber());
         // skipping issuer country code
-        try {
-            YearMonthDay expirationDateOfDocumentIdYearMonthDay = person.getExpirationDateOfDocumentIdYearMonthDay();
-            if (expirationDateOfDocumentIdYearMonthDay != null) {
-                card.setExpirationDate(objectFactory.createIdentificationCardExpirationDate(DatatypeFactory.newInstance()
-                        .newXMLGregorianCalendar(
-                                expirationDateOfDocumentIdYearMonthDay.toDateTimeAtMidnight().toGregorianCalendar())));
+        executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_ID_CARD_EXPIRATION_DATE, () -> {
+            try {
+                YearMonthDay expirationDateOfDocumentIdYearMonthDay = person.getExpirationDateOfDocumentIdYearMonthDay();
+                if (expirationDateOfDocumentIdYearMonthDay != null) {
+                    card.setExpirationDate(objectFactory
+                            .createIdentificationCardExpirationDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(
+                                    expirationDateOfDocumentIdYearMonthDay.toDateTimeAtMidnight().toGregorianCalendar())));
+                }
+            } catch (DatatypeConfigurationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
-        } catch (DatatypeConfigurationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        });
         personData.setIdentificationCard(objectFactory.createIdentificationCard(card));
 
         return personData;
+    }
+
+    private static String getPhoneNumberWithoutCountryCode(String phoneNumber) {
+        if (phoneNumber == null) {
+            return null;
+        }
+        PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+        try {
+            PhoneNumber numberProto = phoneUtil.parse(phoneNumber, "");
+            return String.valueOf(numberProto.getNationalNumber());
+        } catch (Throwable t) {
+            // most probably it was a number without country code so we'll just
+            // send the number as is.
+            return phoneNumber;
+        }
     }
 
     private static String getShortNameFor(String name) {
@@ -346,15 +418,17 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
 
     private static Student createStudent(Registration registration) {
         Student student = new Student();
-        student.setSchoolCode(getInstitutionCode());
-        student.setCourse(registration.getDegree().getIdCardName());
-        // new contract not yet in production
-        //        student.setStudentNumber(String.valueOf(registration.getStudent().getNumber()));
-        student.setStudentNumber(registration.getStudent().getNumber());
-        student.setAcademicYear(registration.getCurricularYear());
-        student.setAcademicDegreeCode(objectFactory.createStudentAcademicDegreeCode(getCodeForDegreeType(
-                registration.getDegree().getDegreeType()).toString()));
+        executeIfAllowed(registration.getPerson(), CgdAuthorizationCodes.BASIC_INFO, () -> {
+            student.setSchoolCode(getInstitutionCode());
+            student.setCourse(registration.getDegree().getIdCardName());
+            // new contract not yet in production
+            //        student.setStudentNumber(String.valueOf(registration.getStudent().getNumber()));
+            student.setStudentNumber(registration.getStudent().getNumber());
+            student.setAcademicYear(registration.getCurricularYear());
+            student.setAcademicDegreeCode(objectFactory
+                    .createStudentAcademicDegreeCode(getCodeForDegreeType(registration.getDegree().getDegreeType()).toString()));
 
+        });
         return student;
     }
 

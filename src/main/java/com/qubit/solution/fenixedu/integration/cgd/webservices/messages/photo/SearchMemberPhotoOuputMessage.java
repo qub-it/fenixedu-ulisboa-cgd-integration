@@ -31,7 +31,10 @@ import java.io.Serializable;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Photograph;
 import org.fenixedu.academic.domain.photograph.PictureMode;
+import org.fenixedu.academicextensions.domain.person.dataShare.DataShareAuthorization;
+import org.fenixedu.academicextensions.domain.person.dataShare.DataShareAuthorizationType;
 
+import com.qubit.solution.fenixedu.integration.cgd.services.CgdAuthorizationCodes;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
 
 public class SearchMemberPhotoOuputMessage implements Serializable {
@@ -75,7 +78,9 @@ public class SearchMemberPhotoOuputMessage implements Serializable {
         boolean verifyMatch = CgdMessageUtils.verifyMatch(person, populationCode, memberCode, memberID);
         if (verifyMatch) {
             Photograph personalPhoto = person.getPersonalPhoto();
-            if (personalPhoto == null) {
+            DataShareAuthorization photoAuthorization =
+                    DataShareAuthorization.findLatest(person, DataShareAuthorizationType.findUnique(CgdAuthorizationCodes.PHOTO));
+            if (personalPhoto == null || photoAuthorization == null || !photoAuthorization.getAllow()) {
                 setReplyCode(UNAVAILABLE_PHOTO);
                 setName(person.getName());
             } else {
