@@ -199,10 +199,22 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
 
     private static void executeIfAllowed(org.fenixedu.academic.domain.Person person, String dataShareQuestionCode,
             Runnable executeIfAuthorized) {
-        DataShareAuthorization authorization =
-                DataShareAuthorization.findLatest(person, DataShareAuthorizationType.findUnique(dataShareQuestionCode));
-        if (authorization != null && authorization.getAllow()) {
+
+        //  José Lima stated in 30 July 2018 that the basic info fields (the ones that are needed to create the university 
+        //  card) must always be provided. So the BASIC_INFO is not actually an authorization but rather an information to 
+        //  he user that those fields will be sent (since the card is mandatory). 
+        //
+        //  Due to that fact instead of checking for the authorization, if it's something under BASIC_INFO authorization
+        //  we just execute it, this way the rest of the code still maintains it's executeIfAllowed policy.
+        //
+        if (dataShareQuestionCode.equals(CgdAuthorizationCodes.BASIC_INFO)) {
             executeIfAuthorized.run();
+        } else {
+            DataShareAuthorization authorization =
+                    DataShareAuthorization.findLatest(person, DataShareAuthorizationType.findUnique(dataShareQuestionCode));
+            if (authorization != null && authorization.getAllow()) {
+                executeIfAuthorized.run();
+            }
         }
     }
 
