@@ -78,7 +78,9 @@ public class SearchMemberPhotoOuputMessage implements Serializable {
         boolean verifyMatch = CgdMessageUtils.verifyMatch(person, populationCode, memberCode, memberID);
         if (verifyMatch) {
             Photograph personalPhoto = person.getPersonalPhoto();
-            if (personalPhoto == null) {
+            DataShareAuthorization photoAuthorization =
+                    DataShareAuthorization.findLatest(person, DataShareAuthorizationType.findUnique(CgdAuthorizationCodes.PHOTO));
+            if (personalPhoto == null || photoAuthorization == null || !photoAuthorization.getAllow()) {
                 setReplyCode(UNAVAILABLE_PHOTO);
                 setName(person.getName());
             } else {
