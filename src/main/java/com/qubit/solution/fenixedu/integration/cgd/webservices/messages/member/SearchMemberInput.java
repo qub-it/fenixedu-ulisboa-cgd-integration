@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import org.apache.commons.lang.StringUtils;
+import org.fenixedu.academic.FenixEduAcademicConfiguration;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.person.IDDocumentType;
@@ -140,8 +141,12 @@ public class SearchMemberInput implements Serializable {
 
                 }
             } else if (documentType != null && documentType == TAXNUMBER_TYPE) {
-                Party party = requestedPerson.readByContributorNumber(documentID);
-                requestedPerson = (party instanceof Person) ? (Person) party : null;
+                String defaultSocialSecurityNumber =
+                        FenixEduAcademicConfiguration.getConfiguration().getDefaultSocialSecurityNumber();
+                if (defaultSocialSecurityNumber == null || !defaultSocialSecurityNumber.equals(documentID)) {
+                    Party party = Person.readByContributorNumber(documentID);
+                    requestedPerson = (party instanceof Person) ? (Person) party : null;
+                }
             }
         }
 
