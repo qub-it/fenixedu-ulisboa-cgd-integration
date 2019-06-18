@@ -153,7 +153,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
     private static Worker createWorker(org.fenixedu.academic.domain.Person person) {
         Worker worker = new Worker();
         executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_WORKING_INFO, () -> {
-            worker.setIsWorker(person.getStudent().isWorkingStudent());
+            worker.setIsWorker(person.getStudent().hasWorkingStudentStatuteInPeriod(ExecutionYear.readCurrentExecutionYear()));
             PersonalIngressionData personalIngressionDataByExecutionYear =
                     person.getStudent().getPersonalIngressionDataByExecutionYear(ExecutionYear.readCurrentExecutionYear());
 
