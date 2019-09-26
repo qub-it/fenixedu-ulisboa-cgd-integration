@@ -54,17 +54,17 @@
 		<dependency>
 			<groupId>com.qubit.solution.fenixedu</groupId>
 			<artifactId>bennu-webservices-core</artifactId>
-			<version>2.0.0</version>
+			<version>2.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.qubit.solution.fenixedu</groupId>
 			<artifactId>bennu-versioning-core</artifactId>
-			<version>2.0.0</version>
+			<version>2.1.5</version>
 		</dependency>
 		<dependency>
 			<groupId>com.qubit.solution.fenixedu</groupId>
 			<artifactId>fenixedu-academic-core</artifactId>
-			<version>21.2.2</version>
+			<version>25.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.fenixedu.ulisboa</groupId>
@@ -74,7 +74,7 @@
 		<dependency>
 			<groupId>org.fenixedu</groupId>
 			<artifactId>fenixedu-academic-extensions</artifactId>
-			<version>3.0.0</version>
+			<version>3.6.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.googlecode.libphonenumber</groupId>
