@@ -1,3 +1,4 @@
+2.3.2 (19-11-2019)
 - Bug fix: Update cgd integration web service to only send fiscal codes that are portuguese (others with 0)
 
 2.3.1 (26-09-2019)
