@@ -1,6 +1,6 @@
 /**
- * This file was created by Quorum Born IT <http://www.qub-it.com/> and its 
- * copyright terms are bind to the legal agreement regulating the FenixEdu@ULisboa 
+ * This file was created by Quorum Born IT <http://www.qub-it.com/> and its
+ * copyright terms are bind to the legal agreement regulating the FenixEdu@ULisboa
  * software development project between Quorum Born IT and Serviços Partilhados da
  * Universidade de Lisboa:
  *  - Copyright © 2015 Quorum Born IT (until any Go-Live phase)
@@ -8,7 +8,7 @@
  *
  * Contributors: paulo.abrantes@qub-it.com
  *
- * 
+ *
  * This file is part of FenixEdu fenixedu-ulisboa-cgdIntegration.
  *
  * FenixEdu fenixedu-ulisboa-cgdIntegration is free software: you can redistribute it and/or modify
@@ -42,6 +42,7 @@ import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.treasury.util.FiscalCodeValidation;
+import org.fenixedu.treasury.util.TreasuryConstants;
 
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
 
@@ -53,7 +54,7 @@ public class SearchMemberOutputData implements Serializable {
     // D - teacher
     private String populationCode;
 
-    // Member identification it will then be used 
+    // Member identification it will then be used
     // as the ID requested on other webServices
     private String memberID;
 
@@ -207,9 +208,10 @@ public class SearchMemberOutputData implements Serializable {
         searchMemberOutputData.setName(person.getName());
         String socialSecurityNumber = PersonCustomer.fiscalNumber(person);
         String fiscalCountry = PersonCustomer.countryCode(person);
-        if (socialSecurityNumber != null && FiscalCodeValidation.isValidFiscalNumber(fiscalCountry, socialSecurityNumber)) {
+        if (socialSecurityNumber != null && TreasuryConstants.isDefaultCountry(fiscalCountry)
+                && FiscalCodeValidation.isValidFiscalNumber(fiscalCountry, socialSecurityNumber)) {
             searchMemberOutputData.setFiscalCode(Long.valueOf(socialSecurityNumber));
-        }else {
+        } else {
             searchMemberOutputData.setFiscalCode(0L);
         }
 
@@ -224,10 +226,9 @@ public class SearchMemberOutputData implements Serializable {
         semesters.addAll(readCurrentExecutionYear.getExecutionPeriodsSet());
         semesters.addAll(previousYear.getExecutionPeriodsSet());
 
-        String stayingIndicator =
-                (person.getStudent() != null && person.getStudent().hasActiveRegistrations())
-                        || (person.getTeacher() != null && person.getTeacher().getTeacherAuthorizationStream()
-                                .anyMatch(authorization -> semesters.contains(authorization.getExecutionSemester()))) ? "S" : "N";
+        String stayingIndicator = person.getStudent() != null && person.getStudent().hasActiveRegistrations()
+                || person.getTeacher() != null && person.getTeacher().getTeacherAuthorizationStream()
+                        .anyMatch(authorization -> semesters.contains(authorization.getExecutionSemester())) ? "S" : "N";
         searchMemberOutputData.setStayingIndicator(stayingIndicator);
         return searchMemberOutputData;
     }
