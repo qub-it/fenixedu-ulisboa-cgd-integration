@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
-import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
@@ -222,13 +222,13 @@ public class SearchMemberOutputData implements Serializable {
 
         ExecutionYear readCurrentExecutionYear = ExecutionYear.readCurrentExecutionYear();
         ExecutionYear previousYear = readCurrentExecutionYear.getPreviousExecutionYear();
-        List<ExecutionSemester> semesters = new ArrayList<ExecutionSemester>();
+        List<ExecutionInterval> semesters = new ArrayList<>();
         semesters.addAll(readCurrentExecutionYear.getExecutionPeriodsSet());
         semesters.addAll(previousYear.getExecutionPeriodsSet());
 
         String stayingIndicator = person.getStudent() != null && person.getStudent().hasActiveRegistrations()
                 || person.getTeacher() != null && person.getTeacher().getTeacherAuthorizationStream()
-                        .anyMatch(authorization -> semesters.contains(authorization.getExecutionSemester())) ? "S" : "N";
+                        .anyMatch(authorization -> semesters.contains(authorization.getExecutionInterval())) ? "S" : "N";
         searchMemberOutputData.setStayingIndicator(stayingIndicator);
         return searchMemberOutputData;
     }

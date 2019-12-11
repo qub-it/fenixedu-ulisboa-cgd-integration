@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.fenixedu.academic.domain.ExecutionSemester;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
@@ -67,12 +67,12 @@ public class SearchMemberOutput implements Serializable {
                     }
                 }
             }
-            List<ExecutionSemester> semesters = new ArrayList<ExecutionSemester>();
+            List<ExecutionInterval> semesters = new ArrayList<>();
             semesters.addAll(readCurrentExecutionYear.getExecutionPeriodsSet());
             semesters.addAll(previousYear.getExecutionPeriodsSet());
             if (person.getTeacher() != null
                     && person.getTeacher().getTeacherAuthorizationStream()
-                            .anyMatch(authorization -> semesters.contains(authorization.getExecutionSemester()))) {
+                            .anyMatch(authorization -> semesters.contains(authorization.getExecutionInterval()))) {
                 list.add(SearchMemberOutputData.createTeacherBased(memberIDStrategy, person.getTeacher()));
             }
 
