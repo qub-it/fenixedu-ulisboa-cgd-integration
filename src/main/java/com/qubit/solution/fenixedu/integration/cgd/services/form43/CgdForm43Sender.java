@@ -168,7 +168,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         });
 
         executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_FISCAL_COUNTRY, () -> worker
-                .setFiscalCountryCode(objectFactory.createWorkerFiscalCountryCode(PersonCustomer.countryCode(person))));
+                .setFiscalCountryCode(objectFactory.createWorkerFiscalCountryCode(PersonCustomer.addressCountryCode(person))));
 
         return worker;
     }

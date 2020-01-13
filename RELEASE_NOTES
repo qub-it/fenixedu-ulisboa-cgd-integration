@@ -1,3 +1,5 @@
+- Refactor: Treasury - Reference addressCountryCode instead of country code
+
 2.3.3 (17-12-2019)
 - Refactor: upgraded fenixedu-academic-core and other dependencies
 
