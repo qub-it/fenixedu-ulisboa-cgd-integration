@@ -64,17 +64,17 @@
 		<dependency>
 			<groupId>com.qubit.solution.fenixedu</groupId>
 			<artifactId>fenixedu-academic-core</artifactId>
-			<version>25.8.0</version>
+			<version>28.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.fenixedu.ulisboa</groupId>
 			<artifactId>fenixedu-ulisboa-specifications</artifactId>
-			<version>6.4.0</version>
+			<version>6.6.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.fenixedu</groupId>
 			<artifactId>fenixedu-academic-extensions</artifactId>
-			<version>4.3.0</version>
+			<version>4.4.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.googlecode.libphonenumber</groupId>
