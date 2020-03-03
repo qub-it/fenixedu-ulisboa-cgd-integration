@@ -19,6 +19,26 @@
 	<properties>
 		<version.org.fenixedu.bennu>6.0.8-FORK</version.org.fenixedu.bennu>
 	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.sun.xml.ws</groupId>
+				<artifactId>jaxws-ri</artifactId>
+				<version>2.3.0</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+			<dependency>
+				<groupId>com.sun.xml.ws</groupId>
+				<artifactId>jaxws-rt</artifactId>
+				<version>2.3.1</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.fenixedu</groupId>
@@ -81,37 +101,10 @@
 			<artifactId>libphonenumber</artifactId>
 			<version>8.9.9</version>
 		</dependency>
-		<!-- java 11 -->
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-core</artifactId>
-			<version>2.3.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>2.3.1</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<version>2.3.1</version>
-		</dependency>
 
-		<!-- should use 2.3.0 and not 2.3.1 like other jars because -->
-		<!-- resolver jar comes only in this pom -->
-		<!-- Check https://stackoverflow.com/questions/58319199/java-lang-classnotfoundexception-com-sun-org-apache-xml-internal-resolver-catal -->
-		<dependency>
-			<groupId>com.sun.xml.ws</groupId>
-			<artifactId>jaxws-ri</artifactId>
-			<version>2.3.0</version>
-			<type>pom</type>
-		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.ws</groupId>
 			<artifactId>jaxws-rt</artifactId>
-			<version>2.3.1</version>
-			<type>pom</type>
 		</dependency>
 
 		<dependency>
@@ -119,10 +112,7 @@
 			<artifactId>jaxws-api</artifactId>
 			<version>2.3.1</version>
 		</dependency>
-
 	</dependencies>
-
-
 
 	<repositories>
 		<repository>
