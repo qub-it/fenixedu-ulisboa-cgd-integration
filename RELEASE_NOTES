@@ -1,3 +1,5 @@
+- Refactor: upgraded fenixedu-academic-core and other dependencies
+
 2.4.0 (09-03-2020)
 - New feature: Support for Java 11
 
