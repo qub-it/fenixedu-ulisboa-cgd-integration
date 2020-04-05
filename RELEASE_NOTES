@@ -1,3 +1,5 @@
+- Fix: Articat groupID from com.qubit.solution.fenixedu.build to com.qubit.solution.fenixedu 
+
 2.4.2 (05-04-2020)
 2.4.1 (04-04-2020)
 - Refactor: upgraded fenixedu-academic-core and other dependencies
