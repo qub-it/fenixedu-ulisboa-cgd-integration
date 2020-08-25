@@ -36,11 +36,11 @@ import javax.xml.ws.ResponseWrapper;
 import org.datacontract.schemas._2004._07.wcfservice2.ErrorCode;
 import org.datacontract.schemas._2004._07.wcfservice2.Status;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.ulisboa.specifications.domain.idcards.CgdCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qubit.solution.fenixedu.bennu.webservices.services.server.BennuWebService;
+import com.qubit.solution.fenixedu.integration.cgd.domain.idcards.CgdCard;
 import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Sender;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
 

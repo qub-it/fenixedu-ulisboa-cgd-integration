@@ -28,7 +28,6 @@ package com.qubit.solution.fenixedu.integration.cgd.domain.configuration;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.ulisboa.specifications.domain.CgdMod43Template;
 
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
 

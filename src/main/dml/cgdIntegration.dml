@@ -36,7 +36,7 @@ relation CgdIntegrationConfigurationRootDomainObject {
 	.org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
 }
 
-class .org.fenixedu.ulisboa.specifications.domain.idcards.CgdCard {
+class idcards.CgdCard {
 	String mifareCode;
 	String cardNumber;
 	LocalDate lastMifareModication;
@@ -46,27 +46,27 @@ class .org.fenixedu.ulisboa.specifications.domain.idcards.CgdCard {
 }
 
 relation CgdCardPerson {
-	.org.fenixedu.ulisboa.specifications.domain.idcards.CgdCard playsRole cgdCards {
+	idcards.CgdCard playsRole cgdCards {
 		multiplicity *;
 	}
 	.org.fenixedu.academic.domain.Person playsRole person;
 }
 
 relation CgdCardRootDomainObject {
-	.org.fenixedu.ulisboa.specifications.domain.idcards.CgdCard playsRole cgdCards {
+	idcards.CgdCard playsRole cgdCards {
 		multiplicity *;
 	}
 	.org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
 }
 
 
-class .org.fenixedu.ulisboa.specifications.domain.CgdMod43Template extends .org.fenixedu.bennu.io.domain.GenericFile {
+class configuration.CgdMod43Template extends .org.fenixedu.bennu.io.domain.GenericFile {
 }
 
 relation CgdIntegrationConfigurationTemplate {
 	configuration.CgdIntegrationConfiguration playsRole cgdIntegrationConfiguration {
 		multiplicity 1;
 	}
-	.org.fenixedu.ulisboa.specifications.domain.CgdMod43Template playsRole mod43Template;
+	configuration.CgdMod43Template playsRole mod43Template;
 }	
 

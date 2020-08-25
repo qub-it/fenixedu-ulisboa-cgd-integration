@@ -1,4 +1,4 @@
-package org.fenixedu.ulisboa.specifications.domain.idcards;
+package com.qubit.solution.fenixedu.integration.cgd.domain.idcards;
 
 import java.util.Optional;
 

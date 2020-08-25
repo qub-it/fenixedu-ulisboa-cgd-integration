@@ -29,12 +29,12 @@ package com.qubit.solution.fenixedu.integration.cgd.webservices.messages.mifare;
 import java.io.Serializable;
 
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.ulisboa.specifications.domain.idcards.CgdCard;
 import org.joda.time.LocalDate;
 
-import pt.ist.fenixframework.Atomic;
-
+import com.qubit.solution.fenixedu.integration.cgd.domain.idcards.CgdCard;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
+
+import pt.ist.fenixframework.Atomic;
 
 public class UpdateMifareOutputMessage implements Serializable {
 

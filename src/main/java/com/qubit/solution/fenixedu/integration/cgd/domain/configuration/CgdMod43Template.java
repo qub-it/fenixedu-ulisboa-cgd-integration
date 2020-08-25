@@ -1,4 +1,4 @@
-package org.fenixedu.ulisboa.specifications.domain;
+package com.qubit.solution.fenixedu.integration.cgd.domain.configuration;
 
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.groups.Group;

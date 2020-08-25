@@ -9,12 +9,12 @@ import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
-import org.fenixedu.ulisboa.specifications.domain.idcards.CgdCard;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.qubit.solution.fenixedu.integration.cgd.domain.idcards.CgdCard;
 import com.qubit.solution.fenixedu.integration.cgd.ui.CgdBaseController;
 import com.qubit.solution.fenixedu.integration.cgd.ui.CgdController;
 
