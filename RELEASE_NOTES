@@ -1,3 +1,5 @@
+- Refactor: CgdCard was moved from ulisboa specifications to this module
+- Refactor: Mod43 Template was moved from ulisboa specifications to this module
 - Refactor: upgraded fenixedu-academic-core and other dependencies
 
 2.4.3 (05-04-2020)

@@ -31,12 +31,9 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 import org.fenixedu.bennu.core.groups.DynamicGroup;
-import org.fenixedu.ulisboa.specifications.domain.student.access.StudentAccessServices;
 
 import pt.ist.fenixframework.CallableWithoutException;
 import pt.ist.fenixframework.FenixFramework;
-
-import com.qubit.solution.fenixedu.integration.cgd.services.integration.SyncRegistrationWithCgd;
 
 @WebListener
 public class CgdintegrationInitializer implements ServletContextListener {
@@ -54,8 +51,6 @@ public class CgdintegrationInitializer implements ServletContextListener {
                 return null;
             }
         });
-
-        StudentAccessServices.subscribeSyncRegistration(new SyncRegistrationWithCgd());
 
     }
 

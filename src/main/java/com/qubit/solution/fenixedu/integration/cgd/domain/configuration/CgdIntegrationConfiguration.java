@@ -28,10 +28,11 @@ package com.qubit.solution.fenixedu.integration.cgd.domain.configuration;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
-
-import pt.ist.fenixframework.Atomic;
+import org.fenixedu.ulisboa.specifications.domain.CgdMod43Template;
 
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
+
+import pt.ist.fenixframework.Atomic;
 
 public class CgdIntegrationConfiguration extends CgdIntegrationConfiguration_Base {
 
@@ -68,6 +69,24 @@ public class CgdIntegrationConfiguration extends CgdIntegrationConfiguration_Bas
     @Atomic
     private static CgdIntegrationConfiguration createConfiguration() {
         return new CgdIntegrationConfiguration();
+    }
+
+    public void uploadMod43Template(final String filename, final byte[] content) {
+        CgdMod43Template template = new CgdMod43Template(filename, content);
+        cleanTemplate();
+        setMod43Template(template);
+    }
+
+    public void cleanTemplate() {
+        if (hasMod43Template()) {
+            CgdMod43Template oldTemplate = getMod43Template();
+            setMod43Template(null);
+            oldTemplate.delete();
+        }
+    }
+
+    public boolean hasMod43Template() {
+        return getMod43Template() != null;
     }
 
 }

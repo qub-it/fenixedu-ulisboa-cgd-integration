@@ -26,10 +26,17 @@
  */
 package com.qubit.solution.fenixedu.integration.cgd.ui.cgdConfiguration;
 
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.fenixedu.bennu.spring.portal.SpringFunctionality;
+import org.fenixedu.commons.StringNormalizer;
+import org.fenixedu.ulisboa.specifications.domain.CgdMod43Template;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AssignableTypeFilter;
@@ -38,13 +45,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import pt.ist.fenixframework.Atomic;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
 import com.qubit.solution.fenixedu.integration.cgd.ui.CgdBaseController;
 import com.qubit.solution.fenixedu.integration.cgd.ui.CgdController;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
+
+import pt.ist.fenixframework.Atomic;
 
 @SpringFunctionality(app = CgdController.class, title = "label.title.cgdConfiguration", accessGroup = "#managers")
 @RequestMapping("/cgd/cgdconfiguration/cgdintegrationconfiguration")
@@ -77,8 +85,9 @@ public class CgdIntegrationConfigurationController extends CgdBaseController {
     }
 
     @RequestMapping(value = "/update/{oid}", method = RequestMethod.POST)
-    public String update(@PathVariable("oid") CgdIntegrationConfiguration cgdIntegrationConfiguration, @RequestParam(
-            value = "memberidresolverclass", required = false) java.lang.String memberIDResolverClass, Model model) {
+    public String update(@PathVariable("oid") CgdIntegrationConfiguration cgdIntegrationConfiguration,
+            @RequestParam(value = "memberidresolverclass", required = false) java.lang.String memberIDResolverClass,
+            @RequestParam(value = "cgdTemplateFile", required = true) final MultipartFile cgdTemplateFile, Model model) {
 
         setCgdIntegrationConfiguration(cgdIntegrationConfiguration, model);
         boolean validClass = false;
@@ -89,19 +98,35 @@ public class CgdIntegrationConfigurationController extends CgdBaseController {
         }
 
         if (!validClass) {
-            addErrorMessage("Class " + memberIDResolverClass
-                    + " not a valid class. Could it be it's mispelled? Or perhaps does not implement IMemberIDAdapter", model);
+            addErrorMessage(
+                    "Class " + memberIDResolverClass
+                            + " not a valid class. Could it be it's mispelled? Or perhaps does not implement IMemberIDAdapter",
+                    model);
             return update(cgdIntegrationConfiguration, model);
         }
 
-        updateCgdIntegrationConfiguration(memberIDResolverClass, model);
+        updateCgdIntegrationConfiguration(memberIDResolverClass, cgdTemplateFile, model);
+
         return "redirect:/cgd/cgdconfiguration/cgdintegrationconfiguration/read/"
                 + getCgdIntegrationConfiguration(model).getExternalId();
     }
 
     @Atomic
-    public void updateCgdIntegrationConfiguration(java.lang.String memberIDResolverClass, Model m) {
-        getCgdIntegrationConfiguration(m).setMemberIDResolverClass(memberIDResolverClass);
+    public void updateCgdIntegrationConfiguration(java.lang.String memberIDResolverClass, MultipartFile cgdTemplateFile,
+            Model m) {
+        CgdIntegrationConfiguration cgdIntegrationConfiguration = getCgdIntegrationConfiguration(m);
+        cgdIntegrationConfiguration.setMemberIDResolverClass(memberIDResolverClass);
+        if (!cgdTemplateFile.isEmpty()) {
+            String fileName = cgdTemplateFile.getOriginalFilename();
+            byte[] fileContent;
+            try {
+                fileContent = cgdTemplateFile.getBytes();
+                cgdIntegrationConfiguration.uploadMod43Template(fileName, fileContent);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to upload file", e);
+            }
+        }
+
     }
 
     @RequestMapping(value = "/update/{oid}/strategies", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
@@ -117,5 +142,21 @@ public class CgdIntegrationConfigurationController extends CgdBaseController {
         }
 
         return results;
+    }
+
+    @RequestMapping(value = "/downloadTemplate/{oid}", method = RequestMethod.GET)
+    public void downloadCGDTemplate(@PathVariable("oid") final CgdMod43Template template, final HttpServletResponse response) {
+        try {
+            if (template.isAccessible(Authenticate.getUser())) {
+                response.setContentType(template.getContentType());
+                String filename = URLEncoder.encode(
+                        StringNormalizer.normalizePreservingCapitalizedLetters(template.getDisplayName()).replaceAll("\\s", "_"),
+                        "UTF-8");
+                response.setHeader("Content-disposition", "attachment; filename=" + filename);
+                response.getOutputStream().write(template.getContent());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -88,7 +88,7 @@ ${portal.toolkit()}
 				</div>	
 			</c:if>
 
-<form method="post" class="form-horizontal">
+<form method="post" class="form-horizontal" enctype="multipart/form-data">
 <div class="panel panel-default">
   <div class="panel-body">
 <div class="form-group row">
@@ -98,9 +98,17 @@ ${portal.toolkit()}
 	<select id="cgdIntegrationConfiguration_memberIDResolverClass" class="form-control" name="memberidresolverclass" >
 		<option></option>
 	</select>
-</div>	
+</div>
+	
 </div>		
   </div>
+  <div class="form-group row">
+                      <div class="col-sm-2 control-label"><spring:message code="label.CgdIntegrationConfiguration.mod43TemplateFile"/></div> 
+                      <div class="col-sm-4" ng-show="edit.details">
+                          <input type="file" name="cgdTemplateFile" id="cgdTemplateFile" accept="application/pdf" />
+                      </div>
+ </div>  
+                  
   <div class="panel-footer">
 		<input type="submit" class="btn btn-default" role="button" value="<spring:message code="label.submit" />"/>
 	</div>

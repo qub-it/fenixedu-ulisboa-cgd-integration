@@ -101,6 +101,14 @@ ${portal.toolkit()}
 		<c:out value='${cgdIntegrationConfiguration.memberIDResolverClass}'/>
 	</td> 
 </tr>
+<tr>
+	<th scope="row" class="col-xs-3"><spring:message code="label.CgdIntegrationConfiguration.mod43TemplateFile"/></th> 
+	<td>
+	  <a href="${pageContext.request.contextPath}/cgd/cgdconfiguration/cgdintegrationconfiguration/downloadTemplate/<c:out value='${cgdIntegrationConfiguration.mod43Template.externalId}'/>">
+        		<c:out value='${cgdIntegrationConfiguration.mod43Template.filename}'/>
+      </a>
+	</td> 
+</tr>
 </tbody>
 </table>
 </form>
