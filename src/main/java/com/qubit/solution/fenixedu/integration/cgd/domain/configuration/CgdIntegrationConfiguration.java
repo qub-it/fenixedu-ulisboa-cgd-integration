@@ -29,6 +29,7 @@ package com.qubit.solution.fenixedu.integration.cgd.domain.configuration;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 
+import com.qubit.solution.fenixedu.integration.cgd.services.CgdAddressProofGenerator;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
 
 import pt.ist.fenixframework.Atomic;
@@ -86,6 +87,26 @@ public class CgdIntegrationConfiguration extends CgdIntegrationConfiguration_Bas
 
     public boolean hasMod43Template() {
         return getMod43Template() != null;
+    }
+
+    public void setAddressProofGenerator(Class<? extends CgdAddressProofGenerator> proofGeneratorClass) {
+        setAddressProofGeneratorClass(proofGeneratorClass.getName());
+    }
+
+    public CgdAddressProofGenerator getAddressProofGenerator() {
+        String addressProofGeneratorClass = getAddressProofGeneratorClass();
+        CgdAddressProofGenerator generator = null;
+        if (!StringUtils.isEmpty(addressProofGeneratorClass)) {
+            try {
+                Class<? extends CgdAddressProofGenerator> generateClass =
+                        (Class<? extends CgdAddressProofGenerator>) Class.forName(addressProofGeneratorClass);
+                generator = generateClass.getConstructor(new Class[] {}).newInstance(new Object[] {});
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+
+        return generator;
     }
 
 }

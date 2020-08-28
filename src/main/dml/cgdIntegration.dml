@@ -29,6 +29,7 @@ package com.qubit.solution.fenixedu.integration.cgd.domain;
 
 class configuration.CgdIntegrationConfiguration {
 	String memberIDResolverClass;
+	String addressProofGeneratorClass;
 }
 
 relation CgdIntegrationConfigurationRootDomainObject {

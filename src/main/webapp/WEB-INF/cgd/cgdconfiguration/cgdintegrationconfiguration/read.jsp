@@ -102,6 +102,13 @@ ${portal.toolkit()}
 	</td> 
 </tr>
 <tr>
+	<th scope="row" class="col-xs-3"><spring:message code="label.CgdIntegrationConfiguration.addressProofGeneratorClass"/></th> 
+	<td>
+		<c:out value='${cgdIntegrationConfiguration.addressProofGeneratorClass}'/>
+	</td> 
+</tr>
+
+<tr>
 	<th scope="row" class="col-xs-3"><spring:message code="label.CgdIntegrationConfiguration.mod43TemplateFile"/></th> 
 	<td>
 	  <a href="${pageContext.request.contextPath}/cgd/cgdconfiguration/cgdintegrationconfiguration/downloadTemplate/<c:out value='${cgdIntegrationConfiguration.mod43Template.externalId}'/>">

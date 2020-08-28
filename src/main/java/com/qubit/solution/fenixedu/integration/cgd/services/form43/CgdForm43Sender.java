@@ -26,12 +26,18 @@
  */
 package com.qubit.solution.fenixedu.integration.cgd.services.form43;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.ws.BindingProvider;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.datacontract.schemas._2004._07.wingman_cgd_caixaiu_datacontract.School;
 import org.fenixedu.academic.domain.Country;
@@ -56,9 +62,11 @@ import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.microsoft.schemas._2003._10.serialization.arrays.ArrayOfstring;
 import com.qubit.solution.fenixedu.bennu.webservices.services.client.BennuWebServiceClient;
 import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
+import com.qubit.solution.fenixedu.integration.cgd.services.CgdAddressProofGenerator;
 import com.qubit.solution.fenixedu.integration.cgd.services.CgdAuthorizationCodes;
 
 import services.caixaiu.cgd.wingman.iesservice.Client;
+import services.caixaiu.cgd.wingman.iesservice.FindFormRequest;
 import services.caixaiu.cgd.wingman.iesservice.Form43Digital;
 import services.caixaiu.cgd.wingman.iesservice.IESService;
 import services.caixaiu.cgd.wingman.iesservice.IIESService;
@@ -66,11 +74,18 @@ import services.caixaiu.cgd.wingman.iesservice.IdentificationCard;
 import services.caixaiu.cgd.wingman.iesservice.ObjectFactory;
 import services.caixaiu.cgd.wingman.iesservice.OperationResult;
 import services.caixaiu.cgd.wingman.iesservice.Person;
+import services.caixaiu.cgd.wingman.iesservice.PostedFile;
 import services.caixaiu.cgd.wingman.iesservice.Student;
 import services.caixaiu.cgd.wingman.iesservice.ValidationResult;
 import services.caixaiu.cgd.wingman.iesservice.Worker;
 
 public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
+
+    // Ricardo Oliveira from Wingman indicated that the name for the file 
+    // must always be Address.pdf when calling the uploadFormAttachment
+    // 
+    // 27 August 2020 - Paulo Abrantes
+    private static final String UPLOAD_FORM_ATTACHMENT_NAME = "Address.pdf";
 
     @Override
     protected BindingProvider getService() {
@@ -119,6 +134,53 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
                 }
             } else {
                 logger.info("Sent successfuly form 43 for student with number:" + registration.getStudent().getNumber());
+
+                CgdAddressProofGenerator addressProofGenerator =
+                        CgdIntegrationConfiguration.getInstance().getAddressProofGenerator();
+                if (addressProofGenerator != null) {
+                    FindFormRequest formRequest = new FindFormRequest();
+                    formRequest.setIES(clientData.getIES());
+                    formRequest.setMemberCategoryCode(
+                            objectFactory.createFindFormRequestMemberCategoryCode(clientData.getMemberCategoryCode()));
+                    formRequest.setMemberNumber(objectFactory.createFindFormRequestMemberNumber(clientData.getMemberNumber()));
+                    JAXBElement<String> fiscalNumber = personData.getFiscalNumber();
+
+                    if (fiscalNumber != null) {
+                        // fiscalNumber will only be filled in if CgdAuthorizationCodes.BASIC_INFO is active
+                        // which needs to be on for the previous ws call to work. Hence this check may sound
+                        // redundant, but I feel better doing it.
+                        //
+                        // 24 August 2020 - Paulo Abrantes
+                        formRequest.setFiscalNumber(objectFactory.createFindFormRequestFiscalNumber(fiscalNumber.getValue()));
+                    }
+
+                    // We'll always have a card even if empty so no need to check if there's a card before reaching for
+                    // the value
+                    IdentificationCard card = personData.getIdentificationCard().getValue();
+                    formRequest.setIdCardNumber(objectFactory.createFindFormRequestIdCardNumber(card.getNumber()));
+
+                    PostedFile request = new PostedFile();
+                    request.setFileName(UPLOAD_FORM_ATTACHMENT_NAME);
+                    byte[] byteArray = addressProofGenerator.apply(registration);
+                    request.setFileContent(byteArray);
+                    OperationResult uploadFormAttachment = service.uploadFormAttachment(formRequest, request);
+                    boolean uploadSuccess = !uploadFormAttachment.isError();
+                    if (!uploadSuccess) {
+                        logger.info("Problems while trying to upload form attachment to student with number: "
+                                + registration.getStudent().getNumber() + "with message: "
+                                + uploadFormAttachment.getFriendlyMessage().getValue() + "\nCode id: "
+                                + uploadFormAttachment.getCodeId() + "\n Unique Error ID: " + uploadFormAttachment.getUEC()
+                                + "\n In case there are violations they'll be present bellow ");
+                        for (ValidationResult validation : uploadFormAttachment.getViolations().getValue()
+                                .getValidationResult()) {
+                            logger.error("Validation error : " + validation.getErrorMessage().getValue() + " [member: "
+                                    + validation.getMemberNames().getValue().getString().toString() + "]");
+                        }
+                    } else {
+                        logger.info("Successful upload of form attachment for student with number:"
+                                + registration.getStudent().getNumber());
+                    }
+                }
             }
         } catch (Throwable t) {
             logger.warn("Problems while trying to send form43 for student with number: " + registration.getStudent().getNumber(),
@@ -435,7 +497,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
             student.setCourse(registration.getDegree().getIdCardName());
             // new contract not yet in production
             //        student.setStudentNumber(String.valueOf(registration.getStudent().getNumber()));
-            student.setStudentNumber(registration.getStudent().getNumber());
+            student.setStudentNumber(String.valueOf(registration.getStudent().getNumber()));
             student.setAcademicYear(registration.getCurricularYear());
             student.setAcademicDegreeCode(objectFactory
                     .createStudentAcademicDegreeCode(getCodeForDegreeType(registration.getDegree().getDegreeType()).toString()));

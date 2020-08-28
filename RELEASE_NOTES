@@ -1,3 +1,5 @@
+- New feature: Sending to cgd the proof of address document
+
 2.5.0 (25-08-2020)
 - Refactor: CgdCard was moved from ulisboa specifications to this module
 - Refactor: Mod43 Template was moved from ulisboa specifications to this module

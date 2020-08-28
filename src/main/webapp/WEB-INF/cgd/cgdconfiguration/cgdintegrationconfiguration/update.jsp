@@ -100,7 +100,18 @@ ${portal.toolkit()}
 	</select>
 </div>
 	
+</div>
+<div class="form-group row">
+<div class="col-sm-2 control-label"><spring:message code="label.CgdIntegrationConfiguration.addressProofGeneratorClass"/></div> 
+
+<div class="col-sm-10">
+	<select id="cgdIntegrationConfiguration_addressProofGeneratorClass" class="form-control" name="addressProofGeneratorClass" >
+		<option></option>
+	</select>
+</div>
+	
 </div>		
+		
   </div>
   <div class="form-group row">
                       <div class="col-sm-2 control-label"><spring:message code="label.CgdIntegrationConfiguration.mod43TemplateFile"/></div> 
@@ -132,8 +143,26 @@ function requestImplementations() {
 			}
 		);
 	}
-	
+
+function requestProofGenerators() {
+	var selectedStrategy = "${not empty param.addressProofGeneratorClass ? param.addressProofGeneratorClass : cgdIntegrationConfiguration.addressProofGeneratorClass }";
+	$.getJSON("${pageContext.request.contextPath}/cgd/cgdconfiguration/cgdintegrationconfiguration/update/${cgdIntegrationConfiguration.externalId}/addressProofGenerators" ,
+		function (data) {
+			 $("#cgdIntegrationConfiguration_addressProofGeneratorClass").empty();
+			 $.each(data, function( key, val ) {
+				 if (val == selectedStrategy) {
+				 	$("#cgdIntegrationConfiguration_addressProofGeneratorClass").append("<option value='" + val + "' selected>" + val + "</option>")
+				 }else {
+					 $("#cgdIntegrationConfiguration_addressProofGeneratorClass").append("<option value='" + val + "'>" + val + "</option>")
+				 }
+				 
+			});
+		}
+	);
+}
+
 $(document).ready(function() {
 	requestImplementations();
+	requestProofGenerators();
 });
 	</script>

@@ -48,6 +48,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
 import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdMod43Template;
+import com.qubit.solution.fenixedu.integration.cgd.services.CgdAddressProofProvider;
 import com.qubit.solution.fenixedu.integration.cgd.ui.CgdBaseController;
 import com.qubit.solution.fenixedu.integration.cgd.ui.CgdController;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
@@ -87,6 +88,7 @@ public class CgdIntegrationConfigurationController extends CgdBaseController {
     @RequestMapping(value = "/update/{oid}", method = RequestMethod.POST)
     public String update(@PathVariable("oid") CgdIntegrationConfiguration cgdIntegrationConfiguration,
             @RequestParam(value = "memberidresolverclass", required = false) java.lang.String memberIDResolverClass,
+            @RequestParam(value = "addressProofGeneratorClass", required = false) java.lang.String addressProofGeneratorClass,
             @RequestParam(value = "cgdTemplateFile", required = true) final MultipartFile cgdTemplateFile, Model model) {
 
         setCgdIntegrationConfiguration(cgdIntegrationConfiguration, model);
@@ -105,17 +107,18 @@ public class CgdIntegrationConfigurationController extends CgdBaseController {
             return update(cgdIntegrationConfiguration, model);
         }
 
-        updateCgdIntegrationConfiguration(memberIDResolverClass, cgdTemplateFile, model);
+        updateCgdIntegrationConfiguration(memberIDResolverClass, addressProofGeneratorClass, cgdTemplateFile, model);
 
         return "redirect:/cgd/cgdconfiguration/cgdintegrationconfiguration/read/"
                 + getCgdIntegrationConfiguration(model).getExternalId();
     }
 
     @Atomic
-    public void updateCgdIntegrationConfiguration(java.lang.String memberIDResolverClass, MultipartFile cgdTemplateFile,
-            Model m) {
+    public void updateCgdIntegrationConfiguration(java.lang.String memberIDResolverClass,
+            java.lang.String addressProofGeneratorClass, MultipartFile cgdTemplateFile, Model m) {
         CgdIntegrationConfiguration cgdIntegrationConfiguration = getCgdIntegrationConfiguration(m);
         cgdIntegrationConfiguration.setMemberIDResolverClass(memberIDResolverClass);
+        cgdIntegrationConfiguration.setAddressProofGeneratorClass(addressProofGeneratorClass);
         if (!cgdTemplateFile.isEmpty()) {
             String fileName = cgdTemplateFile.getOriginalFilename();
             byte[] fileContent;
@@ -127,6 +130,16 @@ public class CgdIntegrationConfigurationController extends CgdBaseController {
             }
         }
 
+    }
+
+    @RequestMapping(value = "/update/{oid}/addressProofGenerators", method = RequestMethod.GET,
+            produces = "application/json; charset=utf-8")
+    public @org.springframework.web.bind.annotation.ResponseBody List<String> requestAvailableAddressProofGenerators(
+            @PathVariable("oid") CgdIntegrationConfiguration cgdIntegrationConfiguration, Model model) {
+
+        List<String> results = new ArrayList<String>();
+        CgdAddressProofProvider.getCgdEnrolmentProviders().forEach(clazz -> results.add(clazz.getName()));
+        return results;
     }
 
     @RequestMapping(value = "/update/{oid}/strategies", method = RequestMethod.GET, produces = "application/json; charset=utf-8")
