@@ -1,4 +1,5 @@
 - New feature: Sending proof of address only when address was authorized in GDPR
+- Bug fix: Corrected MaritalSTatus codes sent in CGDForm43 web service
 
 2.6.0 (13-09-2020)
 - New feature: Sending to cgd the proof of address document

@@ -490,15 +490,14 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         case SINGLE:
             return "001";
         case MARRIED:
-            return "009";
+            return "010";
         case DIVORCED:
-            return "007";
-        case WIDOWER:
-            return "008";
         case SEPARATED:
-            return "006";
+            return "008";
+        case WIDOWER:
+            return "009";
         case CIVIL_UNION:
-            return "005";
+            return "006";
         case UNKNOWN:
             return "099";
         default:
