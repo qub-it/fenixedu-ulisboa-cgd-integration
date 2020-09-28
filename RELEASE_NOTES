@@ -1,3 +1,5 @@
+- New feature: Sending proof of address only when address was authorized in GDPR
+
 2.6.0 (13-09-2020)
 - New feature: Sending to cgd the proof of address document
 

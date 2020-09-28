@@ -26,10 +26,6 @@
  */
 package com.qubit.solution.fenixedu.integration.cgd.services.form43;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
@@ -37,7 +33,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.ws.BindingProvider;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.datacontract.schemas._2004._07.wingman_cgd_caixaiu_datacontract.School;
 import org.fenixedu.academic.domain.Country;
@@ -137,7 +132,11 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
 
                 CgdAddressProofGenerator addressProofGenerator =
                         CgdIntegrationConfiguration.getInstance().getAddressProofGenerator();
-                if (addressProofGenerator != null) {
+                if (addressProofGenerator != null && isAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_PLACE,
+                        CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_POSTAL_CODE,
+                        CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_DISTRICT,
+                        CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_POSTAL_COUNTY,
+                        CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_POSTAL_PARISH)) {
                     FindFormRequest formRequest = new FindFormRequest();
                     formRequest.setIES(clientData.getIES());
                     formRequest.setMemberCategoryCode(
@@ -161,24 +160,32 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
 
                     PostedFile request = new PostedFile();
                     request.setFileName(UPLOAD_FORM_ATTACHMENT_NAME);
-                    byte[] byteArray = addressProofGenerator.apply(registration);
-                    request.setFileContent(byteArray);
-                    OperationResult uploadFormAttachment = service.uploadFormAttachment(formRequest, request);
-                    boolean uploadSuccess = !uploadFormAttachment.isError();
-                    if (!uploadSuccess) {
-                        logger.info("Problems while trying to upload form attachment to student with number: "
-                                + registration.getStudent().getNumber() + "with message: "
-                                + uploadFormAttachment.getFriendlyMessage().getValue() + "\nCode id: "
-                                + uploadFormAttachment.getCodeId() + "\n Unique Error ID: " + uploadFormAttachment.getUEC()
-                                + "\n In case there are violations they'll be present bellow ");
-                        for (ValidationResult validation : uploadFormAttachment.getViolations().getValue()
-                                .getValidationResult()) {
-                            logger.error("Validation error : " + validation.getErrorMessage().getValue() + " [member: "
-                                    + validation.getMemberNames().getValue().getString().toString() + "]");
+                    byte[] byteArray = null;
+                    try {
+                        byteArray = addressProofGenerator.apply(registration);
+                    } catch (Throwable t) {
+                        logger.info("Problems while trying to generate form attachment for student with number: "
+                                + registration.getStudent().getNumber() + "with message: " + t.getMessage());
+                    }
+                    if (byteArray != null) {
+                        request.setFileContent(byteArray);
+                        OperationResult uploadFormAttachment = service.uploadFormAttachment(formRequest, request);
+                        boolean uploadSuccess = !uploadFormAttachment.isError();
+                        if (!uploadSuccess) {
+                            logger.info("Problems while trying to upload form attachment to student with number: "
+                                    + registration.getStudent().getNumber() + "with message: "
+                                    + uploadFormAttachment.getFriendlyMessage().getValue() + "\nCode id: "
+                                    + uploadFormAttachment.getCodeId() + "\n Unique Error ID: " + uploadFormAttachment.getUEC()
+                                    + "\n In case there are violations they'll be present bellow ");
+                            for (ValidationResult validation : uploadFormAttachment.getViolations().getValue()
+                                    .getValidationResult()) {
+                                logger.error("Validation error : " + validation.getErrorMessage().getValue() + " [member: "
+                                        + validation.getMemberNames().getValue().getString().toString() + "]");
+                            }
+                        } else {
+                            logger.info("Successful upload of form attachment for student with number:"
+                                    + registration.getStudent().getNumber());
                         }
-                    } else {
-                        logger.info("Successful upload of form attachment for student with number:"
-                                + registration.getStudent().getNumber());
                     }
                 }
             }
@@ -272,12 +279,21 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         if (dataShareQuestionCode.equals(CgdAuthorizationCodes.BASIC_INFO)) {
             executeIfAuthorized.run();
         } else {
-            DataShareAuthorization authorization =
-                    DataShareAuthorization.findLatest(person, DataShareAuthorizationType.findUnique(dataShareQuestionCode));
-            if (authorization != null && authorization.getAllow()) {
+            if (isAllowed(person, dataShareQuestionCode)) {
                 executeIfAuthorized.run();
             }
         }
+    }
+
+    private static boolean isAllowed(org.fenixedu.academic.domain.Person person, String... dataShareQuestionCodes) {
+        boolean returnValue = true;
+        for (String code : dataShareQuestionCodes) {
+            DataShareAuthorization authorization =
+                    DataShareAuthorization.findLatest(person, DataShareAuthorizationType.findUnique(code));
+            returnValue &= authorization != null && authorization.getAllow();
+        }
+
+        return returnValue;
     }
 
     private static Person createPerson(org.fenixedu.academic.domain.Person person) {
