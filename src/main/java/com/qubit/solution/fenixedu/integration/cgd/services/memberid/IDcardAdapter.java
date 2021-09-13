@@ -26,11 +26,16 @@
  */
 package com.qubit.solution.fenixedu.integration.cgd.services.memberid;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.academic.domain.person.IdDocument;
+import org.fenixedu.academic.domain.person.IdDocumentTypeObject;
+import org.fenixedu.bennu.core.domain.Bennu;
 
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
 
@@ -38,22 +43,66 @@ public class IDcardAdapter implements IMemberIDAdapter {
 
     @Override
     public String retrieveMemberID(Person person) {
-        IdDocument doc =
-                person.getIdDocumentsSet().stream()
-                        .filter(document -> document.getIdDocumentType().getValue() == IDDocumentType.IDENTITY_CARD).findFirst()
-                        .orElse(null);
+        IdDocument doc = person.getIdDocumentsSet().stream()
+                .filter(document -> document.getIdDocumentType().getValue() == IDDocumentType.IDENTITY_CARD).findFirst()
+                .orElse(null);
         return doc != null ? doc.getValue() : person.getDocumentIdNumber();
 
     }
 
     @Override
     public Person readPerson(String memberID) {
-        Person person = Person.readByDocumentIdNumberAndIdDocumentType(memberID, IDDocumentType.IDENTITY_CARD);
+        Person person = find(memberID, IDDocumentType.IDENTITY_CARD);
         if (person == null) {
-            Collection<Person> people = Person.readByDocumentIdNumber(memberID);
+            Collection<Person> people = find(memberID);
             person = people.isEmpty() ? null : people.iterator().next();
         }
         return person;
+    }
+
+    // Instead of using domain's document finders we are recreating them here so we can 
+    // perform the normalization process in the document numbers as well
+    //
+    // 13 September 2021 - Paulo Abrantes
+    private Collection<Person> find(String idDocumentValue) {
+        idDocumentValue = normalizeMemberID(idDocumentValue);
+
+        final Collection<IdDocument> idDocuments = new ArrayList<IdDocument>();
+        for (final IdDocument idDocument : Bennu.getInstance().getIdDocumentsSet()) {
+            if (normalizeMemberID(idDocument.getValue()).equalsIgnoreCase(idDocumentValue)) {
+                idDocuments.add(idDocument);
+            }
+        }
+        return idDocuments.stream().map(doc -> doc.getPerson()).collect(Collectors.toSet());
+    }
+
+    private Person find(String idDocumentValue, final IDDocumentType documentType) {
+        idDocumentValue = normalizeMemberID(idDocumentValue);
+        final IdDocumentTypeObject typeObject = IdDocumentTypeObject.readByIDDocumentType(documentType);
+        for (final IdDocument idDocument : typeObject.getIdDocumentsSet()) {
+            if (normalizeMemberID(idDocument.getValue()).equalsIgnoreCase(idDocumentValue)) {
+                return idDocument.getPerson();
+            }
+        }
+        return null;
+    }
+
+    // According to the CGD specification for the memberID field when the value is numeric leading zeros 
+    // have to be ignored while comparting as well as any white spaces. According to their documentation 
+    // all the following strings match "123":
+    //
+    // - "123          "
+    // - "0000000000123"
+    // - "000123       "
+    // - "          123"
+    //
+    // If, on the other hand, the memberID is not numeric then the value should be left unaltered (including
+    // not trimming).
+    //
+    // 13 September 2021 - Paulo Abrantes
+    private String normalizeMemberID(String idDocumentValue) {
+        String trimmedValue = idDocumentValue.trim();
+        return StringUtils.isNumeric(trimmedValue) ? trimmedValue.replaceFirst("^0+", "") : idDocumentValue;
     }
 
 }
