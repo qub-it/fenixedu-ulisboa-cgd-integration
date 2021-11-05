@@ -1,3 +1,5 @@
+- Bug fix: CGD will only accept postal code up to 8 characters. Truncating if more
+
 2.7.1 (13-09-2021)
 - Bug fix: Numeric memberIDs where not being handled correctly according to the specification
 

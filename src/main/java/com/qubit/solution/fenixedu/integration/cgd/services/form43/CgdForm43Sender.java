@@ -371,8 +371,13 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
                 personData.setAddress(objectFactory.createPersonAddress(defaultPhysicalAddress.getAddress()));
                 personData.setPlace(objectFactory.createPersonPlace(defaultPhysicalAddress.getArea()));
             });
-            executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_POSTAL_CODE,
-                    () -> personData.setPostalCode(objectFactory.createPersonPostalCode(defaultPhysicalAddress.getAreaCode())));
+            executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_POSTAL_CODE, () -> {
+                String areaCode = defaultPhysicalAddress.getAreaCode();
+                if (areaCode != null && areaCode.length() > 8) {
+                    areaCode = areaCode.substring(0, 8);
+                }
+                personData.setPostalCode(objectFactory.createPersonPostalCode(areaCode));
+            });
             executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_DISTRICT, () -> personData
                     .setDistrict(objectFactory.createPersonDistrict(defaultPhysicalAddress.getDistrictOfResidence())));
             executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_POSTAL_COUNTY, () -> personData
