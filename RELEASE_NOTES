@@ -1,3 +1,4 @@
+2.7.2 (05-11-2021)
 - Bug fix: CGD will only accept postal code up to 8 characters. Truncating if more
 
 2.7.1 (13-09-2021)
