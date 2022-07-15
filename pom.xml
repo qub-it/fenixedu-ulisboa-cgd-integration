@@ -18,7 +18,7 @@
 	<name>CGD Integration</name>
 
 	<properties>
-		<version.org.fenixedu.bennu>6.0.8-FORK</version.org.fenixedu.bennu>
+		<version.org.fenixedu.bennu>6.2.4-FORK</version.org.fenixedu.bennu>
 	</properties>
 
 	<dependencyManagement>
@@ -79,18 +79,13 @@
 		</dependency>
 		<dependency>
 			<groupId>com.qubit.solution.fenixedu</groupId>
-			<artifactId>bennu-versioning-core</artifactId>
-			<version>2.1.5</version>
-		</dependency>
-		<dependency>
-			<groupId>com.qubit.solution.fenixedu</groupId>
 			<artifactId>fenixedu-academic-core</artifactId>
-			<version>32.10.3</version>
+			<version>33.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.fenixedu</groupId>
 			<artifactId>fenixedu-academic-extensions</artifactId>
-			<version>4.12.6</version>
+			<version>4.14.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.googlecode.libphonenumber</groupId>
