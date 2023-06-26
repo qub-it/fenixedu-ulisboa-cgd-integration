@@ -205,13 +205,14 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
 
     private static Client createClient(org.fenixedu.academic.domain.Person person, IIESService service) {
         Client client = new Client();
-        String findIES = findIES(getInstitutionCode(), service);
+        CgdIntegrationConfiguration cgdIntegrationConfiguration = CgdIntegrationConfiguration.getInstance();
+        String findIES = findIES(cgdIntegrationConfiguration.getIESCodeProvider().getIESCode(), service);//findIES(getInstitutionCode(), service);
 
         executeIfAllowed(person, CgdAuthorizationCodes.BASIC_INFO, () -> {
             client.setIES(findIES);
             client.setGroup(objectFactory.createClientGroup("1")); // Fernando Nunes indicou que é o protocolo e neste caso será sempre 1
             client.setMemberCategoryCode("91"); // Resposta da Carla Récio a 19 do 6 indica que grande parte das escolas usam ALUNOS 
-            String retrieveMemberID = CgdIntegrationConfiguration.getInstance().getMemberIDStrategy().retrieveMemberID(person);
+            String retrieveMemberID = cgdIntegrationConfiguration.getMemberIDStrategy().retrieveMemberID(person);
             client.setMemberNumber(retrieveMemberID);
         });
 

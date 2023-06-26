@@ -30,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 
 import com.qubit.solution.fenixedu.integration.cgd.services.CgdAddressProofGenerator;
+import com.qubit.solution.fenixedu.integration.cgd.services.utils.CgdIESCodeProviderStrategyClass;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
 
 import pt.ist.fenixframework.Atomic;
@@ -93,6 +94,10 @@ public class CgdIntegrationConfiguration extends CgdIntegrationConfiguration_Bas
         setAddressProofGeneratorClass(proofGeneratorClass.getName());
     }
 
+    public void setIESCodProviderStrategyClass(Class<? extends CgdIESCodeProviderStrategyClass> cgdIESCodeProviderStrategyClass) {
+        setIesCodeProviderStrategyClass(cgdIESCodeProviderStrategyClass.getName());
+    }
+
     public CgdAddressProofGenerator getAddressProofGenerator() {
         String addressProofGeneratorClass = getAddressProofGeneratorClass();
         CgdAddressProofGenerator generator = null;
@@ -107,6 +112,20 @@ public class CgdIntegrationConfiguration extends CgdIntegrationConfiguration_Bas
         }
 
         return generator;
+    }
+
+    public <T extends CgdIESCodeProviderStrategyClass> T getIESCodeProvider() {
+        String iesCodeProviderClass = getIesCodeProviderStrategyClass();
+        if (StringUtils.isEmpty(iesCodeProviderClass)) {
+            throw new IllegalStateException("No IES code provider strategy class defined. Please define it in the application");
+        }
+        try {
+            Class<?> forName = Class.forName(iesCodeProviderClass);
+            return (T) forName.newInstance();
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return null;
+        }
     }
 
 }
