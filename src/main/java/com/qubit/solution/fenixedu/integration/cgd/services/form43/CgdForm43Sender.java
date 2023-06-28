@@ -206,7 +206,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
     private static Client createClient(org.fenixedu.academic.domain.Person person, IIESService service) {
         Client client = new Client();
         CgdIntegrationConfiguration cgdIntegrationConfiguration = CgdIntegrationConfiguration.getInstance();
-        String findIES = findIES(cgdIntegrationConfiguration.getIESCodeProvider().getIESCode(), service);//findIES(getInstitutionCode(), service);
+        String findIES = findIES(cgdIntegrationConfiguration.getIESCodeProvider().getIESCode(), service);
 
         executeIfAllowed(person, CgdAuthorizationCodes.BASIC_INFO, () -> {
             client.setIES(findIES);
