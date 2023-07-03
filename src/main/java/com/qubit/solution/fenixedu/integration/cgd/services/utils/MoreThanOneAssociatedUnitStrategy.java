@@ -46,7 +46,7 @@ public class MoreThanOneAssociatedUnitStrategy extends BaseIESCodeProviderStrate
         for (Unit unit : associatedParentUnits) {
             if (allowedUnitsForSearch.contains(unit)) {
                 String code = unit.getCode();
-                if (listToReturn.contains(code)) {
+                if (!listToReturn.contains(code)) {
                     listToReturn.add(code);
                 }
             }

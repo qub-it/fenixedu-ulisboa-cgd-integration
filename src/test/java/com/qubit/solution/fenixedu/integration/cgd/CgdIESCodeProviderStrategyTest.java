@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Locale;
 
 import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.ExecutionIntervalTest;
+import org.fenixedu.academic.domain.StudentTest;
 import org.fenixedu.academic.domain.organizationalStructure.AccountabilityType;
 import org.fenixedu.academic.domain.organizationalStructure.AccountabilityTypeEnum;
 import org.fenixedu.academic.domain.organizationalStructure.PartyType;
@@ -33,7 +35,7 @@ import pt.ist.fenixframework.FenixFramework;
 public class CgdIESCodeProviderStrategyTest {
 
     private static final String UNIVERSITY_CODE = "1111";
-
+    private static final String EARTH_CODE = "123698745";
     private static final String SCHOOL_CODE = "12345";
 
     private static Unit scientificUnit1;
@@ -48,7 +50,8 @@ public class CgdIESCodeProviderStrategyTest {
          * We start by having the strategy that returns only one
          */
         FenixFramework.getTransactionManager().withTransaction(() -> {
-            SetUpCgdIESCodeProviderStrategyTests.generateDataForCgdTests();
+            ExecutionIntervalTest.init();
+            StudentTest.init();
             createStartUnits();
             CgdIntegrationConfiguration integration = CgdIntegrationConfiguration.getInstance();
             integration.setAllowsMultipleUnits(false);
@@ -59,8 +62,8 @@ public class CgdIESCodeProviderStrategyTest {
     }
 
     private static void createStartUnits() {
-        //Defined in SetUpCgdIESCodeProviderStrategyTests
         earthUnit = Unit.readAllUnits().stream().filter(u -> "E".equals(u.getAcronym())).findFirst().get();
+        earthUnit.setCode("123698745");
         universityUnit = Unit.createNewUnit(PartyType.of(PartyTypeEnum.UNIVERSITY),
                 new LocalizedString.Builder().with(Locale.getDefault(), "UniversityName").build(), "UN", earthUnit,
                 AccountabilityType.readByType(AccountabilityTypeEnum.ORGANIZATIONAL_STRUCTURE));
@@ -141,6 +144,7 @@ public class CgdIESCodeProviderStrategyTest {
         assertEquals(UNIVERSITY_CODE, iesCodeList.get(0));
     }
 
+    @Test
     public void e_changeAllowedMultipleUnits() {
         CgdIntegrationConfiguration instance = CgdIntegrationConfiguration.getInstance();
         Registration registration = Registration.readByNumber(1).get(0);
@@ -148,11 +152,11 @@ public class CgdIESCodeProviderStrategyTest {
             instance.setAllowsMultipleUnits(true);
             return null;
         });
+
         List<String> iesCodeList = instance.getIESCodeProvider().getIESCode(registration);
         assertTrue(iesCodeList.size() > 1);
-
         assertTrue(iesCodeList.contains(UNIVERSITY_CODE));
-        assertTrue(iesCodeList.contains(SCHOOL_CODE));
+        assertTrue(iesCodeList.contains(EARTH_CODE));
     }
 
 }
