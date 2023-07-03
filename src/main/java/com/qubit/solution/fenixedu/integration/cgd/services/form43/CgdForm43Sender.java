@@ -104,7 +104,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         boolean success = false;
         try {
             org.fenixedu.academic.domain.Person person = registration.getStudent().getPerson();
-            List<Client> clients = createClient(person, registration, service);
+            List<Client> clients = createClients(person, registration, service);
             Person personData = createPerson(person);
             Worker workerData = createWorker(person);
             Student studentData = createStudent(registration);
@@ -208,7 +208,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         return code;
     }
 
-    private static List<Client> createClient(org.fenixedu.academic.domain.Person person, Registration registration,
+    private static List<Client> createClients(org.fenixedu.academic.domain.Person person, Registration registration,
             IIESService service) {
         List<Client> clients = new ArrayList<Client>();
         CgdIntegrationConfiguration cgdIntegrationConfiguration = CgdIntegrationConfiguration.getInstance();

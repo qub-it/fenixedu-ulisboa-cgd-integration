@@ -43,7 +43,7 @@ public class MoreThanOneAssociatedUnitStrategy extends BaseIESCodeProviderStrate
 
     private void continueSearchUnitWithParentUnits(Collection<Unit> associatedParentUnits, Set<Unit> allowedUnitsForSearch,
             List<String> listToReturn) {
-        for (Unit unit : associatedParentUnits) {
+        associatedParentUnits.forEach(unit -> {
             if (allowedUnitsForSearch.contains(unit)) {
                 String code = unit.getCode();
                 if (!listToReturn.contains(code)) {
@@ -51,7 +51,7 @@ public class MoreThanOneAssociatedUnitStrategy extends BaseIESCodeProviderStrate
                 }
             }
             continueSearchUnitWithParentUnits(unit.getAllParentUnits(), allowedUnitsForSearch, listToReturn);
-        }
+        });
     }
 
     private List<String> findFirstUnitFromConfiguration(Registration registration, Unit associatedUnit) {
