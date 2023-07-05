@@ -1,6 +1,6 @@
 package com.qubit.solution.fenixedu.integration.cgd.mocks;
 
-import java.util.List;
+import java.util.Set;
 
 import org.fenixedu.academic.domain.student.Registration;
 
@@ -9,8 +9,8 @@ import com.qubit.solution.fenixedu.integration.cgd.services.utils.CgdIESCodeProv
 public class StrategyReturnsOnlyOneTest implements CgdIESCodeProviderStrategyClass {
 
     @Override
-    public List<String> getIESCode(Registration registration) {
-        return List.of("1");
+    public Set<String> getIESCode(Registration registration) {
+        return Set.of("1");
     }
 
 }

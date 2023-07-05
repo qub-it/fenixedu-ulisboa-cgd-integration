@@ -1,9 +1,8 @@
 package com.qubit.solution.fenixedu.integration.cgd.services.utils;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
@@ -14,7 +13,7 @@ import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdInteg
 public class MoreThanOneAssociatedUnitStrategy extends BaseIESCodeProviderStrategy implements CgdIESCodeProviderStrategyClass {
 
     @Override
-    public List<String> getIESCode(Registration registration) {
+    public Set<String> getIESCode(Registration registration) {
         Unit associatedUnit = registration.getDegree().getUnit();
 
         if (associatedUnit == null) {
@@ -25,15 +24,12 @@ public class MoreThanOneAssociatedUnitStrategy extends BaseIESCodeProviderStrate
                 associatedUnit) : findFirstUnitFromConfiguration(registration, associatedUnit);
     }
 
-    private List<String> findAllUnitsCodes(Registration registration, Unit associatedUnit) {
+    private Set<String> findAllUnitsCodes(Registration registration, Unit associatedUnit) {
         Set<Unit> allowedUnits = CgdIntegrationConfiguration.getInstance().getUnitsSet();
-        List<String> result = new ArrayList<String>();
+        Set<String> result = new HashSet<String>();
 
         if (allowedUnits.contains(associatedUnit)) {
-            String code = associatedUnit.getCode();
-            if (!result.contains(code)) {
-                result.add(code);
-            }
+            result.add(associatedUnit.getCode());
         }
 
         continueSearchUnitWithParentUnits(associatedUnit.getParentUnits(), allowedUnits, result);
@@ -42,19 +38,16 @@ public class MoreThanOneAssociatedUnitStrategy extends BaseIESCodeProviderStrate
     }
 
     private void continueSearchUnitWithParentUnits(Collection<Unit> associatedParentUnits, Set<Unit> allowedUnitsForSearch,
-            List<String> listToReturn) {
+            Set<String> setToReturn) {
         associatedParentUnits.forEach(unit -> {
             if (allowedUnitsForSearch.contains(unit)) {
-                String code = unit.getCode();
-                if (!listToReturn.contains(code)) {
-                    listToReturn.add(code);
-                }
+                setToReturn.add(unit.getCode());
             }
-            continueSearchUnitWithParentUnits(unit.getAllParentUnits(), allowedUnitsForSearch, listToReturn);
+            continueSearchUnitWithParentUnits(unit.getAllParentUnits(), allowedUnitsForSearch, setToReturn);
         });
     }
 
-    private List<String> findFirstUnitFromConfiguration(Registration registration, Unit associatedUnit) {
+    private Set<String> findFirstUnitFromConfiguration(Registration registration, Unit associatedUnit) {
         Set<Unit> allowedUnits = CgdIntegrationConfiguration.getInstance().getUnitsSet();
         LinkedList<Unit> queue = new LinkedList<Unit>();
         queue.add(associatedUnit);
@@ -65,7 +58,7 @@ public class MoreThanOneAssociatedUnitStrategy extends BaseIESCodeProviderStrate
             if (allowedUnits.contains(unit)) {
                 //We found the first unit in BFS that is a school unit.
                 //We set the code variable with the unit code and break the cycle.
-                return List.of(unit.getCode());
+                return Set.of(unit.getCode());
             } else {
                 //Polled unit is not a school unit so we add unit parents to continue the search
                 queue.addAll(unit.getParentUnits());

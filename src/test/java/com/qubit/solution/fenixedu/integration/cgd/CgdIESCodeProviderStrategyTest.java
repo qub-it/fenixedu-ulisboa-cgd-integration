@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionIntervalTest;
@@ -100,7 +101,8 @@ public class CgdIESCodeProviderStrategyTest {
     @Test
     public void b_assertIesCodeProviderReturnsOnlyOne() {
         Registration registration = Registration.readByNumber(1).get(0);
-        String iesCode = CgdIntegrationConfiguration.getInstance().getIESCodeProvider().getIESCode(registration).get(0);
+        String iesCode =
+                CgdIntegrationConfiguration.getInstance().getIESCodeProvider().getIESCode(registration).iterator().next();
         assertEquals("1", iesCode);
     }
 
@@ -119,12 +121,12 @@ public class CgdIESCodeProviderStrategyTest {
         /*
          * With these changes we expect to get the school code, since there is no associated unit
          */
-        List<String> iesCodeList = instance.getIESCodeProvider().getIESCode(registration);
-        assertTrue(iesCodeList.size() == 1);
+        Set<String> iesCodeSet = instance.getIESCodeProvider().getIESCode(registration);
+        assertTrue(iesCodeSet.size() == 1);
         /*
          * Since we don't have any associated unit we will find the institutionalUnit (Base strategy)
          */
-        assertEquals(SCHOOL_CODE, iesCodeList.get(0));
+        assertEquals(SCHOOL_CODE, iesCodeSet.iterator().next());
     }
 
     @Test
@@ -139,9 +141,9 @@ public class CgdIESCodeProviderStrategyTest {
             return null;
         });
 
-        List<String> iesCodeList = instance.getIESCodeProvider().getIESCode(registration);
-        assertTrue(iesCodeList.size() == 1);
-        assertEquals(UNIVERSITY_CODE, iesCodeList.get(0));
+        Set<String> iesCodeSet = instance.getIESCodeProvider().getIESCode(registration);
+        assertTrue(iesCodeSet.size() == 1);
+        assertEquals(UNIVERSITY_CODE, iesCodeSet.iterator().next());
     }
 
     @Test
@@ -153,10 +155,10 @@ public class CgdIESCodeProviderStrategyTest {
             return null;
         });
 
-        List<String> iesCodeList = instance.getIESCodeProvider().getIESCode(registration);
-        assertTrue(iesCodeList.size() > 1);
-        assertTrue(iesCodeList.contains(UNIVERSITY_CODE));
-        assertTrue(iesCodeList.contains(EARTH_CODE));
+        Set<String> iesCodeSet = instance.getIESCodeProvider().getIESCode(registration);
+        assertTrue(iesCodeSet.size() > 1);
+        assertTrue(iesCodeSet.contains(UNIVERSITY_CODE));
+        assertTrue(iesCodeSet.contains(EARTH_CODE));
     }
 
 }

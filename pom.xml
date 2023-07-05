@@ -17,7 +17,6 @@
 
 	<properties>
 		<version.org.fenixedu.bennu>6.2.4-FORK</version.org.fenixedu.bennu>
-		<debug.tests>true</debug.tests>
 	</properties>
 
 	<dependencyManagement>
@@ -79,7 +78,7 @@
 		<dependency>
 			<groupId>com.qubit.solution.fenixedu</groupId>
 			<artifactId>fenixedu-academic-core</artifactId>
-			<version>40.15.2</version> <!--<version>33.1.0</version>-->
+			<version>40.15.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.qubit.solution.fenixedu</groupId>

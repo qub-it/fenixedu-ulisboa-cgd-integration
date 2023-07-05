@@ -102,13 +102,7 @@ public class CgdIntegrationConfiguration extends CgdIntegrationConfiguration_Bas
         String addressProofGeneratorClass = getAddressProofGeneratorClass();
         CgdAddressProofGenerator generator = null;
         if (!StringUtils.isEmpty(addressProofGeneratorClass)) {
-            try {
-                Class<? extends CgdAddressProofGenerator> generateClass =
-                        (Class<? extends CgdAddressProofGenerator>) Class.forName(addressProofGeneratorClass);
-                generator = generateClass.getConstructor(new Class[] {}).newInstance(new Object[] {});
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
+            generator = instanceProvider(addressProofGeneratorClass);
         }
 
         return generator;
@@ -119,8 +113,12 @@ public class CgdIntegrationConfiguration extends CgdIntegrationConfiguration_Bas
         if (StringUtils.isEmpty(iesCodeProviderClass)) {
             throw new IllegalStateException("No IES code provider strategy class defined. Please define it in the application");
         }
+        return instanceProvider(iesCodeProviderClass);
+    }
+
+    private <T> T instanceProvider(String className) {
         try {
-            Class<?> forName = Class.forName(iesCodeProviderClass);
+            Class<?> forName = Class.forName(className);
             return (T) forName.newInstance();
         } catch (Throwable t) {
             t.printStackTrace();
