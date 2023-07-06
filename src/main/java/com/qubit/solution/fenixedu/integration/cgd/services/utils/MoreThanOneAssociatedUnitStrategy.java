@@ -1,6 +1,5 @@
 package com.qubit.solution.fenixedu.integration.cgd.services.utils;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -31,20 +30,10 @@ public class MoreThanOneAssociatedUnitStrategy extends BaseIESCodeProviderStrate
         if (allowedUnits.contains(associatedUnit)) {
             result.add(associatedUnit.getCode());
         }
-
-        continueSearchUnitWithParentUnits(associatedUnit.getParentUnits(), allowedUnits, result);
+        associatedUnit.getAllParentUnits().stream().filter(unit -> allowedUnits.contains(unit))
+                .forEach(unit -> result.add(unit.getCode()));
 
         return result.isEmpty() ? super.getIESCode(registration) : result;
-    }
-
-    private void continueSearchUnitWithParentUnits(Collection<Unit> associatedParentUnits, Set<Unit> allowedUnitsForSearch,
-            Set<String> setToReturn) {
-        associatedParentUnits.forEach(unit -> {
-            if (allowedUnitsForSearch.contains(unit)) {
-                setToReturn.add(unit.getCode());
-            }
-            continueSearchUnitWithParentUnits(unit.getAllParentUnits(), allowedUnitsForSearch, setToReturn);
-        });
     }
 
     private Set<String> findFirstUnitFromConfiguration(Registration registration, Unit associatedUnit) {
