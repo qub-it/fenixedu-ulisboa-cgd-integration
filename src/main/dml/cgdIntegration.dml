@@ -30,11 +30,20 @@ package com.qubit.solution.fenixedu.integration.cgd.domain;
 class configuration.CgdIntegrationConfiguration {
 	String memberIDResolverClass;
 	String addressProofGeneratorClass;
+	String iesCodeProviderStrategyClass;
+	boolean allowsMultipleUnits;
 }
 
 relation CgdIntegrationConfigurationRootDomainObject {
 	configuration.CgdIntegrationConfiguration playsRole cgdIntegrationConfiguration;
 	.org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
+}
+
+relation CgdIntegrationConfigurationUnits {
+	.org.fenixedu.academic.domain.organizationalStructure.Unit playsRole units {
+		multiplicity *;
+	}
+	configuration.CgdIntegrationConfiguration playsRole cgdIntegrationConfiguration;
 }
 
 class idcards.CgdCard {

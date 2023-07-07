@@ -26,6 +26,7 @@
  */
 package com.qubit.solution.fenixedu.integration.cgd.services.form43;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
@@ -103,88 +104,92 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         boolean success = false;
         try {
             org.fenixedu.academic.domain.Person person = registration.getStudent().getPerson();
-            Client clientData = createClient(person, service);
+            List<Client> clients = createClients(person, registration, service);
             Person personData = createPerson(person);
             Worker workerData = createWorker(person);
             Student studentData = createStudent(registration);
 
-            Form43Digital form43Digital = new Form43Digital();
-            form43Digital.setClientData(clientData);
-            form43Digital.setPersonData(personData);
-            form43Digital.setProfessionalData(workerData);
-            form43Digital.setStudentData(studentData);
-            form43Digital.setIDCardProduction(requestCard);
+            for (Client clientData : clients) {
+                Form43Digital form43Digital = new Form43Digital();
+                form43Digital.setClientData(clientData);
+                form43Digital.setPersonData(personData);
+                form43Digital.setProfessionalData(workerData);
+                form43Digital.setStudentData(studentData);
+                form43Digital.setIDCardProduction(requestCard);
 
-            OperationResult setForm43DigitalData = service.setForm43DigitalData(form43Digital);
-            success = !setForm43DigitalData.isError();
-            if (!success) {
-                logger.info(
-                        "Problems while trying to send form 43 to student with number: " + registration.getStudent().getNumber()
-                                + "with message: " + setForm43DigitalData.getFriendlyMessage().getValue() + "\nCode id: "
-                                + setForm43DigitalData.getCodeId() + "\n Unique Error ID: " + setForm43DigitalData.getUEC()
-                                + "\n In case there are violations they'll be present bellow ");
-                for (ValidationResult validation : setForm43DigitalData.getViolations().getValue().getValidationResult()) {
-                    logger.error("Validation error : " + validation.getErrorMessage().getValue() + " [member: "
-                            + validation.getMemberNames().getValue().getString().toString() + "]");
-                }
-            } else {
-                logger.info("Sent successfuly form 43 for student with number:" + registration.getStudent().getNumber());
-
-                CgdAddressProofGenerator addressProofGenerator =
-                        CgdIntegrationConfiguration.getInstance().getAddressProofGenerator();
-                if (addressProofGenerator != null && isAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_PLACE,
-                        CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_POSTAL_CODE,
-                        CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_DISTRICT,
-                        CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_POSTAL_COUNTY,
-                        CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_POSTAL_PARISH)) {
-                    FindFormRequest formRequest = new FindFormRequest();
-                    formRequest.setIES(clientData.getIES());
-                    formRequest.setMemberCategoryCode(
-                            objectFactory.createFindFormRequestMemberCategoryCode(clientData.getMemberCategoryCode()));
-                    formRequest.setMemberNumber(objectFactory.createFindFormRequestMemberNumber(clientData.getMemberNumber()));
-                    JAXBElement<String> fiscalNumber = personData.getFiscalNumber();
-
-                    if (fiscalNumber != null) {
-                        // fiscalNumber will only be filled in if CgdAuthorizationCodes.BASIC_INFO is active
-                        // which needs to be on for the previous ws call to work. Hence this check may sound
-                        // redundant, but I feel better doing it.
-                        //
-                        // 24 August 2020 - Paulo Abrantes
-                        formRequest.setFiscalNumber(objectFactory.createFindFormRequestFiscalNumber(fiscalNumber.getValue()));
+                OperationResult setForm43DigitalData = service.setForm43DigitalData(form43Digital);
+                success = !setForm43DigitalData.isError();
+                if (!success) {
+                    logger.info("Problems while trying to send form 43 to student with number: "
+                            + registration.getStudent().getNumber() + "with message: "
+                            + setForm43DigitalData.getFriendlyMessage().getValue() + "\nCode id: "
+                            + setForm43DigitalData.getCodeId() + "\n Unique Error ID: " + setForm43DigitalData.getUEC()
+                            + "\n In case there are violations they'll be present bellow ");
+                    for (ValidationResult validation : setForm43DigitalData.getViolations().getValue().getValidationResult()) {
+                        logger.error("Validation error : " + validation.getErrorMessage().getValue() + " [member: "
+                                + validation.getMemberNames().getValue().getString().toString() + "]");
                     }
+                } else {
+                    logger.info("Sent successfuly form 43 for student with number:" + registration.getStudent().getNumber());
 
-                    // We'll always have a card even if empty so no need to check if there's a card before reaching for
-                    // the value
-                    IdentificationCard card = personData.getIdentificationCard().getValue();
-                    formRequest.setIdCardNumber(objectFactory.createFindFormRequestIdCardNumber(card.getNumber()));
+                    CgdAddressProofGenerator addressProofGenerator =
+                            CgdIntegrationConfiguration.getInstance().getAddressProofGenerator();
+                    if (addressProofGenerator != null && isAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_PLACE,
+                            CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_POSTAL_CODE,
+                            CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_DISTRICT,
+                            CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_POSTAL_COUNTY,
+                            CgdAuthorizationCodes.EXTENDED_INFO_ADDRESS_POSTAL_PARISH)) {
+                        FindFormRequest formRequest = new FindFormRequest();
+                        formRequest.setIES(clientData.getIES());
+                        formRequest.setMemberCategoryCode(
+                                objectFactory.createFindFormRequestMemberCategoryCode(clientData.getMemberCategoryCode()));
+                        formRequest
+                                .setMemberNumber(objectFactory.createFindFormRequestMemberNumber(clientData.getMemberNumber()));
+                        JAXBElement<String> fiscalNumber = personData.getFiscalNumber();
 
-                    PostedFile request = new PostedFile();
-                    request.setFileName(UPLOAD_FORM_ATTACHMENT_NAME);
-                    byte[] byteArray = null;
-                    try {
-                        byteArray = addressProofGenerator.apply(registration);
-                    } catch (Throwable t) {
-                        logger.info("Problems while trying to generate form attachment for student with number: "
-                                + registration.getStudent().getNumber() + "with message: " + t.getMessage());
-                    }
-                    if (byteArray != null) {
-                        request.setFileContent(byteArray);
-                        OperationResult uploadFormAttachment = service.uploadFormAttachment(formRequest, request);
-                        boolean uploadSuccess = !uploadFormAttachment.isError();
-                        if (!uploadSuccess) {
-                            logger.info("Problems while trying to upload form attachment to student with number: "
-                                    + registration.getStudent().getNumber() + "with message: "
-                                    + uploadFormAttachment.getFriendlyMessage().getValue() + "\nCode id: "
-                                    + uploadFormAttachment.getCodeId() + "\n Unique Error ID: " + uploadFormAttachment.getUEC()
-                                    + "\n In case there are violations they'll be present bellow ");
-                            for (ValidationResult validation : uploadFormAttachment.getViolations().getValue()
-                                    .getValidationResult()) {
-                                logger.error("Validation error : " + validation.getErrorMessage().getValue() + " [member: "
-                                        + validation.getMemberNames().getValue().getString().toString() + "]");
+                        if (fiscalNumber != null) {
+                            // fiscalNumber will only be filled in if CgdAuthorizationCodes.BASIC_INFO is active
+                            // which needs to be on for the previous ws call to work. Hence this check may sound
+                            // redundant, but I feel better doing it.
+                            //
+                            // 24 August 2020 - Paulo Abrantes
+                            formRequest.setFiscalNumber(objectFactory.createFindFormRequestFiscalNumber(fiscalNumber.getValue()));
+                        }
+
+                        // We'll always have a card even if empty so no need to check if there's a card before reaching for
+                        // the value
+                        IdentificationCard card = personData.getIdentificationCard().getValue();
+                        formRequest.setIdCardNumber(objectFactory.createFindFormRequestIdCardNumber(card.getNumber()));
+
+                        PostedFile request = new PostedFile();
+                        request.setFileName(UPLOAD_FORM_ATTACHMENT_NAME);
+                        byte[] byteArray = null;
+                        try {
+                            byteArray = addressProofGenerator.apply(registration);
+                        } catch (Throwable t) {
+                            logger.info("Problems while trying to generate form attachment for student with number: "
+                                    + registration.getStudent().getNumber() + "with message: " + t.getMessage());
+                        }
+                        if (byteArray != null) {
+                            request.setFileContent(byteArray);
+                            OperationResult uploadFormAttachment = service.uploadFormAttachment(formRequest, request);
+                            boolean uploadSuccess = !uploadFormAttachment.isError();
+                            if (!uploadSuccess) {
+                                logger.info("Problems while trying to upload form attachment to student with number: "
+                                        + registration.getStudent().getNumber() + "with message: "
+                                        + uploadFormAttachment.getFriendlyMessage().getValue() + "\nCode id: "
+                                        + uploadFormAttachment.getCodeId() + "\n Unique Error ID: "
+                                        + uploadFormAttachment.getUEC()
+                                        + "\n In case there are violations they'll be present bellow ");
+                                for (ValidationResult validation : uploadFormAttachment.getViolations().getValue()
+                                        .getValidationResult()) {
+                                    logger.error("Validation error : " + validation.getErrorMessage().getValue() + " [member: "
+                                            + validation.getMemberNames().getValue().getString().toString() + "]");
+                                }
+                            } else {
+                                logger.info("Successful upload of form attachment for student with number:"
+                                        + registration.getStudent().getNumber());
                             }
-                        } else {
-                            logger.info("Successful upload of form attachment for student with number:"
-                                    + registration.getStudent().getNumber());
                         }
                     }
                 }
@@ -203,19 +208,24 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         return code;
     }
 
-    private static Client createClient(org.fenixedu.academic.domain.Person person, IIESService service) {
-        Client client = new Client();
-        String findIES = findIES(getInstitutionCode(), service);
+    private static List<Client> createClients(org.fenixedu.academic.domain.Person person, Registration registration,
+            IIESService service) {
+        List<Client> clients = new ArrayList<Client>();
+        CgdIntegrationConfiguration cgdIntegrationConfiguration = CgdIntegrationConfiguration.getInstance();
+        for (String code : cgdIntegrationConfiguration.getIESCodeProvider().getIESCode(registration)) {
+            Client client = new Client();
+            String findIES = findIES(code, service);
 
-        executeIfAllowed(person, CgdAuthorizationCodes.BASIC_INFO, () -> {
-            client.setIES(findIES);
-            client.setGroup(objectFactory.createClientGroup("1")); // Fernando Nunes indicou que é o protocolo e neste caso será sempre 1
-            client.setMemberCategoryCode("91"); // Resposta da Carla Récio a 19 do 6 indica que grande parte das escolas usam ALUNOS 
-            String retrieveMemberID = CgdIntegrationConfiguration.getInstance().getMemberIDStrategy().retrieveMemberID(person);
-            client.setMemberNumber(retrieveMemberID);
-        });
+            executeIfAllowed(person, CgdAuthorizationCodes.BASIC_INFO, () -> {
+                client.setIES(findIES);
+                client.setGroup(objectFactory.createClientGroup("1")); // Fernando Nunes indicou que é o protocolo e neste caso será sempre 1
+                client.setMemberCategoryCode("91"); // Resposta da Carla Récio a 19 do 6 indica que grande parte das escolas usam ALUNOS 
+                String retrieveMemberID = cgdIntegrationConfiguration.getMemberIDStrategy().retrieveMemberID(person);
+                client.setMemberNumber(retrieveMemberID);
+            });
+        }
 
-        return client;
+        return clients;
 
     }
 

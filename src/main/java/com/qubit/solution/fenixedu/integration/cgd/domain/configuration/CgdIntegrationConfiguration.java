@@ -30,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 
 import com.qubit.solution.fenixedu.integration.cgd.services.CgdAddressProofGenerator;
+import com.qubit.solution.fenixedu.integration.cgd.services.utils.CgdIESCodeProviderStrategyClass;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
 
 import pt.ist.fenixframework.Atomic;
@@ -93,20 +94,36 @@ public class CgdIntegrationConfiguration extends CgdIntegrationConfiguration_Bas
         setAddressProofGeneratorClass(proofGeneratorClass.getName());
     }
 
+    public void setIESCodProviderStrategyClass(Class<? extends CgdIESCodeProviderStrategyClass> cgdIESCodeProviderStrategyClass) {
+        setIesCodeProviderStrategyClass(cgdIESCodeProviderStrategyClass.getName());
+    }
+
     public CgdAddressProofGenerator getAddressProofGenerator() {
         String addressProofGeneratorClass = getAddressProofGeneratorClass();
         CgdAddressProofGenerator generator = null;
         if (!StringUtils.isEmpty(addressProofGeneratorClass)) {
-            try {
-                Class<? extends CgdAddressProofGenerator> generateClass =
-                        (Class<? extends CgdAddressProofGenerator>) Class.forName(addressProofGeneratorClass);
-                generator = generateClass.getConstructor(new Class[] {}).newInstance(new Object[] {});
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
+            generator = instanceProvider(addressProofGeneratorClass);
         }
 
         return generator;
+    }
+
+    public <T extends CgdIESCodeProviderStrategyClass> T getIESCodeProvider() {
+        String iesCodeProviderClass = getIesCodeProviderStrategyClass();
+        if (StringUtils.isEmpty(iesCodeProviderClass)) {
+            throw new IllegalStateException("No IES code provider strategy class defined. Please define it in the application");
+        }
+        return instanceProvider(iesCodeProviderClass);
+    }
+
+    private <T> T instanceProvider(String className) {
+        try {
+            Class<?> forName = Class.forName(className);
+            return (T) forName.newInstance();
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return null;
+        }
     }
 
 }

@@ -26,6 +26,8 @@
  */
 package com.qubit.solution.fenixedu.integration.cgd.webservices;
 
+import java.util.Set;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -36,12 +38,13 @@ import javax.xml.ws.ResponseWrapper;
 import org.datacontract.schemas._2004._07.wcfservice2.ErrorCode;
 import org.datacontract.schemas._2004._07.wcfservice2.Status;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qubit.solution.fenixedu.bennu.webservices.services.server.BennuWebService;
+import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
 import com.qubit.solution.fenixedu.integration.cgd.domain.idcards.CgdCard;
-import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Sender;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
 
 import pt.ist.fenixframework.Atomic;
@@ -53,16 +56,7 @@ public class ReceiveMifareService extends BennuWebService implements IGenericSer
 
     private static Logger logger = LoggerFactory.getLogger(ReceiveMifareService.class);
 
-    private static String IES_CODE = null;
-
     response.genericwebservice.ObjectFactory objectFactory = new response.genericwebservice.ObjectFactory();
-
-    private String getIESCode() {
-        if (IES_CODE == null) {
-            IES_CODE = new CgdForm43Sender().getSchooldIESCode();
-        }
-        return IES_CODE;
-    }
 
     @WebMethod(operationName = "ReceiveMifare", action = "http://ReceveiveMifareService/IGenericService/ReceiveMifare")
     @WebResult(name = "ReceiveMifareResult", targetNamespace = "http://ReceveiveMifareService")
@@ -76,11 +70,11 @@ public class ReceiveMifareService extends BennuWebService implements IGenericSer
             @WebParam(name = "memberCategoryCode", targetNamespace = "http://ReceveiveMifareService") String memberCategoryCode,
             @WebParam(name = "IES", targetNamespace = "http://ReceveiveMifareService") String iesCode) {
         Response response = new Response();
-        if (getIESCode() != null && !getIESCode().equals(iesCode)) {
+        if (!validateIESCode(iesCode)) {
             response.setStatus(Status.NOK);
             response.setErrorCode(ErrorCode.INVALID_DATA);
             response.setErrorDescription(objectFactory
-                    .createResponseErrorDescription("Wrong iesCode, expected: " + getIESCode() + " received " + iesCode));
+                    .createResponseErrorDescription("Wrong iesCode. Received iesCode: " + iesCode + " is not allowed."));
         } else {
             try {
                 Person readPerson = CgdMessageUtils.getMemberIDStrategy().readPerson(memberNumber);
@@ -108,6 +102,11 @@ public class ReceiveMifareService extends BennuWebService implements IGenericSer
             }
         }
         return response;
+    }
+
+    private boolean validateIESCode(String iesCode) {
+        Set<Unit> allowedUnitsSet = CgdIntegrationConfiguration.getInstance().getUnitsSet();
+        return iesCode != null && allowedUnitsSet.stream().anyMatch(unit -> iesCode.equals(unit.getCode()));
     }
 
     @Atomic
