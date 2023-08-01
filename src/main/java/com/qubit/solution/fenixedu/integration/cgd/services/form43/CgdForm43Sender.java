@@ -222,6 +222,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
                 client.setMemberCategoryCode("91"); // Resposta da Carla Récio a 19 do 6 indica que grande parte das escolas usam ALUNOS 
                 String retrieveMemberID = cgdIntegrationConfiguration.getMemberIDStrategy().retrieveMemberID(person);
                 client.setMemberNumber(retrieveMemberID);
+                clients.add(client);
             });
         }
 

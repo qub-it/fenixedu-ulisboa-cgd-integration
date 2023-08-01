@@ -1,3 +1,5 @@
+- Bug fix: Correctly adding client data when calling form43sender
+
 2.8.0 (11-07-2023)
 - Improvement: Adds strategy to provide IES code
 
