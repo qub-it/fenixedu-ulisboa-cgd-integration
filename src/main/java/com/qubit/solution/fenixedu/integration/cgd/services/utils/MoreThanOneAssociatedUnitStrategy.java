@@ -58,4 +58,9 @@ public class MoreThanOneAssociatedUnitStrategy extends BaseIESCodeProviderStrate
         return super.getIESCode(registration);
     }
 
+    @Override
+    public boolean requiresUnits() {
+        return true;
+    }
+
 }

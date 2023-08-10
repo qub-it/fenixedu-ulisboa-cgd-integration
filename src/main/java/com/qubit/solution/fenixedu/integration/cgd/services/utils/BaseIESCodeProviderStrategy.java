@@ -12,4 +12,9 @@ public class BaseIESCodeProviderStrategy implements CgdIESCodeProviderStrategyCl
         return Set.of(Bennu.getInstance().getInstitutionUnit().getCode());
     }
 
+    @Override
+    public boolean requiresUnits() {
+        return false;
+    }
+
 }
