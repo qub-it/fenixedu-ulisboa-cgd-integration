@@ -26,6 +26,7 @@
  */
 package com.qubit.solution.fenixedu.integration.cgd.webservices;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.jws.WebMethod;
@@ -37,6 +38,7 @@ import javax.xml.ws.ResponseWrapper;
 
 import org.datacontract.schemas._2004._07.wcfservice2.ErrorCode;
 import org.datacontract.schemas._2004._07.wcfservice2.Status;
+import org.datacontract.schemas._2004._07.wingman_cgd_caixaiu_datacontract.School;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.slf4j.Logger;
@@ -45,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import com.qubit.solution.fenixedu.bennu.webservices.services.server.BennuWebService;
 import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
 import com.qubit.solution.fenixedu.integration.cgd.domain.idcards.CgdCard;
+import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Sender;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
 
 import pt.ist.fenixframework.Atomic;
@@ -106,7 +109,21 @@ public class ReceiveMifareService extends BennuWebService implements IGenericSer
 
     private boolean validateIESCode(String iesCode) {
         Set<Unit> allowedUnitsSet = CgdIntegrationConfiguration.getInstance().getUnitsSet();
-        return iesCode != null && allowedUnitsSet.stream().anyMatch(unit -> iesCode.equals(unit.getCode()));
+        String findMinistryCodeCode = findMinistryCodeCode(iesCode);
+        return findMinistryCodeCode != null
+                && allowedUnitsSet.stream().anyMatch(unit -> findMinistryCodeCode.equals(unit.getCode()));
+    }
+
+    private String findMinistryCodeCode(String iesCode) {
+        if (iesCode != null) {
+            List<School> schools = new CgdForm43Sender().getClient().getSchools().getSchool();
+            for (School school : schools) {
+                if (iesCode.equals(school.getPartnerCode().getValue())) {
+                    return school.getCode().getValue();
+                }
+            }
+        }
+        return null;
     }
 
     @Atomic

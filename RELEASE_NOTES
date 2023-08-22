@@ -1,3 +1,5 @@
+- Bug fix: Corrected iesCode handling in ReceiveMifare webservice
+
 2.8.2 (10-08-2023)
 - Improvement: Adds requiresUnits for CgdIESCodeProviderStrategy 
 
