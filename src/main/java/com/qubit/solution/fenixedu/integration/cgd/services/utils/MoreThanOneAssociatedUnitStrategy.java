@@ -9,14 +9,14 @@ import org.fenixedu.academic.domain.student.Registration;
 
 import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
 
-public class MoreThanOneAssociatedUnitStrategy extends BaseIESCodeProviderStrategy implements CgdIESCodeProviderStrategyClass {
+public class MoreThanOneAssociatedUnitStrategy extends BaseIESCodeProviderStrategy implements CgdSchoolCodeProviderStrategyClass {
 
     @Override
-    public Set<String> getIESCode(Registration registration) {
+    public Set<String> getSchoolCodes(Registration registration) {
         Unit associatedUnit = registration.getDegree().getUnit();
 
         if (associatedUnit == null) {
-            return super.getIESCode(registration);
+            return super.getSchoolCodes(registration);
         }
 
         return CgdIntegrationConfiguration.getInstance().getAllowsMultipleUnits() ? findAllUnitsCodes(registration,
@@ -33,7 +33,7 @@ public class MoreThanOneAssociatedUnitStrategy extends BaseIESCodeProviderStrate
         associatedUnit.getAllParentUnits().stream().filter(unit -> allowedUnits.contains(unit))
                 .forEach(unit -> result.add(unit.getCode()));
 
-        return result.isEmpty() ? super.getIESCode(registration) : result;
+        return result.isEmpty() ? super.getSchoolCodes(registration) : result;
     }
 
     private Set<String> findFirstUnitFromConfiguration(Registration registration, Unit associatedUnit) {
@@ -55,7 +55,7 @@ public class MoreThanOneAssociatedUnitStrategy extends BaseIESCodeProviderStrate
 
         }
         //We didn't find any school unit
-        return super.getIESCode(registration);
+        return super.getSchoolCodes(registration);
     }
 
     @Override

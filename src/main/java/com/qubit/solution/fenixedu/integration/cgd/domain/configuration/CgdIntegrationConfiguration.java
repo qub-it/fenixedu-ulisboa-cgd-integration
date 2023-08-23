@@ -30,7 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import org.fenixedu.bennu.core.domain.Bennu;
 
 import com.qubit.solution.fenixedu.integration.cgd.services.CgdAddressProofGenerator;
-import com.qubit.solution.fenixedu.integration.cgd.services.utils.CgdIESCodeProviderStrategyClass;
+import com.qubit.solution.fenixedu.integration.cgd.services.utils.CgdSchoolCodeProviderStrategyClass;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
 
 import pt.ist.fenixframework.Atomic;
@@ -94,7 +94,8 @@ public class CgdIntegrationConfiguration extends CgdIntegrationConfiguration_Bas
         setAddressProofGeneratorClass(proofGeneratorClass.getName());
     }
 
-    public void setIESCodProviderStrategyClass(Class<? extends CgdIESCodeProviderStrategyClass> cgdIESCodeProviderStrategyClass) {
+    public void setIESCodProviderStrategyClass(
+            Class<? extends CgdSchoolCodeProviderStrategyClass> cgdIESCodeProviderStrategyClass) {
         setIesCodeProviderStrategyClass(cgdIESCodeProviderStrategyClass.getName());
     }
 
@@ -108,7 +109,7 @@ public class CgdIntegrationConfiguration extends CgdIntegrationConfiguration_Bas
         return generator;
     }
 
-    public <T extends CgdIESCodeProviderStrategyClass> T getIESCodeProvider() {
+    public <T extends CgdSchoolCodeProviderStrategyClass> T getSchoolCodeProvider() {
         String iesCodeProviderClass = getIesCodeProviderStrategyClass();
         if (StringUtils.isEmpty(iesCodeProviderClass)) {
             throw new IllegalStateException("No IES code provider strategy class defined. Please define it in the application");

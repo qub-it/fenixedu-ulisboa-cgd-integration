@@ -5,10 +5,10 @@ import java.util.Set;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.bennu.core.domain.Bennu;
 
-public class BaseIESCodeProviderStrategy implements CgdIESCodeProviderStrategyClass {
+public class BaseIESCodeProviderStrategy implements CgdSchoolCodeProviderStrategyClass {
 
     @Override
-    public Set<String> getIESCode(Registration registration) {
+    public Set<String> getSchoolCodes(Registration registration) {
         return Set.of(Bennu.getInstance().getInstitutionUnit().getCode());
     }
 

@@ -4,9 +4,9 @@ import java.util.Set;
 
 import org.fenixedu.academic.domain.student.Registration;
 
-public interface CgdIESCodeProviderStrategyClass {
+public interface CgdSchoolCodeProviderStrategyClass {
 
-    public Set<String> getIESCode(Registration registration);
+    public Set<String> getSchoolCodes(Registration registration);
 
     public boolean requiresUnits();
 }

@@ -26,7 +26,6 @@
  */
 package com.qubit.solution.fenixedu.integration.cgd.services.form43;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
@@ -48,7 +47,6 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academicextensions.domain.person.dataShare.DataShareAuthorization;
 import org.fenixedu.academicextensions.domain.person.dataShare.DataShareAuthorizationType;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.YearMonthDay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,12 +102,15 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         boolean success = false;
         try {
             org.fenixedu.academic.domain.Person person = registration.getStudent().getPerson();
-            List<Client> clients = createClients(person, registration, service);
+
+            CgdIntegrationConfiguration cgdIntegrationConfiguration = CgdIntegrationConfiguration.getInstance();
+
             Person personData = createPerson(person);
             Worker workerData = createWorker(person);
-            Student studentData = createStudent(registration);
 
-            for (Client clientData : clients) {
+            for (String schoolCode : cgdIntegrationConfiguration.getSchoolCodeProvider().getSchoolCodes(registration)) {
+                Client clientData = createClient(person, schoolCode, service);
+                Student studentData = createStudent(registration, schoolCode);
                 Form43Digital form43Digital = new Form43Digital();
                 form43Digital.setClientData(clientData);
                 form43Digital.setPersonData(personData);
@@ -202,31 +203,20 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         return success;
     }
 
-    private static String getInstitutionCode() {
-        String code = Bennu.getInstance().getInstitutionUnit().getCode();
-
-        return code;
-    }
-
-    private static List<Client> createClients(org.fenixedu.academic.domain.Person person, Registration registration,
-            IIESService service) {
-        List<Client> clients = new ArrayList<Client>();
+    private static Client createClient(org.fenixedu.academic.domain.Person person, String schoolCode, IIESService service) {
+        Client client = new Client();
+        String findIES = findIES(schoolCode, service);
         CgdIntegrationConfiguration cgdIntegrationConfiguration = CgdIntegrationConfiguration.getInstance();
-        for (String code : cgdIntegrationConfiguration.getIESCodeProvider().getIESCode(registration)) {
-            Client client = new Client();
-            String findIES = findIES(code, service);
 
-            executeIfAllowed(person, CgdAuthorizationCodes.BASIC_INFO, () -> {
-                client.setIES(findIES);
-                client.setGroup(objectFactory.createClientGroup("1")); // Fernando Nunes indicou que é o protocolo e neste caso será sempre 1
-                client.setMemberCategoryCode("91"); // Resposta da Carla Récio a 19 do 6 indica que grande parte das escolas usam ALUNOS 
-                String retrieveMemberID = cgdIntegrationConfiguration.getMemberIDStrategy().retrieveMemberID(person);
-                client.setMemberNumber(retrieveMemberID);
-                clients.add(client);
-            });
-        }
+        executeIfAllowed(person, CgdAuthorizationCodes.BASIC_INFO, () -> {
+            client.setIES(findIES);
+            client.setGroup(objectFactory.createClientGroup("1")); // Fernando Nunes indicou que é o protocolo e neste caso será sempre 1
+            client.setMemberCategoryCode("91"); // Resposta da Carla Récio a 19 do 6 indica que grande parte das escolas usam ALUNOS 
+            String retrieveMemberID = cgdIntegrationConfiguration.getMemberIDStrategy().retrieveMemberID(person);
+            client.setMemberNumber(retrieveMemberID);
+        });
 
-        return clients;
+        return client;
 
     }
 
@@ -521,10 +511,10 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         }
     }
 
-    private static Student createStudent(Registration registration) {
+    private static Student createStudent(Registration registration, String schoolCode) {
         Student student = new Student();
         executeIfAllowed(registration.getPerson(), CgdAuthorizationCodes.BASIC_INFO, () -> {
-            student.setSchoolCode(getInstitutionCode());
+            student.setSchoolCode(schoolCode);
             student.setCourse(registration.getDegree().getIdCardName());
             // new contract not yet in production
             //        student.setStudentNumber(String.valueOf(registration.getStudent().getNumber()));
@@ -586,12 +576,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         return DEGREE;
     }
 
-    public String getSchooldIESCode() {
-        String institutionCode = getInstitutionCode();
-        IIESService client = getClient();
-        return findIES(institutionCode, client);
-    }
-
+    // cgd partner code
     private static String findIES(String ministryCode, IIESService service) {
         List<School> schools = service.getSchools().getSchool();
         for (School school : schools) {
