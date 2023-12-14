@@ -34,6 +34,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.datacontract.schemas._2004._07.wingman_cgd_caixaiu_datacontract.School;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -56,8 +57,10 @@ import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.microsoft.schemas._2003._10.serialization.arrays.ArrayOfstring;
 import com.qubit.solution.fenixedu.bennu.webservices.services.client.BennuWebServiceClient;
 import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
+import com.qubit.solution.fenixedu.integration.cgd.domain.logs.CgdCommunicationLog;
 import com.qubit.solution.fenixedu.integration.cgd.services.CgdAddressProofGenerator;
 import com.qubit.solution.fenixedu.integration.cgd.services.CgdAuthorizationCodes;
+import com.qubit.terra.framework.services.context.ApplicationUser;
 
 import services.caixaiu.cgd.wingman.iesservice.Client;
 import services.caixaiu.cgd.wingman.iesservice.FindFormRequest;
@@ -120,18 +123,27 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
 
                 OperationResult setForm43DigitalData = service.setForm43DigitalData(form43Digital);
                 success = !setForm43DigitalData.isError();
+
+                StringBuilder sb = new StringBuilder();
                 if (!success) {
-                    logger.info("Problems while trying to send form 43 to student with number: "
+                    String infoLogMessage = "Problems while trying to send form 43 to student with number: "
                             + registration.getStudent().getNumber() + "with message: "
                             + setForm43DigitalData.getFriendlyMessage().getValue() + "\nCode id: "
                             + setForm43DigitalData.getCodeId() + "\n Unique Error ID: " + setForm43DigitalData.getUEC()
-                            + "\n In case there are violations they'll be present bellow ");
+                            + "\n In case there are violations they'll be present bellow ";
+                    sb.append(infoLogMessage + "\n");
+                    logger.info(infoLogMessage);
                     for (ValidationResult validation : setForm43DigitalData.getViolations().getValue().getValidationResult()) {
-                        logger.error("Validation error : " + validation.getErrorMessage().getValue() + " [member: "
-                                + validation.getMemberNames().getValue().getString().toString() + "]");
+                        String validationError = "Validation error : " + validation.getErrorMessage().getValue() + " [member: "
+                                + validation.getMemberNames().getValue().getString().toString() + "]";
+                        sb.append(validationError + "\n");
+                        logger.error(validationError);
                     }
                 } else {
-                    logger.info("Sent successfuly form 43 for student with number:" + registration.getStudent().getNumber());
+                    String sentSuccessfulyMessage =
+                            "Sent successfuly form 43 for student with number:" + registration.getStudent().getNumber();
+                    logger.info(sentSuccessfulyMessage);
+                    sb.append(sentSuccessfulyMessage + "\n");
 
                     CgdAddressProofGenerator addressProofGenerator =
                             CgdIntegrationConfiguration.getInstance().getAddressProofGenerator();
@@ -168,36 +180,57 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
                         try {
                             byteArray = addressProofGenerator.apply(registration);
                         } catch (Throwable t) {
-                            logger.info("Problems while trying to generate form attachment for student with number: "
-                                    + registration.getStudent().getNumber() + "with message: " + t.getMessage());
+                            String problemGeneratingAttachmentMessage =
+                                    "Problems while trying to generate form attachment for student with number: "
+                                            + registration.getStudent().getNumber() + "with message: " + t.getMessage();
+                            logger.info(problemGeneratingAttachmentMessage);
+                            sb.append(problemGeneratingAttachmentMessage + "\n");
                         }
                         if (byteArray != null) {
                             request.setFileContent(byteArray);
                             OperationResult uploadFormAttachment = service.uploadFormAttachment(formRequest, request);
                             boolean uploadSuccess = !uploadFormAttachment.isError();
                             if (!uploadSuccess) {
-                                logger.info("Problems while trying to upload form attachment to student with number: "
-                                        + registration.getStudent().getNumber() + "with message: "
-                                        + uploadFormAttachment.getFriendlyMessage().getValue() + "\nCode id: "
-                                        + uploadFormAttachment.getCodeId() + "\n Unique Error ID: "
-                                        + uploadFormAttachment.getUEC()
-                                        + "\n In case there are violations they'll be present bellow ");
+                                String failedUploadMessage =
+                                        "Problems while trying to upload form attachment to student with number: "
+                                                + registration.getStudent().getNumber() + " with message: "
+                                                + uploadFormAttachment.getFriendlyMessage().getValue() + "\nCode id: "
+                                                + uploadFormAttachment.getCodeId() + "\n Unique Error ID: "
+                                                + uploadFormAttachment.getUEC()
+                                                + "\n In case there are violations they'll be present bellow ";
+                                logger.info(failedUploadMessage);
+                                sb.append(failedUploadMessage + "\n");
                                 for (ValidationResult validation : uploadFormAttachment.getViolations().getValue()
                                         .getValidationResult()) {
-                                    logger.error("Validation error : " + validation.getErrorMessage().getValue() + " [member: "
-                                            + validation.getMemberNames().getValue().getString().toString() + "]");
+                                    String validationErrorMessage =
+                                            "Validation error : " + validation.getErrorMessage().getValue() + " [member: "
+                                                    + validation.getMemberNames().getValue().getString().toString() + "]";
+                                    logger.error(validationErrorMessage);
+                                    sb.append(validationErrorMessage + "\n");
                                 }
                             } else {
-                                logger.info("Successful upload of form attachment for student with number:"
-                                        + registration.getStudent().getNumber());
+                                String successfulUpload = "Successful upload of form attachment for student with number:"
+                                        + registration.getStudent().getNumber();
+                                logger.info(successfulUpload);
+                                sb.append(successfulUpload + "\n");
                             }
                         }
                     }
                 }
+                CgdCommunicationLog log =
+                        new CgdCommunicationLog(registration, requestCard, success, org.fenixedu.academic.domain.Person
+                                .findByUsername(ApplicationUser.getCurrentApplicationUser().getUsername()));
+                log.setMessage(sb.toString());
             }
         } catch (Throwable t) {
-            logger.warn("Problems while trying to send form43 for student with number: " + registration.getStudent().getNumber(),
-                    t);
+            String message =
+                    "Problems while trying to send form43 for student with number: " + registration.getStudent().getNumber();
+            logger.warn(message, t);
+            CgdCommunicationLog log =
+                    new CgdCommunicationLog(registration, requestCard, success, org.fenixedu.academic.domain.Person
+                            .findByUsername(ApplicationUser.getCurrentApplicationUser().getUsername()));
+            log.setMessage(message);
+            log.setExceptionStackTrace(ExceptionUtils.getStackTrace(t));
         }
 
         return success;
