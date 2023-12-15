@@ -34,6 +34,8 @@ public class CgdCommunicationLog extends CgdCommunicationLog_Base {
         setRegistration(null);
         setSender(null);
         setSendDate(null);
+        setSearchDate(null);
+        setUpdateMifareDate(null);
         setRootDomainObject(null);
     }
 
