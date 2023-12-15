@@ -30,10 +30,12 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 import org.fenixedu.academic.domain.Person;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 
 import com.qubit.solution.fenixedu.bennu.webservices.services.server.BennuWebService;
+import com.qubit.solution.fenixedu.integration.cgd.domain.logs.CgdCommunicationLog;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.member.SearchMemberInput;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.member.SearchMemberOutput;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.mifare.UpdateMifareInputMessage;
@@ -50,6 +52,8 @@ public class CgdIntegrationService extends BennuWebService {
         Person identifiedPerson = message.getIdentifiedPerson();
         if (identifiedPerson != null) {
             outputMessage.populate(identifiedPerson, message.getPopulationCode(), message.getMemberCode(), message.getMemberID());
+            CgdCommunicationLog.getStudentLatestCgdCommunicationLog(identifiedPerson)
+                    .ifPresent(log -> log.setSearchDate(DateTime.now()));
         }
         return outputMessage;
     }
@@ -59,7 +63,7 @@ public class CgdIntegrationService extends BennuWebService {
         SearchMemberPhotoOuputMessage outputMessage = new SearchMemberPhotoOuputMessage();
         Person person = message.getIdentifiedPerson();
         if (person != null) {
-            outputMessage.populate(person, message.getPopulationCode(), message.getMemberCode(),message.getMemberID());
+            outputMessage.populate(person, message.getPopulationCode(), message.getMemberCode(), message.getMemberID());
         }
         return outputMessage;
     }

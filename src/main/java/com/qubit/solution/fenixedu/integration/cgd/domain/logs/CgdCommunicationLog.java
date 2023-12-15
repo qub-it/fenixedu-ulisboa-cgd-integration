@@ -1,6 +1,7 @@
 package com.qubit.solution.fenixedu.integration.cgd.domain.logs;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.Person;
@@ -21,7 +22,12 @@ public class CgdCommunicationLog extends CgdCommunicationLog_Base {
 
     public static Collection<CgdCommunicationLog> findLogsByStudent(Person person) {
         return Bennu.getInstance().getCgdComunicationLogsSet().stream()
-                .filter(log -> log.getRegistration().getPerson().equals(person)).collect(Collectors.toSet());
+                .filter(log -> log.getRegistration().getPerson().equals(person))
+                .sorted((log1, log2) -> log2.getSendDate().compareTo(log1.getSendDate())).collect(Collectors.toSet());
+    }
+
+    public static Optional<CgdCommunicationLog> getStudentLatestCgdCommunicationLog(Person person) {
+        return findLogsByStudent(person).stream().findFirst();
     }
 
     public void delete() {

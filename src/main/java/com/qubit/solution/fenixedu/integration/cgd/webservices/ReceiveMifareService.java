@@ -41,12 +41,14 @@ import org.datacontract.schemas._2004._07.wcfservice2.Status;
 import org.datacontract.schemas._2004._07.wingman_cgd_caixaiu_datacontract.School;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.qubit.solution.fenixedu.bennu.webservices.services.server.BennuWebService;
 import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
 import com.qubit.solution.fenixedu.integration.cgd.domain.idcards.CgdCard;
+import com.qubit.solution.fenixedu.integration.cgd.domain.logs.CgdCommunicationLog;
 import com.qubit.solution.fenixedu.integration.cgd.services.form43.CgdForm43Sender;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
 
@@ -95,6 +97,8 @@ public class ReceiveMifareService extends BennuWebService implements IGenericSer
                     }
                     response.setStatus(Status.OK);
                     response.setErrorCode(ErrorCode.NONE);
+                    CgdCommunicationLog.getStudentLatestCgdCommunicationLog(readPerson)
+                            .ifPresent(log -> log.setUpdateMifareDate(DateTime.now()));
                 }
 
             } catch (Throwable t) {

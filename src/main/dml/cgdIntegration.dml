@@ -81,7 +81,9 @@ relation CgdIntegrationConfigurationTemplate {
 }	
 
 class logs.CgdCommunicationLog {
-	DateTime sendDate;
+	DateTime sendDate; //sendForm43 date
+	DateTime updateMifareDate; //validateMifare date 
+	DateTime searchDate; //searchMember date
 	boolean success;
 	boolean requestCard;
 	String message;
