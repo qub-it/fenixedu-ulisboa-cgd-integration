@@ -49,6 +49,7 @@ import org.fenixedu.academicextensions.domain.person.dataShare.DataShareAuthoriz
 import org.fenixedu.academicextensions.domain.person.dataShare.DataShareAuthorizationType;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.bennu.core.security.Authenticate;
 import org.joda.time.YearMonthDay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,6 @@ import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdInteg
 import com.qubit.solution.fenixedu.integration.cgd.domain.logs.CgdCommunicationLog;
 import com.qubit.solution.fenixedu.integration.cgd.services.CgdAddressProofGenerator;
 import com.qubit.solution.fenixedu.integration.cgd.services.CgdAuthorizationCodes;
-import com.qubit.terra.framework.services.context.ApplicationUser;
 
 import services.caixaiu.cgd.wingman.iesservice.Client;
 import services.caixaiu.cgd.wingman.iesservice.FindFormRequest;
@@ -225,20 +225,16 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
                         }
                     }
                 }
-                CgdCommunicationLog log =
-                        new CgdCommunicationLog(registration, requestCard, success, org.fenixedu.academic.domain.Person
-                                .findByUsername(ApplicationUser.getCurrentApplicationUser().getUsername()));
-                log.setMessage(sb.toString());
+                CgdCommunicationLog.createCgdCommunicationLog(registration, requestCard, success,
+                        Authenticate.getUser().getPerson(), sb.toString(), "");
             }
         } catch (Throwable t) {
             Integer studentNumber = registration.getStudent().getNumber();
             logger.warn("Problems while trying to send form43 for student with number: " + studentNumber, t);
-            CgdCommunicationLog log =
-                    new CgdCommunicationLog(registration, requestCard, success, org.fenixedu.academic.domain.Person
-                            .findByUsername(ApplicationUser.getCurrentApplicationUser().getUsername()));
-            log.setMessage(BundleUtil.getString(BUNDLE_CGDINTEGRATION, "label.form43.sendForm43.exceptionWhileSendingForm",
-                    studentNumber.toString()));
-            log.setExceptionStackTrace(ExceptionUtils.getStackTrace(t));
+            CgdCommunicationLog.createCgdCommunicationLog(registration, requestCard, success, Authenticate.getUser().getPerson(),
+                    BundleUtil.getString(BUNDLE_CGDINTEGRATION, "label.form43.sendForm43.exceptionWhileSendingForm",
+                            studentNumber.toString()),
+                    ExceptionUtils.getStackTrace(t));
         }
 
         return success;

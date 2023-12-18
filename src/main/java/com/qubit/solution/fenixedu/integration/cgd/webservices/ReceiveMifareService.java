@@ -97,7 +97,7 @@ public class ReceiveMifareService extends BennuWebService implements IGenericSer
                     }
                     response.setStatus(Status.OK);
                     response.setErrorCode(ErrorCode.NONE);
-                    CgdCommunicationLog.getStudentLatestCgdCommunicationLog(readPerson)
+                    CgdCommunicationLog.findLatestStudentLog(readPerson)
                             .ifPresent(log -> log.setUpdateMifareDate(DateTime.now()));
                 }
 

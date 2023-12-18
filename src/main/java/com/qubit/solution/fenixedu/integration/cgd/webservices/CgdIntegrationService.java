@@ -52,7 +52,7 @@ public class CgdIntegrationService extends BennuWebService {
         Person identifiedPerson = message.getIdentifiedPerson();
         if (identifiedPerson != null) {
             outputMessage.populate(identifiedPerson, message.getPopulationCode(), message.getMemberCode(), message.getMemberID());
-            CgdCommunicationLog.getStudentLatestCgdCommunicationLog(identifiedPerson)
+            CgdCommunicationLog.findLatestStudentLog(identifiedPerson)
                     .ifPresent(log -> log.setSearchDate(DateTime.now()));
         }
         return outputMessage;
