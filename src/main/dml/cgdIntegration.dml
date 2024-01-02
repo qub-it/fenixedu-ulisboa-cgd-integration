@@ -80,3 +80,33 @@ relation CgdIntegrationConfigurationTemplate {
 	configuration.CgdMod43Template playsRole mod43Template;
 }	
 
+class logs.CgdCommunicationLog {
+	DateTime sendDate; //sendForm43 date
+	DateTime updateMifareDate; //validateMifare date 
+	DateTime searchDate; //searchMember date
+	boolean success;
+	boolean requestCard;
+	String message;
+	String exceptionStackTrace;
+}
+
+relation CgdCommunicationLogRootDomainObject {
+	logs.CgdCommunicationLog playsRole cgdComunicationLogs {
+		multiplicity *;
+	}
+	.org.fenixedu.bennu.core.domain.Bennu playsRole rootDomainObject;
+}
+
+relation CgdCommunicationLogPerson {
+	logs.CgdCommunicationLog playsRole cgdComunicationLogs {
+		multiplicity *;
+	}
+	.org.fenixedu.academic.domain.Person playsRole sender;
+}
+
+relation CgdCommunicationLogRegistration {
+	logs.CgdCommunicationLog playsRole cgdComunicationLogs {
+		multiplicity *;
+	}
+	.org.fenixedu.academic.domain.student.Registration playsRole registration;
+}
