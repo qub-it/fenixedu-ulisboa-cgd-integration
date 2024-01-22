@@ -269,7 +269,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
             marshaller.marshal(root, stringWriter);
             xmlData = stringWriter.toString();
         } catch (JAXBException e) {
-            e.printStackTrace();
+            logger.error("Problems creating data to send field for CgdCommunicationLog", e);
         }
         return xmlData;
     }

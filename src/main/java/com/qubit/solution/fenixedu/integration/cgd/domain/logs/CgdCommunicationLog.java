@@ -12,14 +12,19 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import pt.ist.fenixframework.Atomic;
 
 public class CgdCommunicationLog extends CgdCommunicationLog_Base {
+
+    private static Logger logger = LoggerFactory.getLogger(CgdCommunicationLog.class);
 
     protected CgdCommunicationLog(Registration registration, boolean requestCard, boolean success, Person sender) {
         setRegistration(registration);
@@ -36,7 +41,7 @@ public class CgdCommunicationLog extends CgdCommunicationLog_Base {
         CgdCommunicationLog communicationLog = new CgdCommunicationLog(registration, requestCard, success, sender);
         communicationLog.setMessage(message);
         communicationLog.setExceptionStackTrace(exceptionStackTrace);
-        communicationLog.setDataSent(dataSent == null || dataSent.isBlank() ? "" : compressData(dataSent));
+        communicationLog.setDataSent(StringUtils.isBlank(dataSent) ? StringUtils.EMPTY : compressData(dataSent));
         return communicationLog;
     }
 
@@ -69,7 +74,7 @@ public class CgdCommunicationLog extends CgdCommunicationLog_Base {
         try {
             result = compressedData.isBlank() ? result : uncompressData(Base64.getDecoder().decode(compressedData));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Problem while uncompressing data", e);
         }
         return result;
     }
@@ -79,7 +84,7 @@ public class CgdCommunicationLog extends CgdCommunicationLog_Base {
         try {
             byteToEncode = compress(dataSent);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Problem while compressing data", e);
         }
         return Base64.getEncoder().encodeToString(byteToEncode);
     }
