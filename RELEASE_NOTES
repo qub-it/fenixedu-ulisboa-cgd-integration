@@ -1,3 +1,5 @@
+- FENIX-14082 - Added new client for CGD Member Photo service
+
 2.9.0 (02-01-2024)
 - Improvement: Adds CgdCommunicationLog entity [#qubIT-Fenix-4669]
 - Improvement: Adds fenixedu OSS DM [#qubIT-Omnis-4736]

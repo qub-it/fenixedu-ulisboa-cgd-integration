@@ -32,6 +32,9 @@ import javax.servlet.annotation.WebListener;
 
 import org.fenixedu.bennu.core.groups.DynamicGroup;
 
+import com.qubit.solution.fenixedu.bennu.webservices.domain.webservice.WebServiceClientConfiguration;
+import com.qubit.solution.fenixedu.integration.cgd.services.studentPhoto.CgdStudentPhotoClient;
+
 import pt.ist.fenixframework.CallableWithoutException;
 import pt.ist.fenixframework.FenixFramework;
 
@@ -48,6 +51,9 @@ public class CgdintegrationInitializer implements ServletContextListener {
                 if (!dynamicGroup.isDefined()) {
                     dynamicGroup.toPersistentGroup();
                 }
+                
+                new WebServiceClientConfiguration(CgdStudentPhotoClient.class.getName());
+                
                 return null;
             }
         });

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" targetNamespace="http://Wingman.CGD.CaixaIU.Services/IESService"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:tns="http://Wingman.CGD.CaixaIU.Services/IESService">
+	<xs:complexType name="ArrayOfMember">
+		<xs:sequence>
+			<xs:element minOccurs="0" maxOccurs="unbounded" name="Member" nillable="true" type="tns:Member"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="ArrayOfMember" nillable="true" type="tns:ArrayOfMember"/>
+	<xs:complexType name="Member">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="IES" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="MemberCategoryCode" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="MemberNumber" nillable="true" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Member" nillable="true" type="tns:Member"/>
+</xs:schema>

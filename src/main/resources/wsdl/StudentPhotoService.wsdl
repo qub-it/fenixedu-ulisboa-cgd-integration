@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions name="StudentPhotoService" targetNamespace="http://Wingman.CGD.CaixaIU.Services/StudentPhotoService"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex"
+	xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+	xmlns:wsa10="http://www.w3.org/2005/08/addressing"
+	xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+	xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy"
+	xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract"
+	xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+	xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing"
+	xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:tns="http://Wingman.CGD.CaixaIU.Services/StudentPhotoService"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+	xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/">
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://Wingman.CGD.CaixaIU.Services/StudentPhotoService/Imports">
+			<xsd:import schemaLocation="xsd/studentPhotoService/xsd0.xsd" namespace="http://Wingman.CGD.CaixaIU.Services/StudentPhotoService"/>
+			<xsd:import schemaLocation="xsd/studentPhotoService/xsd1.xsd" namespace="http://schemas.microsoft.com/2003/10/Serialization/"/>
+			<xsd:import schemaLocation="xsd/studentPhotoService/xsd2.xsd" namespace="http://schemas.datacontract.org/2004/07/Wingman.CGD.CaixaIU.DataContract.SOAP"/>
+			<xsd:import schemaLocation="xsd/studentPhotoService/xsd3.xsd" namespace="http://Wingman.CGD.CaixaIU.Services/IESService"/>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="IStudentPhotoService_GetPhoto_InputMessage">
+		<wsdl:part name="parameters" element="tns:GetPhoto"/>
+	</wsdl:message>
+	<wsdl:message name="IStudentPhotoService_GetPhoto_OutputMessage">
+		<wsdl:part name="parameters" element="tns:GetPhotoResponse"/>
+	</wsdl:message>
+	<wsdl:message name="IStudentPhotoService_GetAllStudentsByIES_InputMessage">
+		<wsdl:part name="parameters" element="tns:GetAllStudentsByIES"/>
+	</wsdl:message>
+	<wsdl:message name="IStudentPhotoService_GetAllStudentsByIES_OutputMessage">
+		<wsdl:part name="parameters" element="tns:GetAllStudentsByIESResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="IStudentPhotoService">
+		<wsdl:operation name="GetPhoto">
+			<wsdl:input wsaw:Action="http://Wingman.CGD.CaixaIU.Services/StudentPhotoService/IStudentPhotoService/GetPhoto" message="tns:IStudentPhotoService_GetPhoto_InputMessage"/>
+			<wsdl:output wsaw:Action="http://Wingman.CGD.CaixaIU.Services/StudentPhotoService/IStudentPhotoService/GetPhotoResponse" message="tns:IStudentPhotoService_GetPhoto_OutputMessage"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAllStudentsByIES">
+			<wsdl:input wsaw:Action="http://Wingman.CGD.CaixaIU.Services/StudentPhotoService/IStudentPhotoService/GetAllStudentsByIES" message="tns:IStudentPhotoService_GetAllStudentsByIES_InputMessage"/>
+			<wsdl:output wsaw:Action="http://Wingman.CGD.CaixaIU.Services/StudentPhotoService/IStudentPhotoService/GetAllStudentsByIESResponse" message="tns:IStudentPhotoService_GetAllStudentsByIES_OutputMessage"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="BasicHttpBinding_PhotoStudentService" type="tns:IStudentPhotoService">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="GetPhoto">
+			<soap:operation soapAction="http://Wingman.CGD.CaixaIU.Services/StudentPhotoService/IStudentPhotoService/GetPhoto" style="document"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetAllStudentsByIES">
+			<soap:operation soapAction="http://Wingman.CGD.CaixaIU.Services/StudentPhotoService/IStudentPhotoService/GetAllStudentsByIES" style="document"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="StudentPhotoService">
+		<wsdl:port name="BasicHttpBinding_PhotoStudentService" binding="tns:BasicHttpBinding_PhotoStudentService">
+			<soap:address location="http://cliacneu.cgd.pt/IESWebService/StudentPhotoService.svc"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
