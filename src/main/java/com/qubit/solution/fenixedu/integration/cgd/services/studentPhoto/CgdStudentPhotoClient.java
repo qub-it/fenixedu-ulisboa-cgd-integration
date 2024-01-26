@@ -1,10 +1,10 @@
 package com.qubit.solution.fenixedu.integration.cgd.services.studentPhoto;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.ws.BindingProvider;
@@ -27,70 +27,71 @@ public class CgdStudentPhotoClient extends BennuWebServiceClient<IStudentPhotoSe
 
     private static Logger logger = LoggerFactory.getLogger(CgdStudentPhotoClient.class);
 
+    public static final String STUDENT_IDENTIFICATION_CODE = "91";
+    public static final String EMPLOYEE_IDENTIFICATION_CODE = "71";
+    public static final String TEACHER_IDENTIFICATION_CODE = "81";
+
     @Override
     protected BindingProvider getService() {
         return (BindingProvider) new StudentPhotoService().getBasicHttpBindingPhotoStudentService();
     }
 
     public static class MemberCGD {
-        String category;
-        String memberNumber;
+        private String category;
+        private String memberNumber;
+
+        private MemberCGD(Member member) {
+            this.category = Optional.ofNullable(member.getMemberCategoryCode()).map(mcc -> mcc.getValue()).orElse(null);
+            this.memberNumber = Optional.ofNullable(member.getMemberNumber()).map(mn -> mn.getValue()).orElse(null);
+        }
 
         public boolean isStudent() {
-            return "91".equals(category) && memberNumber.length() <= 5 && getMemberAsNumber() != null;
+            return STUDENT_IDENTIFICATION_CODE.equals(category)
+                    && Optional.ofNullable(memberNumber).map(memberNumber -> memberNumber.length() <= 5).orElse(false)
+                    && getMemberAsNumber() != null;
         }
 
         public Integer getMemberAsNumber() {
-            try {
-                return Integer.valueOf(this.memberNumber);
-            } catch (NumberFormatException e) {
-                logger.warn("Invalid student number '{}'", this.memberNumber);
-                return null;
-            }
+            return Optional.ofNullable(memberNumber).map(memberNumber -> Integer.valueOf(memberNumber)).orElse(null);
         }
 
         public boolean isStaff() {
-            return Arrays.asList("71", "81").contains(this.category);
+            return Arrays.asList(EMPLOYEE_IDENTIFICATION_CODE, TEACHER_IDENTIFICATION_CODE).contains(this.category);
         }
 
         public boolean isMemberNumberLikeIdDocumentNumber() {
-            return this.memberNumber.length() > 5;
+            return Optional.ofNullable(memberNumber).map(memberNumber -> memberNumber.length() > 5).orElse(false);
         }
 
-        private MemberCGD(Member member) {
-            this.category = member.getMemberCategoryCode().getValue();
-            this.memberNumber = member.getMemberNumber().getValue();
-        }
-
-        private Person getPersonFromDocumentId() {
+        private Optional<Person> getPersonFromDocumentId() {
             Collection<Person> persons = Person.findPersonByDocumentID(this.memberNumber);
             if (persons.size() > 1) {
                 logger.warn("Too many persons match the member number sent from CGD when using document id number.");
-                return null;
+                return Optional.empty();
             } else {
-                return Iterables.getFirst(persons, null);
+                return Optional.of(Iterables.getFirst(persons, null));
             }
         }
 
-        public Person getPerson() {
-            Person personFromDocumentId = getPersonFromDocumentId();
+        public Optional<Person> getPerson() {
+            Optional<Person> personFromDocumentId = getPersonFromDocumentId();
             if (isMemberNumberLikeIdDocumentNumber()) {
                 return personFromDocumentId;
             } else if (isStudent()) {
                 Student student = Student.readStudentByNumber(getMemberAsNumber());
                 if (student != null) {
-                    return student.getPerson();
+                    return Optional.of(student.getPerson());
                 }
             } else if (isStaff()) {
                 Optional<Employee> employeeOpt = Employee.findByNumber(this.memberNumber);
                 if (employeeOpt.isPresent()) {
-                    return employeeOpt.get().getPerson();
+                    return Optional.of(employeeOpt.get().getPerson());
                 }
                 if (personFromDocumentId != null) {
                     return personFromDocumentId;
                 }
             }
-            return null;
+            return Optional.empty();
         }
 
         public String getMemberNumber() {
@@ -98,7 +99,7 @@ public class CgdStudentPhotoClient extends BennuWebServiceClient<IStudentPhotoSe
         }
 
         public String getCategory() {
-            return category;
+            return this.category;
         }
     }
 
@@ -123,17 +124,13 @@ public class CgdStudentPhotoClient extends BennuWebServiceClient<IStudentPhotoSe
 
     public Collection<MemberCGD> getStudentsWithPhotos() {
         logger.debug("CgdPhotoWsClient.getStudentsWithPhotos()");
-        IStudentPhotoService ws = (IStudentPhotoService) getClient();
-        List<Member> members = ws.getAllStudentsByIES().getMember();
-
-        List<MemberCGD> memberCGDs = new ArrayList<MemberCGD>();
-        for (Member member : members) {
-            memberCGDs.add(new MemberCGD(member));
-        }
-        return memberCGDs;
+        final IStudentPhotoService ws = (IStudentPhotoService) getClient();
+        final Set<MemberCGD> membersCGD =
+                ws.getAllStudentsByIES().getMember().stream().map(member -> new MemberCGD(member)).collect(Collectors.toSet());
+        return membersCGD;
     }
 
-    public PhotoOnCGD getPhoto(final MemberCGD member) {
+    public Optional<PhotoOnCGD> getPhoto(final MemberCGD member) {
         return getPhoto(member.getMemberNumber(), member.getCategory());
     }
 
@@ -141,7 +138,7 @@ public class CgdStudentPhotoClient extends BennuWebServiceClient<IStudentPhotoSe
      * memberCategory parameter is optional. It is used by CGD to disambiguate between members with
      * the same number and different category.
      */
-    public PhotoOnCGD getPhoto(final String memberNumber, final String memberCategory) {
+    public Optional<PhotoOnCGD> getPhoto(final String memberNumber, final String memberCategory) {
         logger.debug("CgdPhotoWsClient.getStudentsWithPhotos()");
         IStudentPhotoService ws = (IStudentPhotoService) getClient();
         StudentPhoto studentPhoto = ws.getPhoto(memberNumber, memberCategory);
@@ -150,8 +147,8 @@ public class CgdStudentPhotoClient extends BennuWebServiceClient<IStudentPhotoSe
         if (photoContent.length > 0) {
             JAXBElement<String> fileNameJB = studentPhoto.getFileName();
             String fileName = fileNameJB.getValue();
-            return new PhotoOnCGD(photoContent, fileName);
+            return Optional.of(new PhotoOnCGD(photoContent, fileName));
         }
-        return null;
+        return Optional.empty();
     }
 }

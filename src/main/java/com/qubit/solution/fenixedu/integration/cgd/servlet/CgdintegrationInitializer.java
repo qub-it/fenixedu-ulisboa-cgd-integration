@@ -51,9 +51,11 @@ public class CgdintegrationInitializer implements ServletContextListener {
                 if (!dynamicGroup.isDefined()) {
                     dynamicGroup.toPersistentGroup();
                 }
-                
-                new WebServiceClientConfiguration(CgdStudentPhotoClient.class.getName());
-                
+
+                WebServiceClientConfiguration.readAll().stream()
+                        .filter(c -> c.getImplementationClass().equals(CgdStudentPhotoClient.class.getName())).findAny()
+                        .orElseGet(() -> new WebServiceClientConfiguration(CgdStudentPhotoClient.class.getName()));
+
                 return null;
             }
         });
