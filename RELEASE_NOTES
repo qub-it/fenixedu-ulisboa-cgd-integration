@@ -1,3 +1,4 @@
+2.10.0 (29-01-2024)
 - New Feature: FENIX-14082 - Added new client for CGD Member Photo service [#qubIT-Fenix-2465]
 - Improvement: Adds dataSent field to CgdCommunicationLog [#qubIT-Fenix-4840]
 
