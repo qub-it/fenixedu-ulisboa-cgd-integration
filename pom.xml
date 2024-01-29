@@ -149,28 +149,53 @@
 				<artifactId>jaxws-maven-plugin</artifactId>
 				<version>2.6</version>
 				<executions>
+
 					<execution>
+						<id>IESService</id>
 						<goals>
 							<goal>wsimport</goal>
 						</goals>
+						<configuration>
+							<packageName>${generate.packageName}</packageName>
+							<wsdlDirectory>
+								src/main/resources/wsdl
+							</wsdlDirectory>
+							<wsdlFiles>
+								<wsdlFile>IESService.prod.wsdl</wsdlFile>
+								<wsdlFile>mifare.wsdl</wsdlFile>
+							</wsdlFiles>
+							<wsdlLocation>
+								/wsdl/IESService.prod.wsdl
+							</wsdlLocation>
+							<vmArgs>
+								<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
+							</vmArgs>
+						</configuration>
 					</execution>
+
+					<execution>
+						<id>StudentPhotoService</id>
+						<goals>
+							<goal>wsimport</goal>
+						</goals>
+						<configuration>
+							<packageName>services.caixaiu.cgd.wingman.studentPhotoService</packageName>
+							<wsdlDirectory>
+								src/main/resources/wsdl
+							</wsdlDirectory>
+							<wsdlFiles>
+								<wsdlFile>StudentPhotoService.wsdl</wsdlFile>
+							</wsdlFiles>
+							<wsdlLocation>
+								/wsdl/StudentPhotoService.wsdl
+							</wsdlLocation>
+							<vmArgs>
+								<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
+							</vmArgs>
+						</configuration>
+					</execution>
+					
 				</executions>
-				<configuration>
-					<packageName>${generate.packageName}</packageName>
-					<wsdlDirectory>
-						src/main/resources/wsdl
-					</wsdlDirectory>
-					<wsdlFiles>
-						<wsdlFile>IESService.prod.wsdl</wsdlFile>
-						<wsdlFile>mifare.wsdl</wsdlFile>
-					</wsdlFiles>
-					<wsdlLocation>
-						/wsdl/IESService.prod.wsdl
-					</wsdlLocation>
-					<vmArgs>
-						<vmArg>-Djavax.xml.accessExternalSchema=all</vmArg>
-					</vmArgs>
-				</configuration>
 			</plugin>
 
 			<plugin>

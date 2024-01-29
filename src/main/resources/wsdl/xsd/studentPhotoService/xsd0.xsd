@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" targetNamespace="http://Wingman.CGD.CaixaIU.Services/StudentPhotoService"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:tns="http://Wingman.CGD.CaixaIU.Services/StudentPhotoService">
+	<xs:import schemaLocation="xsd2.xsd" namespace="http://schemas.datacontract.org/2004/07/Wingman.CGD.CaixaIU.DataContract.SOAP"/>
+	<xs:import schemaLocation="xsd3.xsd" namespace="http://Wingman.CGD.CaixaIU.Services/IESService"/>
+	<xs:element name="GetPhoto">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="0" name="memberNumber" nillable="true" type="xs:string"/>
+				<xs:element minOccurs="0" name="memberCategory" nillable="true" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="GetPhotoResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="0" name="GetPhotoResult" nillable="true" type="q1:StudentPhoto"
+					xmlns:q1="http://schemas.datacontract.org/2004/07/Wingman.CGD.CaixaIU.DataContract.SOAP"/>
+				</xs:sequence>
+			</xs:complexType>
+		</xs:element>
+		<xs:element name="GetAllStudentsByIES">
+			<xs:complexType>
+				<xs:sequence/>
+			</xs:complexType>
+		</xs:element>
+		<xs:element name="GetAllStudentsByIESResponse">
+			<xs:complexType>
+				<xs:sequence>
+					<xs:element minOccurs="0" name="GetAllStudentsByIESResult" nillable="true" type="q2:ArrayOfMember"
+						xmlns:q2="http://Wingman.CGD.CaixaIU.Services/IESService"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:schema>

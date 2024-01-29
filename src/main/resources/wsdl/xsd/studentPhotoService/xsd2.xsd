@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/Wingman.CGD.CaixaIU.DataContract.SOAP"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:tns="http://schemas.datacontract.org/2004/07/Wingman.CGD.CaixaIU.DataContract.SOAP">
+	<xs:complexType name="StudentPhoto">
+		<xs:sequence>
+			<xs:element minOccurs="0" name="FileName" nillable="true" type="xs:string"/>
+			<xs:element minOccurs="0" name="Photo" nillable="true" type="xs:base64Binary"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="StudentPhoto" nillable="true" type="tns:StudentPhoto"/>
+</xs:schema>
