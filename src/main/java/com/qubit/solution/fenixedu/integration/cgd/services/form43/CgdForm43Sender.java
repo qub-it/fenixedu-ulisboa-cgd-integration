@@ -26,11 +26,16 @@
  */
 package com.qubit.solution.fenixedu.integration.cgd.services.form43;
 
+import java.io.StringWriter;
 import java.util.List;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 
 import org.apache.commons.lang.StringUtils;
@@ -123,6 +128,9 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
                 form43Digital.setStudentData(studentData);
                 form43Digital.setIDCardProduction(requestCard);
 
+                String sentDataXML = createSentDataXML(form43Digital);
+                boolean uploadSuccess = false;
+
                 OperationResult setForm43DigitalData = service.setForm43DigitalData(form43Digital);
                 success = !setForm43DigitalData.isError();
 
@@ -193,7 +201,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
                         if (byteArray != null) {
                             request.setFileContent(byteArray);
                             OperationResult uploadFormAttachment = service.uploadFormAttachment(formRequest, request);
-                            boolean uploadSuccess = !uploadFormAttachment.isError();
+                            uploadSuccess = !uploadFormAttachment.isError();
                             if (!uploadSuccess) {
                                 String attachmentValueMessage = uploadFormAttachment.getFriendlyMessage().getValue();
                                 Integer attachmentCodeID = uploadFormAttachment.getCodeId();
@@ -225,8 +233,9 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
                         }
                     }
                 }
+                sentDataXML = sentDataXML + "<!-- Comprovativo de morada enviado: " + uploadSuccess + " -->";
                 CgdCommunicationLog.createCgdCommunicationLog(registration, requestCard, success,
-                        Authenticate.getUser().getPerson(), sb.toString(), "");
+                        Authenticate.getUser().getPerson(), sb.toString(), "", sentDataXML);
             }
         } catch (Throwable t) {
             Integer studentNumber = registration.getStudent().getNumber();
@@ -234,10 +243,35 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
             CgdCommunicationLog.createCgdCommunicationLog(registration, requestCard, success, Authenticate.getUser().getPerson(),
                     BundleUtil.getString(BUNDLE_CGDINTEGRATION, "label.form43.sendForm43.exceptionWhileSendingForm",
                             studentNumber.toString()),
-                    ExceptionUtils.getStackTrace(t));
+                    ExceptionUtils.getStackTrace(t), "");
         }
 
         return success;
+    }
+
+    private String createSentDataXML(Form43Digital form43Digital) {
+        String xmlData = "";
+        try {
+            StringWriter stringWriter = new StringWriter();
+            // Create a JAXB context for the DTO class
+            JAXBContext jaxbContext = JAXBContext.newInstance(Form43Digital.class);
+
+            // Create a marshaller
+            Marshaller marshaller = jaxbContext.createMarshaller();
+
+            // Pretty-print the XML output
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+            QName qName = new QName("com.qubit.solution.fenixedu.integration.cgd.services.form43", "Form43");
+            JAXBElement<Form43Digital> root = new JAXBElement<>(qName, Form43Digital.class, form43Digital);
+
+            // Marshal the DTO to XML and print to console
+            marshaller.marshal(root, stringWriter);
+            xmlData = stringWriter.toString();
+        } catch (JAXBException e) {
+            logger.error("Problems creating data to send field for CgdCommunicationLog", e);
+        }
+        return xmlData;
     }
 
     private static Client createClient(org.fenixedu.academic.domain.Person person, String schoolCode, IIESService service) {

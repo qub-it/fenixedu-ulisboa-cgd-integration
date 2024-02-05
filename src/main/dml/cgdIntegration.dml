@@ -88,6 +88,7 @@ class logs.CgdCommunicationLog {
 	boolean requestCard;
 	String message;
 	String exceptionStackTrace;
+	String dataSent;
 }
 
 relation CgdCommunicationLogRootDomainObject {

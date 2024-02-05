@@ -1,5 +1,8 @@
 - Bug fix: FENIX-14082 - fixed NPE when member was not found  [#qubIT-Fenix-2465]
+
+2.10.0 (29-01-2024)
 - New Feature: FENIX-14082 - Added new client for CGD Member Photo service [#qubIT-Fenix-2465]
+- Improvement: Adds dataSent field to CgdCommunicationLog [#qubIT-Fenix-4840]
 
 2.9.0 (02-01-2024)
 - Improvement: Adds CgdCommunicationLog entity [#qubIT-Fenix-4669]
