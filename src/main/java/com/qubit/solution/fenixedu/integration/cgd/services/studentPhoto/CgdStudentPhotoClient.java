@@ -15,7 +15,6 @@ import org.fenixedu.academic.domain.student.Student;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Iterables;
 import com.qubit.solution.fenixedu.bennu.webservices.services.client.BennuWebServiceClient;
 
 import services.caixaiu.cgd.wingman.studentPhotoService.IStudentPhotoService;
@@ -65,11 +64,10 @@ public class CgdStudentPhotoClient extends BennuWebServiceClient<IStudentPhotoSe
 
         private Optional<Person> getPersonFromDocumentId() {
             Collection<Person> persons = Person.findPersonByDocumentID(this.memberNumber);
-            if (persons.size() > 1) {
-                logger.warn("Too many persons match the member number sent from CGD when using document id number.");
+            if (persons.isEmpty() || persons.size() > 1) {
                 return Optional.empty();
             } else {
-                return Optional.of(Iterables.getFirst(persons, null));
+                return Optional.of(persons.iterator().next());
             }
         }
 
