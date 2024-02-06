@@ -64,7 +64,11 @@ public class CgdStudentPhotoClient extends BennuWebServiceClient<IStudentPhotoSe
 
         private Optional<Person> getPersonFromDocumentId() {
             Collection<Person> persons = Person.findPersonByDocumentID(this.memberNumber);
-            if (persons.isEmpty() || persons.size() > 1) {
+            if (persons.isEmpty()) {
+                return Optional.empty();
+            } else if (persons.size() > 1) {
+                logger.warn("Too many persons match the member number sent from CGD when using document id number: "
+                        + this.memberNumber);
                 return Optional.empty();
             } else {
                 return Optional.of(persons.iterator().next());
