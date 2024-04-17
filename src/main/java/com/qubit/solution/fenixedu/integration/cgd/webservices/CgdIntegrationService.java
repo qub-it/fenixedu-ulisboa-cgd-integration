@@ -30,7 +30,6 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 import org.fenixedu.academic.domain.Person;
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 
@@ -52,8 +51,7 @@ public class CgdIntegrationService extends BennuWebService {
         Person identifiedPerson = message.getIdentifiedPerson();
         if (identifiedPerson != null) {
             outputMessage.populate(identifiedPerson, message.getPopulationCode(), message.getMemberCode(), message.getMemberID());
-            CgdCommunicationLog.findLatestStudentLog(identifiedPerson)
-                    .ifPresent(log -> log.setSearchDate(DateTime.now()));
+            CgdCommunicationLog.findLatestStudentLog(identifiedPerson).ifPresent(log -> log.updateSearchDate());
         }
         return outputMessage;
     }

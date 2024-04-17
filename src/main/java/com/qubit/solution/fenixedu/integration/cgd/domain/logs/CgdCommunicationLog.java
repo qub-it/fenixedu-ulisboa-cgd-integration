@@ -54,6 +54,16 @@ public class CgdCommunicationLog extends CgdCommunicationLog_Base {
         return findLogsByStudent(person).stream().findFirst();
     }
 
+    @Atomic
+    public void updateSearchDate() {
+        setSearchDate(DateTime.now());
+    }
+
+    @Atomic
+    public void updateMifareDate() {
+        setUpdateMifareDate(DateTime.now());
+    }
+
     public void delete() {
         setRegistration(null);
         setSender(null);

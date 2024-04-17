@@ -41,7 +41,6 @@ import org.datacontract.schemas._2004._07.wcfservice2.Status;
 import org.datacontract.schemas._2004._07.wingman_cgd_caixaiu_datacontract.School;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,8 +96,7 @@ public class ReceiveMifareService extends BennuWebService implements IGenericSer
                     }
                     response.setStatus(Status.OK);
                     response.setErrorCode(ErrorCode.NONE);
-                    CgdCommunicationLog.findLatestStudentLog(readPerson)
-                            .ifPresent(log -> log.setUpdateMifareDate(DateTime.now()));
+                    CgdCommunicationLog.findLatestStudentLog(readPerson).ifPresent(log -> log.updateMifareDate());
                 }
 
             } catch (Throwable t) {
