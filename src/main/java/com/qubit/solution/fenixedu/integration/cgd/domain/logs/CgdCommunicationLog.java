@@ -55,9 +55,13 @@ public class CgdCommunicationLog extends CgdCommunicationLog_Base {
     }
 
     @Atomic
-    @Override
-    public void setSearchDate(DateTime searchDate) {
-        super.setSearchDate(searchDate);
+    public void updateSearchDate() {
+        setSearchDate(DateTime.now());
+    }
+
+    @Atomic
+    public void updateMifareDate() {
+        setUpdateMifareDate(DateTime.now());
     }
 
     public void delete() {
