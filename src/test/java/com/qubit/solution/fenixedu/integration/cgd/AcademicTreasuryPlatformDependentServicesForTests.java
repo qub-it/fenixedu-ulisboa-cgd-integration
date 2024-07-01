@@ -232,12 +232,6 @@ public class AcademicTreasuryPlatformDependentServicesForTests implements IAcade
     }
 
     @Override
-    public Optional<FinantialEntity> finantialEntity(AdministrativeOffice administrativeOffice) {
-        // TODO Auto-generated method stub
-        return Optional.empty();
-    }
-
-    @Override
     public Optional<FinantialEntity> finantialEntity(Unit unit) {
         return FinantialEntity.findAll().findFirst();
     }
@@ -282,18 +276,6 @@ public class AcademicTreasuryPlatformDependentServicesForTests implements IAcade
 
     @Override
     public String localizedNameOfEnrolment(Enrolment enrolment, Locale locale) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String localizedNameOfAdministrativeOffice(AdministrativeOffice administrativeOffice) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String localizedNameOfAdministrativeOffice(AdministrativeOffice administrativeOffice, Locale locale) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -367,12 +349,6 @@ public class AcademicTreasuryPlatformDependentServicesForTests implements IAcade
     static public Collection<StatuteType> findVisibleStatuteTypes(final Registration registration,
             final ExecutionInterval executionInterval) {
         return findStatuteTypes(registration, executionInterval).stream().filter(s -> s.getVisible()).collect(Collectors.toSet());
-    }
-
-    @Override
-    public Stream<AdministrativeOffice> findAdministrativeOfficesByPredicate(Predicate<AdministrativeOffice> predicate) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
