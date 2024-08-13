@@ -27,7 +27,6 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationProtocol;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.student.registrationStates.RegistrationStateType;
-import org.fenixedu.academic.domain.student.registrationStates.RegistrationStateTypeEnum;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicCalendarRootEntry;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicIntervalCE;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicPeriod;
@@ -155,8 +154,7 @@ public class CgdCommunicationLogTest {
         IngressionType ingressionType = IngressionType.createIngressionType("INGRESSION_TYPE",
                 new LocalizedString().with(LocaleUtils.EN, "Ingression Type"));
         RegistrationStateType.create(RegistrationStateType.REGISTERED_CODE,
-                new LocalizedString().with(LocaleUtils.EN, "Registration State Type"), false,
-                RegistrationStateTypeEnum.REGISTERED);
+                new LocalizedString().with(LocaleUtils.EN, "Registration State Type"), false, null);
         Registration registration = Registration.create(student, dcp, executionYear, registrationProtocol, ingressionType);
         return registration;
     }
