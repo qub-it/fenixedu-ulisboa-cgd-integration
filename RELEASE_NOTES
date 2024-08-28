@@ -1,3 +1,5 @@
+- Refactor:  Support to  multiple active calendars [#UL-FC-5116]
+
 2.12.1 (13-08-2024)
 - Refactor: Replace usages of deprecated RegistrationStateTypeEnum [#qubIT-Fenix-2585]
 

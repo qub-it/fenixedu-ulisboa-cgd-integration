@@ -50,6 +50,7 @@ import org.fenixedu.academic.domain.person.Gender;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.academic.domain.student.PersonalIngressionData;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.time.calendarStructure.AcademicCalendarRootEntry;
 import org.fenixedu.academicextensions.domain.person.dataShare.DataShareAuthorization;
 import org.fenixedu.academicextensions.domain.person.dataShare.DataShareAuthorizationType;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
@@ -115,8 +116,9 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
 
             CgdIntegrationConfiguration cgdIntegrationConfiguration = CgdIntegrationConfiguration.getInstance();
 
-            Person personData = createPerson(person);
-            Worker workerData = createWorker(person);
+            AcademicCalendarRootEntry calendar = registration.getDegree().getCalendar();
+            Person personData = createPerson(person, calendar);
+            Worker workerData = createWorker(person, calendar);
 
             for (String schoolCode : cgdIntegrationConfiguration.getSchoolCodeProvider().getSchoolCodes(registration)) {
                 Client clientData = createClient(person, schoolCode, service);
@@ -291,12 +293,13 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
 
     }
 
-    private static Worker createWorker(org.fenixedu.academic.domain.Person person) {
+    private static Worker createWorker(org.fenixedu.academic.domain.Person person, AcademicCalendarRootEntry calendar) {
         Worker worker = new Worker();
+        final ExecutionYear currentExecutionYear = ExecutionYear.findCurrent(calendar);
         executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_WORKING_INFO, () -> {
-            worker.setIsWorker(person.getStudent().hasWorkingStudentStatuteInPeriod(ExecutionYear.readCurrentExecutionYear()));
+            worker.setIsWorker(person.getStudent().hasWorkingStudentStatuteInPeriod(currentExecutionYear));
             PersonalIngressionData personalIngressionDataByExecutionYear =
-                    person.getStudent().getPersonalIngressionDataByExecutionYear(ExecutionYear.readCurrentExecutionYear());
+                    person.getStudent().getPersonalIngressionDataByExecutionYear(currentExecutionYear);
 
             if (personalIngressionDataByExecutionYear != null) {
                 // should we also skip this?
@@ -368,7 +371,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         return returnValue;
     }
 
-    private static Person createPerson(org.fenixedu.academic.domain.Person person) {
+    private static Person createPerson(org.fenixedu.academic.domain.Person person, AcademicCalendarRootEntry calendar) {
         Person personData = new Person();
 
         executeIfAllowed(person, CgdAuthorizationCodes.BASIC_INFO, () -> personData.setName(person.getName()));
@@ -393,7 +396,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
                 () -> personData.setFiscalNumber(objectFactory.createPersonFiscalNumber(person.getSocialSecurityNumber())));
 
         PersonalIngressionData personalIngressionDataByExecutionYear =
-                person.getStudent().getPersonalIngressionDataByExecutionYear(ExecutionYear.readCurrentExecutionYear());
+                person.getStudent().getPersonalIngressionDataByExecutionYear(ExecutionYear.findCurrent(calendar));
         if (personalIngressionDataByExecutionYear != null) {
             org.fenixedu.academic.domain.person.MaritalStatus maritalStatus =
                     personalIngressionDataByExecutionYear.getMaritalStatus();

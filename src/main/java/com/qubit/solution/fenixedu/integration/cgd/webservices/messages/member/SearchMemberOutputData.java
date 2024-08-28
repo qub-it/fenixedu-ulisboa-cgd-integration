@@ -27,9 +27,13 @@
 package com.qubit.solution.fenixedu.integration.cgd.webservices.messages.member;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -220,15 +224,13 @@ public class SearchMemberOutputData implements Serializable {
         searchMemberOutputData.setEstablishmentName(institutionUnit.getName());
         searchMemberOutputData.setEstablishmentCode(institutionUnit.getCode());
 
-        ExecutionYear readCurrentExecutionYear = ExecutionYear.readCurrentExecutionYear();
-        ExecutionYear previousYear = readCurrentExecutionYear.getPreviousExecutionYear();
-        List<ExecutionInterval> semesters = new ArrayList<>();
-        semesters.addAll(readCurrentExecutionYear.getExecutionPeriodsSet());
-        semesters.addAll(previousYear.getExecutionPeriodsSet());
+        Set<ExecutionInterval> executionIntervals = ExecutionYear.findCurrents().stream()
+                .flatMap(e -> Stream.of(e, e.getPrevious())).filter(Objects::nonNull).filter(ExecutionYear.class::isInstance)
+                .map(ExecutionYear.class::cast).flatMap(e -> e.getChildIntervals().stream()).collect(Collectors.toSet());
 
         String stayingIndicator = person.getStudent() != null && person.getStudent().hasActiveRegistrations()
                 || person.getTeacher() != null && person.getTeacher().getTeacherAuthorizationStream()
-                        .anyMatch(authorization -> semesters.contains(authorization.getExecutionInterval())) ? "S" : "N";
+                        .anyMatch(authorization -> executionIntervals.contains(authorization.getExecutionInterval())) ? "S" : "N";
         searchMemberOutputData.setStayingIndicator(stayingIndicator);
         return searchMemberOutputData;
     }
@@ -242,15 +244,16 @@ public class SearchMemberOutputData implements Serializable {
         searchMemberOutputData.setStudentNumber(String.valueOf(student.getNumber()));
 
         searchMemberOutputData.setStudentNumber(String.valueOf(student.getNumber()));
-        searchMemberOutputData.setDegreeCode(registration.getDegree().getMinistryCode());
-        searchMemberOutputData.setDegreeName(registration.getDegree().getIdCardName());
+        Degree degree = registration.getDegree();
+        searchMemberOutputData.setDegreeCode(degree.getMinistryCode());
+        searchMemberOutputData.setDegreeName(degree.getIdCardName());
         searchMemberOutputData.setCurricularYear(registration.getCurricularYear());
         List<DegreeCurricularPlan> degreeCurricularPlansForYear =
-                registration.getDegree().getDegreeCurricularPlansForYear(ExecutionYear.readCurrentExecutionYear());
+                degree.getDegreeCurricularPlansForYear(ExecutionYear.findCurrent(degree.getCalendar()));
         if (!degreeCurricularPlansForYear.isEmpty()) {
             searchMemberOutputData.setDegreeDuration(degreeCurricularPlansForYear.iterator().next().getDurationInYears());
         }
-        searchMemberOutputData.setDegreeType(registration.getDegree().getDegreeType().getName().getContent());
+        searchMemberOutputData.setDegreeType(degree.getDegreeType().getName().getContent());
 
         return searchMemberOutputData;
     }

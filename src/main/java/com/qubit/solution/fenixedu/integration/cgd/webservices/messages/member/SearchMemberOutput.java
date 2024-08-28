@@ -4,6 +4,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.ExecutionInterval;
@@ -57,23 +62,28 @@ public class SearchMemberOutput implements Serializable {
             setReplyCode(CgdMessageUtils.REPLY_CODE_OPERATION_OK);
             IMemberIDAdapter memberIDStrategy = CgdMessageUtils.getMemberIDStrategy();
             List<SearchMemberOutputData> list = new ArrayList<SearchMemberOutputData>();
-            ExecutionYear readCurrentExecutionYear = ExecutionYear.readCurrentExecutionYear();
-            ExecutionYear previousYear = readCurrentExecutionYear.getPreviousExecutionYear();
-            if (person.getStudent() != null && !person.getStudent().getActiveRegistrations().isEmpty()) {
-                for (Registration registration : person.getStudent().getActiveRegistrations()) {
-                    if (!registration.getEnrolments(readCurrentExecutionYear).isEmpty()
-                            || !registration.getEnrolments(previousYear).isEmpty()) {
-                        list.add(SearchMemberOutputData.createStudentBased(memberIDStrategy, registration));
-                    }
+
+            List<Registration> activeRegistrations =
+                    Optional.ofNullable(person.getStudent()).map(s -> s.getActiveRegistrationStream().toList()).orElse(List.of());
+
+            for (Registration registration : activeRegistrations) {
+                ExecutionYear currentExecutionYear = ExecutionYear.findCurrent(registration.getDegree().getCalendar());
+                ExecutionYear previousExecutionYear = (ExecutionYear) currentExecutionYear.getPrevious();
+                if (!registration.getEnrolments(currentExecutionYear).isEmpty()
+                        || (previousExecutionYear != null && !registration.getEnrolments(previousExecutionYear).isEmpty())) {
+                    list.add(SearchMemberOutputData.createStudentBased(memberIDStrategy, registration));
                 }
             }
-            List<ExecutionInterval> semesters = new ArrayList<>();
-            semesters.addAll(readCurrentExecutionYear.getExecutionPeriodsSet());
-            semesters.addAll(previousYear.getExecutionPeriodsSet());
-            if (person.getTeacher() != null
-                    && person.getTeacher().getTeacherAuthorizationStream()
-                            .anyMatch(authorization -> semesters.contains(authorization.getExecutionInterval()))) {
-                list.add(SearchMemberOutputData.createTeacherBased(memberIDStrategy, person.getTeacher()));
+
+            if (person.getTeacher() != null) {
+                Set<ExecutionInterval> executionIntervals =
+                        ExecutionYear.findCurrents().stream().flatMap(e -> Stream.of(e, e.getPrevious())).filter(Objects::nonNull)
+                                .filter(ExecutionYear.class::isInstance).map(ExecutionYear.class::cast)
+                                .flatMap(e -> e.getChildIntervals().stream()).collect(Collectors.toSet());
+                if (person.getTeacher().getTeacherAuthorizationStream()
+                        .anyMatch(authorization -> executionIntervals.contains(authorization.getExecutionInterval()))) {
+                    list.add(SearchMemberOutputData.createTeacherBased(memberIDStrategy, person.getTeacher()));
+                }
             }
 
             if (DynamicGroup.get("employees").isMember(person.getUser())) {
