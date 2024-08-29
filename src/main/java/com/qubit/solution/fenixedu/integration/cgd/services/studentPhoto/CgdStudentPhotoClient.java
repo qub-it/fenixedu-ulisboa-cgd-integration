@@ -45,8 +45,11 @@ public class CgdStudentPhotoClient extends BennuWebServiceClient<IStudentPhotoSe
         }
 
         public boolean isStudent() {
+            // The student number being smaller then 999999 is Iscte specific.
+            // Other institutions might have higher numbers.
+            // If that happens, the implementation of this method must change.
             return STUDENT_IDENTIFICATION_CODE.equals(category)
-                    && Optional.ofNullable(memberNumber).map(memberNumber -> memberNumber.length() <= 5).orElse(false)
+                    && Optional.ofNullable(memberNumber).map(memberNumber -> memberNumber.length() <= 6).orElse(false)
                     && getMemberAsNumber() != null;
         }
 
@@ -56,10 +59,6 @@ public class CgdStudentPhotoClient extends BennuWebServiceClient<IStudentPhotoSe
 
         public boolean isStaff() {
             return Arrays.asList(EMPLOYEE_IDENTIFICATION_CODE, TEACHER_IDENTIFICATION_CODE).contains(this.category);
-        }
-
-        public boolean isMemberNumberLikeIdDocumentNumber() {
-            return Optional.ofNullable(memberNumber).map(memberNumber -> memberNumber.length() > 5).orElse(false);
         }
 
         private Optional<Person> getPersonFromDocumentId() {
@@ -76,23 +75,25 @@ public class CgdStudentPhotoClient extends BennuWebServiceClient<IStudentPhotoSe
         }
 
         public Optional<Person> getPerson() {
-            Optional<Person> personFromDocumentId = getPersonFromDocumentId();
-            if (isMemberNumberLikeIdDocumentNumber()) {
-                return personFromDocumentId;
-            } else if (isStudent()) {
+            if (isStudent()) {
                 Student student = Student.readStudentByNumber(getMemberAsNumber());
                 if (student != null) {
                     return Optional.of(student.getPerson());
                 }
-            } else if (isStaff()) {
+            }
+
+            if (isStaff()) {
                 Optional<Employee> employeeOpt = Employee.findByNumber(this.memberNumber);
                 if (employeeOpt.isPresent()) {
                     return Optional.of(employeeOpt.get().getPerson());
                 }
-                if (personFromDocumentId != null) {
-                    return personFromDocumentId;
-                }
             }
+
+            Optional<Person> personFromDocumentId = getPersonFromDocumentId();
+            if (personFromDocumentId != null) {
+                return personFromDocumentId;
+            }
+
             return Optional.empty();
         }
 
@@ -127,8 +128,9 @@ public class CgdStudentPhotoClient extends BennuWebServiceClient<IStudentPhotoSe
     public Collection<MemberCGD> getStudentsWithPhotos() {
         logger.debug("CgdPhotoWsClient.getStudentsWithPhotos()");
         final IStudentPhotoService ws = (IStudentPhotoService) getClient();
-        final Set<MemberCGD> membersCGD =
-                ws.getAllStudentsByIES().getMember().stream().map(member -> new MemberCGD(member)).collect(Collectors.toSet());
+        final Set<MemberCGD> membersCGD = ws.getAllStudentsByIES().getMember().stream() //
+                .map(member -> new MemberCGD(member)) //
+                .collect(Collectors.toSet());
         return membersCGD;
     }
 
