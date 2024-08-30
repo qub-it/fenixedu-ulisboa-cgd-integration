@@ -37,8 +37,9 @@ import org.fenixedu.academic.domain.person.IDDocumentType;
 
 import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
+import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.ISummaryMessage;
 
-public class SearchMemberInput implements Serializable {
+public class SearchMemberInput implements Serializable, ISummaryMessage {
 
     private static int IDCARD_TYPE = 101;
     private static int TAXNUMBER_TYPE = 501;
@@ -155,4 +156,20 @@ public class SearchMemberInput implements Serializable {
         }
         return requestedPerson;
     }
+
+    @Override
+    public String getSummaryMessage() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(populationCode != null ? populationCode : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+        sb.append(memberID != null ? memberID : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+        sb.append(documentType != null ? documentType : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+        sb.append(documentID != null ? documentID : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+        sb.append(memberCode != null ? memberCode : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+        return sb.toString();
+    }
+    
 }

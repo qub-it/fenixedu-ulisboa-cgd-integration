@@ -36,8 +36,9 @@ import org.fenixedu.academicextensions.domain.person.dataShare.DataShareAuthoriz
 
 import com.qubit.solution.fenixedu.integration.cgd.services.CgdAuthorizationCodes;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
+import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.ISummaryMessage;
 
-public class SearchMemberPhotoOuputMessage implements Serializable {
+public class SearchMemberPhotoOuputMessage implements Serializable, ISummaryMessage {
 
     public static int UNAVAILABLE_PHOTO = 8;
 
@@ -93,4 +94,15 @@ public class SearchMemberPhotoOuputMessage implements Serializable {
             setReplyCode(CgdMessageUtils.REPLY_CODE_INFORMATION_NOT_OK);
         }
     }
+
+    @Override
+    public String getSummaryMessage() {
+//        StringBuilder sb = new StringBuilder();
+//        sb.append(replyCode);
+//        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+//        sb.append(name != null ? name : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+//        return sb.toString();
+        return String.valueOf(replyCode);
+    }
+
 }

@@ -35,6 +35,7 @@ import org.joda.time.format.DateTimeFormat;
 
 import com.qubit.solution.fenixedu.bennu.webservices.services.server.BennuWebService;
 import com.qubit.solution.fenixedu.integration.cgd.domain.logs.CgdCommunicationLog;
+import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.member.SearchMemberInput;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.member.SearchMemberOutput;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.mifare.UpdateMifareInputMessage;
@@ -47,35 +48,60 @@ public class CgdIntegrationService extends BennuWebService {
 
     @WebMethod
     public SearchMemberOutput searchMember(SearchMemberInput message) {
-        SearchMemberOutput outputMessage = new SearchMemberOutput();
-        Person identifiedPerson = message.getIdentifiedPerson();
-        if (identifiedPerson != null) {
-            outputMessage.populate(identifiedPerson, message.getPopulationCode(), message.getMemberCode(), message.getMemberID());
-            CgdCommunicationLog.findLatestStudentLog(identifiedPerson).ifPresent(log -> log.updateSearchDate());
+        final String methodName = "searchMember";
+        try {
+            SearchMemberOutput outputMessage = new SearchMemberOutput();
+            Person identifiedPerson = message.getIdentifiedPerson();
+            if (identifiedPerson != null) {
+                outputMessage.populate(identifiedPerson, message.getPopulationCode(), message.getMemberCode(),
+                        message.getMemberID());
+                CgdCommunicationLog.findLatestStudentLog(identifiedPerson).ifPresent(log -> log.updateSearchDate());
+            }
+
+            CgdMessageUtils.log(methodName, message, outputMessage);
+            return outputMessage;
+        } catch (Exception ex) {
+            CgdMessageUtils.log(methodName, message, ex);
+            throw ex;
         }
-        return outputMessage;
     }
 
     @WebMethod
     public SearchMemberPhotoOuputMessage searchPhoto(SearchMemberPhotoInputMessage message) {
-        SearchMemberPhotoOuputMessage outputMessage = new SearchMemberPhotoOuputMessage();
-        Person person = message.getIdentifiedPerson();
-        if (person != null) {
-            outputMessage.populate(person, message.getPopulationCode(), message.getMemberCode(), message.getMemberID());
+        final String methodName = "searchPhoto";
+        try {
+            SearchMemberPhotoOuputMessage outputMessage = new SearchMemberPhotoOuputMessage();
+            Person person = message.getIdentifiedPerson();
+            if (person != null) {
+                outputMessage.populate(person, message.getPopulationCode(), message.getMemberCode(), message.getMemberID());
+            }
+
+            CgdMessageUtils.log(methodName, message, outputMessage);
+            return outputMessage;
+        } catch (Exception ex) {
+            CgdMessageUtils.log(methodName, message, ex);
+            throw ex;
         }
-        return outputMessage;
     }
 
     @WebMethod
     public UpdateMifareOutputMessage updateChip(UpdateMifareInputMessage message) {
-        UpdateMifareOutputMessage outputMessage = new UpdateMifareOutputMessage();
-        Person person = message.getIdentifiedPerson();
-        if (person != null) {
-            outputMessage.populate(person, message.getPopulationCode(), message.getMemberCode(), message.getMemberID(),
-                    message.getChipData(), message.getCardIdentification(),
-                    LocalDate.parse(message.getPersonalizationDate(), DateTimeFormat.forPattern("YYYY-MM-dd")));
+        final String methodName = "updateChip";
+        try {
+            UpdateMifareOutputMessage outputMessage = new UpdateMifareOutputMessage();
+            Person person = message.getIdentifiedPerson();
+            if (person != null) {
+                outputMessage.populate(person, message.getPopulationCode(), message.getMemberCode(), message.getMemberID(),
+                        message.getChipData(), message.getCardIdentification(),
+                        LocalDate.parse(message.getPersonalizationDate(), DateTimeFormat.forPattern("YYYY-MM-dd")));
+            }
+
+            CgdMessageUtils.log(methodName, message, outputMessage);
+            return outputMessage;
+        } catch (Exception ex) {
+            CgdMessageUtils.log(methodName, message, ex);
+            throw ex;
         }
-        return outputMessage;
     }
 
 }

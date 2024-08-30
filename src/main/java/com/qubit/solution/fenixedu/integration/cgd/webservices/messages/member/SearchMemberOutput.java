@@ -20,9 +20,10 @@ import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.core.groups.DynamicGroup;
 
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
+import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.ISummaryMessage;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
 
-public class SearchMemberOutput implements Serializable {
+public class SearchMemberOutput implements Serializable, ISummaryMessage {
 
     private int replyCode;
     private List<SearchMemberOutputData> memberInfo;
@@ -135,5 +136,21 @@ public class SearchMemberOutput implements Serializable {
 //        } else {
 //            setReplyCode(CgdMessageUtils.REPLY_CODE_INFORMATION_NOT_OK);
 //        }
+    }
+
+    @Override
+    public String getSummaryMessage() {
+        String listData = null;
+        if (memberInfo != null) {
+            listData = memberInfo.stream() //
+                    .map(e -> e.getSummaryMessage()) //
+                    .collect(Collectors.joining(CgdMessageUtils.SUMMARY_FIELD_COLUMN_LIST_ELEMENT_SEPARATOR));
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(replyCode);
+        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+        sb.append(listData != null ? listData : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+        return sb.toString();
     }
 }

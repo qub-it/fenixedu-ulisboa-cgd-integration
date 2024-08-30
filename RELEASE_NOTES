@@ -1,3 +1,5 @@
+- New Feature: Write to log all WS CgdIntegrationService calls (FENIX-15291) [ISCTE-FENIXEDU-575]
+
 2.12.2 (28-08-2024)
 - Refactor:  Support to  multiple active calendars [#UL-FC-5116]
 

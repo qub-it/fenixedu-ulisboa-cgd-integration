@@ -31,8 +31,9 @@ import java.io.Serializable;
 import org.fenixedu.academic.domain.Person;
 
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
+import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.ISummaryMessage;
 
-public class SearchMemberPhotoInputMessage implements Serializable {
+public class SearchMemberPhotoInputMessage implements Serializable, ISummaryMessage {
 
     // Single character to identify type of member
     // A - student
@@ -80,6 +81,18 @@ public class SearchMemberPhotoInputMessage implements Serializable {
             person = CgdMessageUtils.readPersonByMemberCode(getPopulationCode(), getMemberCode());
         }
         return person;
+    }
+
+    @Override
+    public String getSummaryMessage() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(populationCode != null ? populationCode : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+        sb.append(memberID != null ? memberID : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+        sb.append(memberCode != null ? memberCode : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+        return sb.toString();
     }
 
 }

@@ -48,9 +48,11 @@ import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.treasury.util.FiscalCodeValidation;
 import org.fenixedu.treasury.util.TreasuryConstants;
 
+import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
+import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.ISummaryMessage;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
 
-public class SearchMemberOutputData implements Serializable {
+public class SearchMemberOutputData implements Serializable, ISummaryMessage {
 
     // Single character to identify type of member
     // A - student
@@ -284,6 +286,41 @@ public class SearchMemberOutputData implements Serializable {
         searchMemberOutputData.setTeacherNumber(person.getUsername());
 
         return searchMemberOutputData;
+    }
+
+    @Override
+    public String getSummaryMessage() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(populationCode != null ? populationCode : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+        sb.append(memberID != null ? memberID : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+//        sb.append(name != null ? name : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+//        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+        sb.append(studentNumber != null ? studentNumber : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+        sb.append(degreeCode != null ? degreeCode : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+//        sb.append(degreeName != null ? degreeName : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+//        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+//        sb.append(degreeType != null ? degreeType : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+//        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+//        sb.append(degreeDuration != null ? degreeDuration : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+//        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+//        sb.append(curricularYear != null ? curricularYear : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+//        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+//        sb.append(teacherCategory != null ? teacherCategory : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+//        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+        sb.append(teacherNumber != null ? teacherNumber : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+//        sb.append(establishmentCode != null ? establishmentCode : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+//        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+//        sb.append(establishmentName != null ? establishmentName : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+//        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+        sb.append(stayingIndicator != null ? stayingIndicator : CgdMessageUtils.SUMMARY_FIELD_COLUMN_NULL);
+        sb.append(CgdMessageUtils.SUMMARY_FIELD_COLUMN_SEPARATOR);
+//        sb.append(fiscalCode);
+        return sb.toString();
     }
 
 }

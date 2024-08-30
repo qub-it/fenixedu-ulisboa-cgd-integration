@@ -34,15 +34,20 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.Teacher;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.bennu.core.groups.DynamicGroup;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
+import com.qubit.terra.framework.services.logging.Log;
+import com.qubit.terra.framework.services.logging.LogContext;
 
 public class CgdMessageUtils {
 
-    private static Logger logger = LoggerFactory.getLogger(CgdMessageUtils.class);
+    private static final LogContext LOG = LogContext.forContext(CgdMessageUtils.class.getSimpleName());
+
+    public static String SUMMARY_FIELD_SEPARATOR = "#";
+    public static String SUMMARY_FIELD_COLUMN_SEPARATOR = "|";
+    public static String SUMMARY_FIELD_COLUMN_LIST_ELEMENT_SEPARATOR = ",";
+    public static String SUMMARY_FIELD_COLUMN_NULL = "-";
 
     public static int REPLY_CODE_OPERATION_OK = 0;
     public static int REPLY_CODE_INFORMATION_NOT_OK = 1;
@@ -59,7 +64,7 @@ public class CgdMessageUtils {
                     int number = Integer.parseInt(memberCode);
                     student = Student.readStudentByNumber(number);
                 } catch (Exception e) {
-                    logger.warn(String.format("Invalid student number: [%s]", memberCode));
+                    Log.warn(String.format("Invalid student number: [%s]", memberCode));
                 }
 
                 if (student != null) {
@@ -105,5 +110,21 @@ public class CgdMessageUtils {
 
     public static IMemberIDAdapter getMemberIDStrategy() {
         return CgdIntegrationConfiguration.getInstance().getMemberIDStrategy();
+    }
+
+    public static void log(String webmethodName, ISummaryMessage inputMessage, ISummaryMessage outputMessage) {
+        // TODO find a way to detect that the log is in DEBUG, to prevent unneeded overhead.
+        //
+        //        if (Log.isEnabledForLogLevel(LogLevel.DEBUG)) {
+        // Only build log message if in debug to avoid unneeded overhead.
+        String msg =
+                String.format("%s#%s#%s", webmethodName, inputMessage.getSummaryMessage(), outputMessage.getSummaryMessage());
+        Log.debug(LOG, msg);
+        //        }
+    }
+
+    public static void log(String webmethodName, ISummaryMessage inputMessage, Exception ex) {
+        String msg = String.format("%s#%s", webmethodName, inputMessage.getSummaryMessage());
+        Log.error(LOG, msg, ex);
     }
 }

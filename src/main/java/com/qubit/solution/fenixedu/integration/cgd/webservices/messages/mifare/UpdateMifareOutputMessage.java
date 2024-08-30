@@ -33,10 +33,11 @@ import org.joda.time.LocalDate;
 
 import com.qubit.solution.fenixedu.integration.cgd.domain.idcards.CgdCard;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
+import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.ISummaryMessage;
 
 import pt.ist.fenixframework.Atomic;
 
-public class UpdateMifareOutputMessage implements Serializable {
+public class UpdateMifareOutputMessage implements Serializable, ISummaryMessage {
 
     private int replyCode;
 
@@ -73,6 +74,11 @@ public class UpdateMifareOutputMessage implements Serializable {
         card.setIssueDate(issueDate);
         card.setTemporary(false);
         card.setCardNumber(cardId);
+    }
+
+    @Override
+    public String getSummaryMessage() {
+        return String.valueOf(replyCode);
     }
 
 }
