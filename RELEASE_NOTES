@@ -1,4 +1,4 @@
-- Bug Fix: FENIX-15818 - Support student numbers with 6 digits
+- Bug Fix: Support student numbers with 6 digits [FENIX-15818]
 
 2.12.2 (28-08-2024)
 - Refactor:  Support to  multiple active calendars [#UL-FC-5116]
