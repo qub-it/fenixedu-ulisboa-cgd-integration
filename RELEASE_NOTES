@@ -1,3 +1,4 @@
+- Improvement: Add support to setup credentials in CgdStudentPhotoClient constructor [FENIX-15817]
 - Bug Fix: CgdIntegrationService - NumberFormatException when student number not a number. (FENIX-15402) [ISCTE-FENIXEDU-637]
 
 2.12.2 (28-08-2024)
