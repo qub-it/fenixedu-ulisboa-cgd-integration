@@ -30,6 +30,14 @@ public class CgdStudentPhotoClient extends BennuWebServiceClient<IStudentPhotoSe
     public static final String EMPLOYEE_IDENTIFICATION_CODE = "71";
     public static final String TEACHER_IDENTIFICATION_CODE = "81";
 
+    public CgdStudentPhotoClient() {
+        super();
+    }
+
+    public CgdStudentPhotoClient(String username, String password) {
+        super(username, password);
+    }
+
     @Override
     protected BindingProvider getService() {
         return (BindingProvider) new StudentPhotoService().getBasicHttpBindingPhotoStudentService();

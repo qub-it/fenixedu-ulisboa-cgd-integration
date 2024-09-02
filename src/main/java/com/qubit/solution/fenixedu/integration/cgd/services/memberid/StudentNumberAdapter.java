@@ -28,10 +28,14 @@ package com.qubit.solution.fenixedu.integration.cgd.services.memberid;
 
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.student.Student;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
 
 public class StudentNumberAdapter implements IMemberIDAdapter {
+
+    private static Logger logger = LoggerFactory.getLogger(StudentNumberAdapter.class);
 
     @Override
     public String retrieveMemberID(Person person) {
@@ -41,8 +45,13 @@ public class StudentNumberAdapter implements IMemberIDAdapter {
 
     @Override
     public Person readPerson(String memberID) {
-        Student readStudentByNumber = Student.readStudentByNumber(Integer.valueOf(memberID));
-        return readStudentByNumber != null ? readStudentByNumber.getPerson() : null;
+        try {
+            Student readStudentByNumber = Student.readStudentByNumber(Integer.valueOf(memberID));
+            return readStudentByNumber != null ? readStudentByNumber.getPerson() : null;
+        } catch (NumberFormatException ex) {
+            logger.error(String.format("Invalid student number: %s", memberID), ex);
+            return null;
+        }
     }
 
 }
