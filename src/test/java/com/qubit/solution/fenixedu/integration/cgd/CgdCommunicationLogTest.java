@@ -154,7 +154,7 @@ public class CgdCommunicationLogTest {
         IngressionType ingressionType = IngressionType.createIngressionType("INGRESSION_TYPE",
                 new LocalizedString().with(LocaleUtils.EN, "Ingression Type"));
         RegistrationStateType.create(RegistrationStateType.REGISTERED_CODE,
-                new LocalizedString().with(LocaleUtils.EN, "Registration State Type"), false, null);
+                new LocalizedString().with(LocaleUtils.EN, "Registration State Type"), false);
         Registration registration = Registration.create(student, dcp, executionYear, registrationProtocol, ingressionType);
         return registration;
     }
