@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.ExecutionIntervalTest;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.curriculum.grade.GradeScale;
@@ -27,20 +28,15 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationProtocol;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.student.registrationStates.RegistrationStateType;
-import org.fenixedu.academic.domain.time.calendarStructure.AcademicCalendarRootEntry;
-import org.fenixedu.academic.domain.time.calendarStructure.AcademicIntervalCE;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicPeriod;
-import org.fenixedu.academic.domain.time.calendarStructure.AcademicYearCE;
 import org.fenixedu.academic.dto.person.PersonBean;
 import org.fenixedu.academic.util.LocaleUtils;
-import org.fenixedu.academic.util.PeriodState;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -68,7 +64,7 @@ public class CgdCommunicationLogTest {
     public void setupTest() {
         FenixFramework.getTransactionManager().withTransaction(() -> {
             Bennu.getInstance();
-            initRootCalendarAndExecutionYears();
+            ExecutionIntervalTest.initRootCalendarAndExecutionYears();
             createUnitsAndPartyTypes();
             AcademicTreasuryPlataformDependentServicesFactory
                     .registerImplementation(new AcademicTreasuryPlatformDependentServicesForTests());
@@ -133,7 +129,7 @@ public class CgdCommunicationLogTest {
     }
 
     private Registration createTestRegistration() {
-        Student student = Student.createStudentWithCustomNumber(person, 0);
+        Student student = new Student(person);
         ExecutionYear executionYear = ExecutionYear.findCurrents().iterator().next();
         Degree degree =
                 new Degree("Degree", "Degree", "D", new DegreeType(new LocalizedString().with(LocaleUtils.EN, "Degree Type")),
@@ -171,94 +167,4 @@ public class CgdCommunicationLogTest {
         Bennu.getInstance().setInstitutionUnit(institutionUnit);
     }
 
-    private void initRootCalendarAndExecutionYears() {
-        if (Bennu.getInstance().getDefaultAcademicCalendar() != null) {// if initialization was already executed
-            return;
-        }
-
-        AcademicCalendarRootEntry rootEntry =
-                new AcademicCalendarRootEntry(new LocalizedString().with(Locale.getDefault(), "Root entry"), null);
-        Bennu.getInstance().setDefaultAcademicCalendar(rootEntry);
-
-        final int year = 2020;
-
-        AcademicYearCE academicYearEntryFirst = createStandardYearInterval(rootEntry, year - 1);
-        AcademicYearCE academicYearEntrySecond = createStandardYearInterval(rootEntry, year);
-        AcademicYearCE academicYearEntryThird = createStandardYearInterval(rootEntry, year + 1);
-        AcademicYearCE academicYearEntryFourth = createStandardYearInterval(rootEntry, year + 2);
-
-        academicYearEntrySecond.getExecutionInterval().setState(PeriodState.CURRENT);
-
-        createFirstSemesterInterval(academicYearEntryFirst);
-        createSecondSemesterInterval(academicYearEntryFirst);
-
-        createFirstSemesterInterval(academicYearEntrySecond).getExecutionInterval().setState(PeriodState.CURRENT);
-        createSecondSemesterInterval(academicYearEntrySecond);
-
-        createFirstSemesterInterval(academicYearEntryThird);
-        createSecondSemesterInterval(academicYearEntryThird);
-
-        createFirstSemesterInterval(academicYearEntryFourth);
-        createSecondSemesterInterval(academicYearEntryFourth);
-
-        AcademicCalendarRootEntry civilCalendar =
-                new AcademicCalendarRootEntry(new LocalizedString().with(Locale.getDefault(), "Civil Calendar"), null);
-
-        createCivilYearIntervalAndMonths(civilCalendar, year - 1);
-        createCivilYearIntervalAndMonths(civilCalendar, year);
-        createCivilYearIntervalAndMonths(civilCalendar, year + 1);
-        createCivilYearIntervalAndMonths(civilCalendar, year + 2);
-
-    }
-
-    private static AcademicYearCE createStandardYearInterval(final AcademicCalendarRootEntry calendar, final int year) {
-        return createYearInterval(calendar, year + "/" + (year + 1), new LocalDate(year, 9, 1), new LocalDate(year + 1, 8, 30));
-    }
-
-    private static AcademicYearCE createYearInterval(AcademicCalendarRootEntry calendar, String name, LocalDate startDate,
-            LocalDate endDate) {
-        return new AcademicYearCE(calendar, new LocalizedString().with(Locale.getDefault(), name), null,
-                startDate.toDateTimeAtStartOfDay(), endDate.toDateTimeAtStartOfDay(), calendar);
-    }
-
-    private static AcademicIntervalCE createFirstSemesterInterval(AcademicYearCE academicYearEntry) {
-        final int year = academicYearEntry.getBegin().getYear();
-        final AcademicIntervalCE firstSemesterEntry = new AcademicIntervalCE(AcademicPeriod.SEMESTER, academicYearEntry,
-                new LocalizedString().with(Locale.getDefault(), "1st Semester"), null, new DateTime(year, 9, 1, 0, 0, 0),
-                new DateTime(year + 1, 1, 31, 23, 59, 59), academicYearEntry.getRootEntry());
-
-        firstSemesterEntry.getExecutionInterval().setState(PeriodState.OPEN);
-        return firstSemesterEntry;
-    }
-
-    private static AcademicIntervalCE createSecondSemesterInterval(AcademicYearCE calendar) {
-        final int year = calendar.getBegin().getYear();
-        final AcademicIntervalCE secondSemesterEntry = new AcademicIntervalCE(AcademicPeriod.SEMESTER, calendar,
-                new LocalizedString().with(Locale.getDefault(), "2nd Semester"), null, new DateTime(year + 1, 2, 1, 0, 0, 0),
-                new DateTime(year + 1, 8, 31, 23, 59, 59), calendar.getRootEntry());
-        secondSemesterEntry.getExecutionInterval().setState(PeriodState.OPEN);
-        return secondSemesterEntry;
-    }
-
-    private static AcademicYearCE createCivilYearIntervalAndMonths(AcademicCalendarRootEntry calendar, final int year) {
-        final AcademicYearCE yearEntry = createCivilYearInterval(calendar, year);
-        for (int i = 1; i <= 12; i++) {
-            createMonthInterval(yearEntry, i);
-        }
-
-        return yearEntry;
-    }
-
-    private static AcademicYearCE createCivilYearInterval(AcademicCalendarRootEntry calendar, final int year) {
-        return createYearInterval(calendar, String.valueOf(year), new LocalDate(year, 1, 1), new LocalDate(year, 12, 31));
-    }
-
-    private static AcademicIntervalCE createMonthInterval(AcademicYearCE academicYearEntry, int month) {
-        final int year = academicYearEntry.getBegin().getYear();
-        final AcademicIntervalCE monthEntry = new AcademicIntervalCE(AcademicPeriod.MONTH, academicYearEntry,
-                new LocalizedString().with(Locale.getDefault(), "Month " + month), null, new DateTime(year, month, 1, 0, 0, 0),
-                new DateTime(year, month, YearMonth.of(year, month).lengthOfMonth(), 0, 0, 0), academicYearEntry.getRootEntry());
-        monthEntry.getExecutionInterval().setState(PeriodState.OPEN);
-        return monthEntry;
-    }
 }
