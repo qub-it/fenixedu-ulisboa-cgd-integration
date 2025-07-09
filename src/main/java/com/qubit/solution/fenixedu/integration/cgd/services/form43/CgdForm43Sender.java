@@ -43,13 +43,13 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.datacontract.schemas._2004._07.wingman_cgd_caixaiu_datacontract.School;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.ProfessionalSituationConditionType;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.person.Gender;
 import org.fenixedu.academic.domain.person.IDDocumentType;
 import org.fenixedu.academic.domain.student.PersonalIngressionData;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.student.personaldata.ProfessionalStatusType;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicCalendarRootEntry;
 import org.fenixedu.academicextensions.domain.person.dataShare.DataShareAuthorization;
 import org.fenixedu.academicextensions.domain.person.dataShare.DataShareAuthorizationType;
@@ -91,6 +91,18 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
     // 
     // 27 August 2020 - Paulo Abrantes
     private static final String UPLOAD_FORM_ATTACHMENT_NAME = "Address.pdf";
+
+    private static final String UNKNOWN = "UNKNOWN";
+    private static final String WORKS_FOR_OTHERS = "WORKS_FOR_OTHERS";
+    private static final String EMPLOYEER = "EMPLOYEER";
+    private static final String INDEPENDENT_WORKER = "INDEPENDENT_WORKER";
+    private static final String WORKS_FOR_FAMILY_WITHOUT_PAYMENT = "WORKS_FOR_FAMILY_WITHOUT_PAYMENT";
+    private static final String RETIRED = "RETIRED";
+    private static final String UNEMPLOYED = "UNEMPLOYED";
+    private static final String HOUSEWIFE = "HOUSEWIFE";
+    private static final String STUDENT = "STUDENT";
+    private static final String MILITARY_SERVICE = "MILITARY_SERVICE";
+    private static final String OTHER = "OTHER";
 
     @Override
     protected BindingProvider getService() {
@@ -304,7 +316,7 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
             if (personalIngressionDataByExecutionYear != null) {
                 // should we also skip this?
                 worker.setSituationCode(objectFactory.createWorkerSituationCode(
-                        getCodeForProfessionalCondition(personalIngressionDataByExecutionYear.getProfessionalCondition())));
+                        getCodeForProfessionalStatusType(personalIngressionDataByExecutionYear.getProfessionalStatusType())));
                 // Skipping employeer
                 // Skpping situationCode
                 // Skipping fiscal country code
@@ -317,11 +329,14 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         return worker;
     }
 
-    private static String getCodeForProfessionalCondition(ProfessionalSituationConditionType professionalCondition) {
-        if (professionalCondition == null) {
-            professionalCondition = ProfessionalSituationConditionType.UNKNOWN;
+    private static String getCodeForProfessionalStatusType(ProfessionalStatusType professionalStatusType) {
+        if (professionalStatusType == null) {
+            professionalStatusType = ProfessionalStatusType.findByCode(UNKNOWN).orElseThrow(() -> new IllegalArgumentException(
+                    BundleUtil.getString(BUNDLE_CGDINTEGRATION, "label.form43.sendForm43.professionalStatusTypeDoesNotExist",
+                            UNKNOWN)));
         }
-        switch (professionalCondition) {
+
+        switch (professionalStatusType.getCode()) {
         case WORKS_FOR_OTHERS:
             return "1";
         case EMPLOYEER:
