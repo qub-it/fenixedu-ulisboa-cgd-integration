@@ -96,12 +96,6 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
     private static final String WORKS_FOR_OTHERS = "WORKS_FOR_OTHERS";
     private static final String EMPLOYEER = "EMPLOYEER";
     private static final String INDEPENDENT_WORKER = "INDEPENDENT_WORKER";
-    private static final String WORKS_FOR_FAMILY_WITHOUT_PAYMENT = "WORKS_FOR_FAMILY_WITHOUT_PAYMENT";
-    private static final String RETIRED = "RETIRED";
-    private static final String UNEMPLOYED = "UNEMPLOYED";
-    private static final String HOUSEWIFE = "HOUSEWIFE";
-    private static final String STUDENT = "STUDENT";
-    private static final String MILITARY_SERVICE = "MILITARY_SERVICE";
     private static final String OTHER = "OTHER";
 
     @Override
@@ -330,26 +324,14 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
     }
 
     private static String getCodeForProfessionalStatusType(ProfessionalStatusType professionalStatusType) {
-        if (professionalStatusType == null) {
-            professionalStatusType = ProfessionalStatusType.findByCode(UNKNOWN).orElseThrow(() -> new IllegalArgumentException(
-                    BundleUtil.getString(BUNDLE_CGDINTEGRATION, "label.form43.sendForm43.professionalStatusTypeDoesNotExist",
-                            UNKNOWN)));
-        }
+        String code = professionalStatusType != null ? professionalStatusType.getCode() : ProfessionalStatusType.UNKNOWN;
 
-        switch (professionalStatusType.getCode()) {
+        switch (code) {
         case WORKS_FOR_OTHERS:
             return "1";
         case EMPLOYEER:
         case INDEPENDENT_WORKER:
             return "2";
-        case WORKS_FOR_FAMILY_WITHOUT_PAYMENT:
-        case RETIRED:
-        case UNEMPLOYED:
-        case HOUSEWIFE:
-        case STUDENT:
-        case MILITARY_SERVICE:
-        case OTHER:
-        case UNKNOWN:
         default:
             return "3";
         }
