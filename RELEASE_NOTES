@@ -1,3 +1,5 @@
+- Refactor: Use static RAIDES code constants [#qubIT-Fenix-7009]
+
 2.12.7 (22-08-2025)
 - Bug fix: Ensuring that field PersonData.place only takes up to 30 characteres which seems to be the limit in CGD [#ISCTE-FENIXEDU-1204]
 
