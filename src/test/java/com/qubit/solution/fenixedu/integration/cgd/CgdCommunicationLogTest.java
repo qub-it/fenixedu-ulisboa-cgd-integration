@@ -31,7 +31,6 @@ import org.fenixedu.academic.domain.student.registrationStates.RegistrationState
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicPeriod;
 import org.fenixedu.academic.dto.person.PersonBean;
 import org.fenixedu.academic.util.LocaleUtils;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.bennu.core.domain.User;
 import org.fenixedu.bennu.core.domain.UserProfile;
@@ -66,8 +65,6 @@ public class CgdCommunicationLogTest {
             Bennu.getInstance();
             ExecutionIntervalTest.initRootCalendarAndExecutionYears();
             createUnitsAndPartyTypes();
-            AcademicTreasuryPlataformDependentServicesFactory
-                    .registerImplementation(new AcademicTreasuryPlatformDependentServicesForTests());
             CgdIntegrationConfiguration instance = CgdIntegrationConfiguration.getInstance();
             instance.setMemberIDResolverClass(StudentNumberAdapter.class.getName());
             IdDocumentTypeObject idDocumentTypeObject = IdDocumentTypeObject.create(IDDocumentType.IDENTITY_CARD);
