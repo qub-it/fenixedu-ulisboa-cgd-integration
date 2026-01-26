@@ -1,17 +1,17 @@
 package com.qubit.solution.fenixedu.integration.cgd;
 
+import static org.fenixedu.academic.domain.person.identificationDocument.IdentificationDocumentTypeTest.createIdentificationDocumentTypes;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
-import java.time.YearMonth;
 import java.util.Locale;
 import java.util.Optional;
 
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
-import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.ExecutionIntervalTest;
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.curriculum.grade.GradeScale;
@@ -69,6 +69,7 @@ public class CgdCommunicationLogTest {
             instance.setMemberIDResolverClass(StudentNumberAdapter.class.getName());
             IdDocumentTypeObject idDocumentTypeObject = IdDocumentTypeObject.create(IDDocumentType.IDENTITY_CARD);
             IdDocumentTypeObject.create(IDDocumentType.CITIZEN_CARD);
+            createIdentificationDocumentTypes();
             PersonBean personBean = new PersonBean();
             personBean.setUsername("usernametest");
             personBean.setName("User for Test");
