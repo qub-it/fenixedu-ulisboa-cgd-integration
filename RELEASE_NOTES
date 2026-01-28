@@ -1,3 +1,4 @@
+- Refactor: Initialize identification document types in tests [#qubIT-Fenix-6491]
 - Refactor: Remove references of AcademicTreasuryPlataformDependentServicesFactory [#qubIT-Fenix-6593]
 
 2.12.8 (24-09-2025)
