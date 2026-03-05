@@ -21,9 +21,8 @@ import org.fenixedu.academic.domain.organizationalStructure.AccountabilityType;
 import org.fenixedu.academic.domain.organizationalStructure.PartyType;
 import org.fenixedu.academic.domain.organizationalStructure.PartyTypeEnum;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
-import org.fenixedu.academic.domain.person.IDDocumentType;
-import org.fenixedu.academic.domain.person.IdDocument;
-import org.fenixedu.academic.domain.person.IdDocumentTypeObject;
+import org.fenixedu.academic.domain.person.identificationDocument.IdentificationDocument;
+import org.fenixedu.academic.domain.person.identificationDocument.IdentificationDocumentType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationProtocol;
 import org.fenixedu.academic.domain.student.Student;
@@ -62,21 +61,29 @@ public class CgdCommunicationLogTest {
 
     public void setupTest() {
         FenixFramework.getTransactionManager().withTransaction(() -> {
+
             Bennu.getInstance();
             ExecutionIntervalTest.initRootCalendarAndExecutionYears();
             createUnitsAndPartyTypes();
+
             CgdIntegrationConfiguration instance = CgdIntegrationConfiguration.getInstance();
             instance.setMemberIDResolverClass(StudentNumberAdapter.class.getName());
-            IdDocumentTypeObject idDocumentTypeObject = IdDocumentTypeObject.create(IDDocumentType.IDENTITY_CARD);
-            IdDocumentTypeObject.create(IDDocumentType.CITIZEN_CARD);
+
             createIdentificationDocumentTypes();
+
+            IdentificationDocumentType type =
+                    IdentificationDocumentType.findByCode(IdentificationDocumentType.IDENTITY_CARD_CODE).orElseThrow();
+
             PersonBean personBean = new PersonBean();
             personBean.setUsername("usernametest");
             personBean.setName("User for Test");
-            personBean.setIdDocumentType(IDDocumentType.IDENTITY_CARD);
+            personBean.setIdentificationDocumentType(type);
             personBean.setDocumentIdNumber(DOCUMENT_NUMBER);
+
             person = new Person(personBean);
-            new IdDocument(person, DOCUMENT_NUMBER, idDocumentTypeObject);
+
+            IdentificationDocument.create(person, DOCUMENT_NUMBER, type);
+
             return null;
         });
     }

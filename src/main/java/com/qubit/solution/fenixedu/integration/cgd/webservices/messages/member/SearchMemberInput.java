@@ -27,13 +27,12 @@
 package com.qubit.solution.fenixedu.integration.cgd.webservices.messages.member;
 
 import java.io.Serializable;
-import java.util.Collection;
 
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.FenixEduAcademicConfiguration;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
-import org.fenixedu.academic.domain.person.IDDocumentType;
+import org.fenixedu.academic.domain.person.identificationDocument.IdentificationDocumentType;
 
 import com.qubit.solution.fenixedu.integration.cgd.domain.configuration.CgdIntegrationConfiguration;
 import com.qubit.solution.fenixedu.integration.cgd.webservices.messages.CgdMessageUtils;
@@ -130,19 +129,26 @@ public class SearchMemberInput implements Serializable {
 
         if (requestedPerson == null) {
             if (documentType != null && documentType == IDCARD_TYPE) {
-                requestedPerson = Person.readByDocumentIdNumberAndIdDocumentType(getDocumentID(), IDDocumentType.CITIZEN_CARD);
-                if (requestedPerson == null) {
-                    requestedPerson =
-                            Person.readByDocumentIdNumberAndIdDocumentType(getDocumentID(), IDDocumentType.IDENTITY_CARD);
-                }
-                if (requestedPerson == null) {
-                    Collection<Person> people = Person.readByDocumentIdNumber(getDocumentID());
-                    requestedPerson = people.isEmpty() ? null : people.iterator().next();
 
+                requestedPerson = Person.findByDocumentIdentification(getDocumentID(),
+                                IdentificationDocumentType.findByCode(IdentificationDocumentType.CITIZEN_CARD_CODE).orElse(null))
+                        .orElse(null);
+
+                if (requestedPerson == null) {
+                    requestedPerson = Person.findByDocumentIdentification(getDocumentID(),
+                                    IdentificationDocumentType.findByCode(IdentificationDocumentType.IDENTITY_CARD_CODE).orElse(null))
+                            .orElse(null);
                 }
+
+                if (requestedPerson == null) {
+                    requestedPerson = Person.findByDocumentIdentification(getDocumentID()).findFirst().orElse(null);
+                }
+
             } else if (documentType != null && documentType == TAXNUMBER_TYPE) {
+
                 String defaultSocialSecurityNumber =
                         FenixEduAcademicConfiguration.getConfiguration().getDefaultSocialSecurityNumber();
+
                 if (defaultSocialSecurityNumber == null || !defaultSocialSecurityNumber.equals(documentID)) {
                     Party party = Person.readByContributorNumber(documentID);
                     requestedPerson = (party instanceof Person) ? (Person) party : null;

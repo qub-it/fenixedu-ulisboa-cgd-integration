@@ -46,7 +46,7 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.person.Gender;
-import org.fenixedu.academic.domain.person.IDDocumentType;
+import org.fenixedu.academic.domain.person.identificationDocument.IdentificationDocumentType;
 import org.fenixedu.academic.domain.student.PersonalIngressionData;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.personaldata.ProfessionalStatusType;
@@ -468,11 +468,12 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         IdentificationCard card = new IdentificationCard();
 
         // skipping issuer
-        String codeForDocumentType = getCodeForDocumentType(person.getIdDocumentType());
+        String codeForDocumentType =
+                getCodeForDocumentType(person.getDefaultIdentificationDocument().getIdentificationDocumentType());
         if (codeForDocumentType != null) {
             card.setTypeCode(objectFactory.createIdentificationCardTypeCode(codeForDocumentType));
         }
-        card.setNumber(person.getDocumentIdNumber());
+        card.setNumber(person.getDefaultIdentificationDocument().getValue());
         // skipping issuer country code
         executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_ID_CARD_EXPIRATION_DATE, () -> {
             try {
@@ -516,34 +517,42 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         return result;
     }
 
-    private static String getCodeForDocumentType(IDDocumentType idDocumentType) {
-        if (idDocumentType != null) {
-            switch (idDocumentType) {
-            case IDENTITY_CARD:
-                return "101";
-            case PASSPORT:
-                return "302";
-            case FOREIGNER_IDENTITY_CARD:
-                return "301";
-            case NATIVE_COUNTRY_IDENTITY_CARD:
-                return "301";
-            case NAVY_IDENTITY_CARD:
-                return "203";
-            case AIR_FORCE_IDENTITY_CARD:
-                return "202";
-            case OTHER:
-                return null;
-            case MILITARY_IDENTITY_CARD:
-                return "201";
-            case EXTERNAL:
-                return null;
-            case CITIZEN_CARD:
-                return "801";
-            case RESIDENCE_AUTHORIZATION:
-                return "102";
-            }
+    private static String getCodeForDocumentType(IdentificationDocumentType type) {
+
+        if (type == null) {
+            return null;
         }
-        return null;
+
+        switch (type.getCode()) {
+
+        case IdentificationDocumentType.IDENTITY_CARD_CODE:
+            return "101";
+
+        case IdentificationDocumentType.PASSPORT_CODE:
+            return "302";
+
+        case IdentificationDocumentType.FOREIGNER_IDENTITY_CARD_CODE:
+        case IdentificationDocumentType.NATIVE_COUNTRY_IDENTITY_CARD_CODE:
+            return "301";
+
+        case IdentificationDocumentType.NAVY_IDENTITY_CARD_CODE:
+            return "203";
+
+        case IdentificationDocumentType.AIR_FORCE_IDENTITY_CARD_CODE:
+            return "202";
+
+        case IdentificationDocumentType.MILITARY_IDENTITY_CARD_CODE:
+            return "201";
+
+        case IdentificationDocumentType.CITIZEN_CARD_CODE:
+            return "801";
+
+        case IdentificationDocumentType.RESIDENCE_AUTHORIZATION_CODE:
+            return "102";
+
+        default:
+            return null;
+        }
     }
 
     private static String getCodeForGender(Gender gender) {

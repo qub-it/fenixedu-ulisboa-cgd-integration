@@ -70,7 +70,7 @@ public class CgdStudentPhotoClient extends BennuWebServiceClient<IStudentPhotoSe
         }
 
         private Optional<Person> getPersonFromDocumentId() {
-            Collection<Person> persons = Person.findPersonByDocumentID(this.memberNumber);
+            Collection<Person> persons = Person.findByDocumentIdentification(this.memberNumber).toList();
             if (persons.isEmpty()) {
                 return Optional.empty();
             } else if (persons.size() > 1) {
