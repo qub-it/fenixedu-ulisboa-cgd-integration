@@ -26,16 +26,13 @@
  */
 package com.qubit.solution.fenixedu.integration.cgd.services.memberid;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.person.IDDocumentType;
-import org.fenixedu.academic.domain.person.IdDocument;
-import org.fenixedu.academic.domain.person.IdDocumentTypeObject;
-import org.fenixedu.bennu.core.domain.Bennu;
+import org.fenixedu.academic.domain.person.identificationDocument.IdentificationDocument;
+import org.fenixedu.academic.domain.person.identificationDocument.IdentificationDocumentType;
 
 import com.qubit.solution.fenixedu.integration.cgd.webservices.resolver.memberid.IMemberIDAdapter;
 
@@ -43,16 +40,18 @@ public class IDcardAdapter implements IMemberIDAdapter {
 
     @Override
     public String retrieveMemberID(Person person) {
-        IdDocument doc = person.getIdDocumentsSet().stream()
-                .filter(document -> document.getIdDocumentType().getValue() == IDDocumentType.IDENTITY_CARD).findFirst()
+        IdentificationDocument doc = person.getIdentificationDocumentsSet().stream()
+                .filter(document -> document.getIdentificationDocumentType().getCode()
+                        .equals(IdentificationDocumentType.IDENTITY_CARD_CODE)).findFirst()
                 .orElse(null);
-        return doc != null ? doc.getValue() : person.getDocumentIdNumber();
+        return doc != null ? doc.getValue() : person.getDefaultIdentificationDocument().getValue();
 
     }
 
     @Override
     public Person readPerson(String memberID) {
-        Person person = find(memberID, IDDocumentType.IDENTITY_CARD);
+        Person person =
+                find(memberID, IdentificationDocumentType.findByCode(IdentificationDocumentType.IDENTITY_CARD_CODE).orElse(null));
         if (person == null) {
             Collection<Person> people = find(memberID);
             person = people.isEmpty() ? null : people.iterator().next();
@@ -67,24 +66,13 @@ public class IDcardAdapter implements IMemberIDAdapter {
     private Collection<Person> find(String idDocumentValue) {
         idDocumentValue = normalizeMemberID(idDocumentValue);
 
-        final Collection<IdDocument> idDocuments = new ArrayList<IdDocument>();
-        for (final IdDocument idDocument : Bennu.getInstance().getIdDocumentsSet()) {
-            if (normalizeMemberID(idDocument.getValue()).equalsIgnoreCase(idDocumentValue)) {
-                idDocuments.add(idDocument);
-            }
-        }
-        return idDocuments.stream().map(doc -> doc.getPerson()).collect(Collectors.toSet());
+        return Person.findByDocumentIdentification(idDocumentValue).collect(Collectors.toSet());
     }
 
-    private Person find(String idDocumentValue, final IDDocumentType documentType) {
+    private Person find(String idDocumentValue, final IdentificationDocumentType documentType) {
         idDocumentValue = normalizeMemberID(idDocumentValue);
-        final IdDocumentTypeObject typeObject = IdDocumentTypeObject.readByIDDocumentType(documentType);
-        for (final IdDocument idDocument : typeObject.getIdDocumentsSet()) {
-            if (normalizeMemberID(idDocument.getValue()).equalsIgnoreCase(idDocumentValue)) {
-                return idDocument.getPerson();
-            }
-        }
-        return null;
+
+        return Person.findByDocumentIdentification(idDocumentValue, documentType).orElse(null);
     }
 
     // According to the CGD specification for the memberID field when the value is numeric leading zeros 
