@@ -120,7 +120,7 @@ public class CGDPdfFiller {
         setField("fill_12", person.getFiscalCountry().getName());
         setField("NIF", person.getSocialSecurityNumber());
 
-        setField("fill_20", person.getDocumentIdNumber());
+        setField("fill_20", person.getDefaultIdentificationDocument().getValue());
 
         switch (person.getMaritalStatus()) {
         case CIVIL_UNION:
@@ -204,7 +204,7 @@ public class CGDPdfFiller {
 
         setField("N aluno", "" + person.getStudent().getNumber());
 
-        setField("undefined_6", person.getDocumentIdNumber());
+        setField("undefined_6", person.getDefaultIdentificationDocument().getValue());
         setField("fill_2", person.getName());
 
         stamper.setFormFlattening(true);
