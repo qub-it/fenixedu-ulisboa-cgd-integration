@@ -16,7 +16,7 @@ import org.fenixedu.academic.domain.contacts.PartyContactType;
 import org.fenixedu.academic.domain.contacts.Phone;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.bennu.core.domain.Bennu;
-import org.joda.time.YearMonthDay;
+import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 
 import com.lowagie.text.DocumentException;
@@ -143,7 +143,7 @@ public class CGDPdfFiller {
             break;
         }
 
-        YearMonthDay expirationDate = person.getExpirationDateOfDocumentIdYearMonthDay();
+        LocalDate expirationDate = person.getDefaultIdentificationDocument().getExpirationDate();
         if (expirationDate != null) {
             setField("Válido até", expirationDate.toString(DateTimeFormat.forPattern("yyyy/MM/dd")));
         }

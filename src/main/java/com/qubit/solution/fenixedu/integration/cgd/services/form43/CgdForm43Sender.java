@@ -56,6 +56,7 @@ import org.fenixedu.academicextensions.domain.person.dataShare.DataShareAuthoriz
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.bennu.core.security.Authenticate;
+import org.joda.time.LocalDate;
 import org.joda.time.YearMonthDay;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -477,11 +478,11 @@ public class CgdForm43Sender extends BennuWebServiceClient<IIESService> {
         // skipping issuer country code
         executeIfAllowed(person, CgdAuthorizationCodes.EXTENDED_INFO_ID_CARD_EXPIRATION_DATE, () -> {
             try {
-                YearMonthDay expirationDateOfDocumentIdYearMonthDay = person.getExpirationDateOfDocumentIdYearMonthDay();
-                if (expirationDateOfDocumentIdYearMonthDay != null) {
+                LocalDate expirationDate = person.getDefaultIdentificationDocument().getExpirationDate();
+                if (expirationDate != null) {
                     card.setExpirationDate(objectFactory
                             .createIdentificationCardExpirationDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(
-                                    expirationDateOfDocumentIdYearMonthDay.toDateTimeAtMidnight().toGregorianCalendar())));
+                                    expirationDate.toDateTimeAtStartOfDay().toGregorianCalendar())));
                 }
             } catch (DatatypeConfigurationException e) {
                 // TODO Auto-generated catch block
