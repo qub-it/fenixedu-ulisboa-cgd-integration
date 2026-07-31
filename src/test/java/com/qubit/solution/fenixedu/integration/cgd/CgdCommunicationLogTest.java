@@ -16,7 +16,6 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.curriculum.grade.GradeScale;
 import org.fenixedu.academic.domain.degree.DegreeType;
-import org.fenixedu.academic.domain.degreeStructure.CurricularStage;
 import org.fenixedu.academic.domain.organizationalStructure.AccountabilityType;
 import org.fenixedu.academic.domain.organizationalStructure.PartyType;
 import org.fenixedu.academic.domain.organizationalStructure.PartyTypeEnum;
@@ -148,7 +147,6 @@ public class CgdCommunicationLogTest {
         new User("admin", userProfile);
         DegreeCurricularPlan dcp =
                 degree.createDegreeCurricularPlan("Test Degree", new Person(userProfile), AcademicPeriod.FIVE_YEAR);
-        dcp.setCurricularStage(CurricularStage.APPROVED);
         dcp.createExecutionDegree(executionYear);
         RegistrationProtocol registrationProtocol = RegistrationProtocol.create("REGISTRATION_PROTOCOL_CODE",
                 new LocalizedString().with(LocaleUtils.EN, "Registration Protocol"));
