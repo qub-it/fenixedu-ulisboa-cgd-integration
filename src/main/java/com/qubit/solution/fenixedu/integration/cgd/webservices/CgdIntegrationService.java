@@ -26,8 +26,9 @@
  */
 package com.qubit.solution.fenixedu.integration.cgd.webservices;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import jakarta.jws.HandlerChain;
+import jakarta.jws.WebMethod;
+import jakarta.jws.WebService;
 
 import org.fenixedu.academic.domain.Person;
 import org.joda.time.LocalDate;
